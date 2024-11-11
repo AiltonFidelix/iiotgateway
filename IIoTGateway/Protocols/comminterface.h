@@ -7,10 +7,10 @@ class CommInterface : public QObject
 {
     Q_OBJECT
 public:
-    ~CommInterface() = default;
+    virtual ~CommInterface() = default;
 
-    virtual void connect() = 0;
-    virtual void disconnect() = 0;
+    virtual void connectComm() = 0;
+    virtual void disconnectComm() = 0;
     virtual bool isconnected() = 0;
 
 signals:
