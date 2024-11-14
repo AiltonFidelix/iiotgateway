@@ -6,36 +6,36 @@
 
 #include <QModbusClient>
 #include <QModbusDataUnit>
-#include <QModbusRtuSerialClient>
+#include <QModbusClient>
 
 class CommModbus : public CommInterface
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE CommModbus();
+    CommModbus() = default;
     ~CommModbus();
 
-    void connectComm();
+    void connectComm() = 0;
     void disconnectComm();
     bool isconnected();
 
 public slots:
     void incoming(QByteArray data);
 
-private:
+protected:
     QModbusDataUnit readRequest() const;
     QModbusDataUnit writeRequest() const;
 
-private slots:
+protected slots:
     void stateChanged(QModbusDevice::State state);
     void readRegisters();
     void writeRegisters();
     void readReady(QModbusReply *reply);
 
-private:
-    static int m_typeId;
+protected:
+    QModbusClient *m_modbusDevice;
 
-    QModbusRtuSerialClient m_modbusDevice;
+private:
     WriteRegisterModel m_writeModel;
 };
 

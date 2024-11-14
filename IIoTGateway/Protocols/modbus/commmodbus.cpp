@@ -1,77 +1,26 @@
 #include "commmodbus.h"
-#include "commfactory.h"
 
 #include <QTimer>
 
-int CommModbus::m_typeId = CommFactory::registerInterface<CommModbus*>("MODBUS_RTU");
-
-CommModbus::CommModbus()
-{
-    // m_modbusDevice = new QModbusRtuSerialClient(this);
-    m_writeModel.setStartAddress(1);
-    m_writeModel.setNumberOfValues("1");
-
-}
-
 CommModbus::~CommModbus()
 {
-    m_modbusDevice.disconnectDevice();
-}
-
-void
-CommModbus::connectComm()
-{
-    if (m_modbusDevice.state() != QModbusDevice::ConnectedState)
+    if (m_modbusDevice)
     {
-        QVariant port = qgetenv("MODBUS_RTU_PORT");
-        QVariant parity = qgetenv("MODBUS_RTU_PARITY");
-        QVariant baudRate = qgetenv("MODBUS_RTU_BAUDRATE");
-        QVariant dataBits = qgetenv("MODBUS_RTU_DATABITS");
-        QVariant stopBits = qgetenv("MODBUS_RTU_STOPBITS");
-
-        bool ok = false;;
-
-        int timeout = qEnvironmentVariableIntValue("MODBUS_RTU_TIMEOUT", &ok);
-
-        timeout = !ok ? 1000 : timeout;
-
-        int retries = qEnvironmentVariableIntValue("MODBUS_RTU_RETRIES", &ok);
-
-        retries = !ok ? 3 : retries;
-
-        m_modbusDevice.setConnectionParameter(QModbusDevice::SerialPortNameParameter, port);
-        m_modbusDevice.setConnectionParameter(QModbusDevice::SerialParityParameter, parity);
-        m_modbusDevice.setConnectionParameter(QModbusDevice::SerialBaudRateParameter, baudRate);
-        m_modbusDevice.setConnectionParameter(QModbusDevice::SerialDataBitsParameter, dataBits);
-        m_modbusDevice.setConnectionParameter(QModbusDevice::SerialStopBitsParameter, stopBits);
-
-        m_modbusDevice.setTimeout(timeout);
-        m_modbusDevice.setNumberOfRetries(retries);
-
-        connect(&m_modbusDevice, &QModbusClient::stateChanged, this, &CommModbus::stateChanged);
-
-        if (!m_modbusDevice.connectDevice())
-        {
-            emit error(QString("Connect failed: %1").arg(m_modbusDevice.errorString()).toUtf8());
-        }
-        else
-        {
-            QTimer::singleShot(1000, this, &CommModbus::readRegisters);
-            QTimer::singleShot(500, this, &CommModbus::writeRegisters);
-        }
+        m_modbusDevice->disconnectDevice();
+        m_modbusDevice->deleteLater();
     }
 }
 
 void
 CommModbus::disconnectComm()
 {
-    m_modbusDevice.disconnectDevice();
+    m_modbusDevice->disconnectDevice();
 }
 
 bool
 CommModbus::isconnected()
 {
-    return (m_modbusDevice.state() == QModbusDevice::ConnectedState);
+    return (m_modbusDevice->state() == QModbusDevice::ConnectedState);
 }
 
 void
@@ -129,7 +78,7 @@ CommModbus::readRegisters()
 {
     quint8 address = 240;
 
-    if (auto *reply = m_modbusDevice.sendReadRequest(readRequest(), address))
+    if (auto *reply = m_modbusDevice->sendReadRequest(readRequest(), address))
     {
         while (!reply->isFinished());
 
@@ -142,7 +91,7 @@ CommModbus::readRegisters()
     }
     else
     {
-        emit error(QString("Read error: %1").arg(m_modbusDevice.errorString()).toUtf8());
+        emit error(QString("Read error: %1").arg(m_modbusDevice->errorString()).toUtf8());
     }
 }
 
@@ -169,7 +118,7 @@ CommModbus::writeRegisters()
         }
     }
 
-    if (auto *reply = m_modbusDevice.sendWriteRequest(writeUnit, address))
+    if (auto *reply = m_modbusDevice->sendWriteRequest(writeUnit, address))
     {
         if (!reply->isFinished())
         {
@@ -201,7 +150,7 @@ CommModbus::writeRegisters()
     }
     else
     {
-        qDebug() << tr("Write error: ") + m_modbusDevice.errorString();
+        qDebug() << tr("Write error: ") + m_modbusDevice->errorString();
     }
 }
 

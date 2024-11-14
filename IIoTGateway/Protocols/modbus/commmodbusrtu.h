@@ -1,0 +1,21 @@
+#ifndef COMMMODBUSRTU_H
+#define COMMMODBUSRTU_H
+
+#include "commmodbus.h"
+
+#include <QModbusRtuSerialClient>
+
+class CommModbusRTU : public CommModbus
+{
+    Q_OBJECT
+public:
+    Q_INVOKABLE CommModbusRTU();
+    ~CommModbusRTU() = default;
+
+    void connectComm();
+
+private:
+    static int m_typeId;
+};
+
+#endif // COMMMODBUSRTU_H

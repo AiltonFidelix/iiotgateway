@@ -2,12 +2,16 @@ set(HEADERS
     comminterface.h
     commfactory.h
     modbus/commmodbus.h
+    modbus/commmodbusrtu.h
+    modbus/commmodbustcp.h
     modbus/writeregistermodel.h
 )
 
 set(SOURCES
     commfactory.cpp
     modbus/commmodbus.cpp
+    modbus/commmodbusrtu.cpp
+    modbus/commmodbustcp.cpp
     modbus/writeregistermodel.cpp
 )
 
