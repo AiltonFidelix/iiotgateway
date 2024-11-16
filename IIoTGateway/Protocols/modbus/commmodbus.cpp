@@ -7,7 +7,7 @@ CommModbus::~CommModbus()
     if (m_modbusDevice)
     {
         m_modbusDevice->disconnectDevice();
-        m_modbusDevice->deleteLater();
+        delete m_modbusDevice;
     }
 }
 
@@ -80,14 +80,15 @@ CommModbus::readRegisters()
 
     if (auto *reply = m_modbusDevice->sendReadRequest(readRequest(), address))
     {
-        while (!reply->isFinished());
+#warning // TODO: create an event loop
+        // while (!reply->isFinished());
 
-        readReady(reply);
+        // readReady(reply);
 
-        // if (!reply->isFinished())
-        //     connect(reply, &QModbusReply::finished, this, &CommModbus::readReady);
-        // else
-        //     delete reply; // broadcast replies return immediately
+        if (!reply->isFinished())
+            connect(reply, &QModbusReply::finished, this, &CommModbus::readReady);
+        else
+            delete reply; // broadcast replies return immediately
     }
     else
     {
@@ -137,7 +138,7 @@ CommModbus::writeRegisters()
 
                 reply->deleteLater();
 
-                QTimer::singleShot(500, this, &CommModbus::writeRegisters);
+                QTimer::singleShot(5000, this, &CommModbus::writeRegisters);
             });
         }
         else
@@ -145,7 +146,7 @@ CommModbus::writeRegisters()
             // broadcast replies return immediately
             reply->deleteLater();
 
-            QTimer::singleShot(500, this, &CommModbus::writeRegisters);
+            QTimer::singleShot(5000, this, &CommModbus::writeRegisters);
         }
     }
     else
@@ -155,9 +156,9 @@ CommModbus::writeRegisters()
 }
 
 void
-CommModbus::readReady(QModbusReply *reply)
+CommModbus::readReady()
 {
-    // auto reply = qobject_cast<QModbusReply*>(sender());
+    auto reply = qobject_cast<QModbusReply*>(sender());
 
     if (!reply)
     {

@@ -12,6 +12,9 @@ class CommModbus : public CommInterface
 {
     Q_OBJECT
 public:
+    using ReadItems = QHash<quint8, QList<quint16>>;
+    using WriteItems = QHash<quint8, QHash<quint16, quint16>>;
+
     CommModbus() = default;
     ~CommModbus();
 
@@ -30,10 +33,11 @@ protected slots:
     void stateChanged(QModbusDevice::State state);
     void readRegisters();
     void writeRegisters();
-    void readReady(QModbusReply *reply);
+    void readReady();
 
 protected:
     QModbusClient *m_modbusDevice;
+    ReadItems m_readItems;
 
 private:
     WriteRegisterModel m_writeModel;

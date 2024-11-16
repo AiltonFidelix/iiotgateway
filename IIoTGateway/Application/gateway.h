@@ -2,23 +2,27 @@
 #define GATEWAY_H
 
 #include <QObject>
-
-#include "../Protocols/comminterface.h"
+#include <QThread>
 
 class Gateway : public QObject
 {
     Q_OBJECT
 public:
     explicit Gateway(QObject *parent = nullptr);
-    ~Gateway() = default;
+    ~Gateway();
 
+public slots:
     void start();
+    void stop();
 
 signals:
 
 private:
-    CommInterface *m_edge;
-    CommInterface *m_cloud;
+    // CommInterface *m_commEdge;
+    // CommInterface *m_commCloud;
+
+    QThread *m_threadEdge;
+    QThread *m_threadCloud;
 };
 
 #endif // GATEWAY_H

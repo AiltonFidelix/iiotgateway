@@ -3,6 +3,12 @@
 
 #include <QObject>
 
+// #include <QCoreApplication>
+// #include <QtHttpServer/QHttpServer>
+// #include <QtConcurrent/QtConcurrent>
+// #include <QRandomGenerator>
+// #include <QJsonObject>
+
 class ControlServer : public QObject
 {
     Q_OBJECT

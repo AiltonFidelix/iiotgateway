@@ -9,7 +9,7 @@ class CommModbusTCP : public CommModbus
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE CommModbusTCP();
+    Q_INVOKABLE CommModbusTCP() = default;
     ~CommModbusTCP() = default;
 
     void connectComm();

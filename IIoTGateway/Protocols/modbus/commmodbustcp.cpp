@@ -5,14 +5,14 @@
 
 int CommModbusTCP::m_typeId = CommFactory::registerInterface<CommModbusTCP*>("MODBUS_TCP");
 
-CommModbusTCP::CommModbusTCP()
-{
-    m_modbusDevice = new QModbusTcpClient();
-}
-
 void
 CommModbusTCP::connectComm()
 {
+    if (!m_modbusDevice)
+    {
+        m_modbusDevice = new QModbusTcpClient();
+    }
+
     if (m_modbusDevice->state() != QModbusDevice::ConnectedState)
     {
         QVariant port = qgetenv("MODBUS_TCP_PORT");

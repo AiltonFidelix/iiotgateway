@@ -9,7 +9,7 @@ class CommModbusRTU : public CommModbus
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE CommModbusRTU();
+    Q_INVOKABLE CommModbusRTU() = default;
     ~CommModbusRTU() = default;
 
     void connectComm();

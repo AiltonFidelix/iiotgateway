@@ -9,8 +9,6 @@ class CommInterface : public QObject
 public:
     virtual ~CommInterface() = default;
 
-    virtual void connectComm() = 0;
-    virtual void disconnectComm() = 0;
     virtual bool isconnected() = 0;
 
 signals:
@@ -20,6 +18,8 @@ signals:
     void error(QByteArray error);
 
 public slots:
+    virtual void connectComm() = 0;
+    virtual void disconnectComm() = 0;
     virtual void incoming(QByteArray data) = 0;
 };
 

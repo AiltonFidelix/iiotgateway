@@ -5,14 +5,14 @@
 
 int CommModbusRTU::m_typeId = CommFactory::registerInterface<CommModbusRTU*>("MODBUS_RTU");
 
-CommModbusRTU::CommModbusRTU()
-{
-    m_modbusDevice = new QModbusRtuSerialClient();
-}
-
 void
 CommModbusRTU::connectComm()
 {
+    if (!m_modbusDevice)
+    {
+        m_modbusDevice = new QModbusRtuSerialClient();
+    }
+
     if (m_modbusDevice->state() != QModbusDevice::ConnectedState)
     {
         QVariant port = qgetenv("MODBUS_RTU_PORT");
@@ -49,7 +49,7 @@ CommModbusRTU::connectComm()
         else
         {
             QTimer::singleShot(1000, this, &CommModbusRTU::readRegisters);
-            QTimer::singleShot(500, this, &CommModbusRTU::writeRegisters);
+            QTimer::singleShot(5000, this, &CommModbusRTU::writeRegisters);
         }
     }
 }
