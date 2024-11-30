@@ -1,6 +1,8 @@
 set(HEADERS
     comminterface.h
     commfactory.h
+    modbus/modbusclientinterface.h
+    modbus/modbusclientwrapper.h
     modbus/commmodbus.h
     modbus/commmodbusrtu.h
     modbus/commmodbustcp.h
@@ -9,6 +11,7 @@ set(HEADERS
 
 set(SOURCES
     commfactory.cpp
+    modbus/modbusclientwrapper.cpp
     modbus/commmodbus.cpp
     modbus/commmodbusrtu.cpp
     modbus/commmodbustcp.cpp
@@ -24,7 +27,7 @@ set(COMPONENTS
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${COMPONENTS})
 
-add_library(Protocols ${HEADERS} ${SOURCES})
+add_library(Protocols SHARED ${HEADERS} ${SOURCES})
 
 foreach(component IN LISTS COMPONENTS)
     target_link_libraries(Protocols Qt${QT_VERSION_MAJOR}::${component})

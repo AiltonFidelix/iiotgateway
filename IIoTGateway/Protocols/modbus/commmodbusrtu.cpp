@@ -1,4 +1,5 @@
 #include "commmodbusrtu.h"
+#include "modbusclientwrapper.h"
 #include "commfactory.h"
 
 #include <QTimer>
@@ -8,12 +9,16 @@ int CommModbusRTU::m_typeId = CommFactory::registerInterface<CommModbusRTU*>("MO
 void
 CommModbusRTU::connectComm()
 {
-    if (!m_modbusDevice)
+    if (!m_modbusClient)
     {
-        m_modbusDevice = new QModbusRtuSerialClient();
+        ModbusClientWrapper *wrapper = new ModbusClientWrapper();
+        QModbusRtuSerialClient *client = new QModbusRtuSerialClient();
+        wrapper->setModbusClient(client);
+
+        m_modbusClient = static_cast<ModbusClientInterface*>(wrapper);
     }
 
-    if (m_modbusDevice->state() != QModbusDevice::ConnectedState)
+    if (m_modbusClient->state() != QModbusDevice::ConnectedState)
     {
         QVariant port = qgetenv("MODBUS_RTU_PORT");
         QVariant parity = qgetenv("MODBUS_RTU_PARITY");
@@ -31,20 +36,21 @@ CommModbusRTU::connectComm()
 
         retries = !ok ? 3 : retries;
 
-        m_modbusDevice->setConnectionParameter(QModbusDevice::SerialPortNameParameter, port);
-        m_modbusDevice->setConnectionParameter(QModbusDevice::SerialParityParameter, parity);
-        m_modbusDevice->setConnectionParameter(QModbusDevice::SerialBaudRateParameter, baudRate);
-        m_modbusDevice->setConnectionParameter(QModbusDevice::SerialDataBitsParameter, dataBits);
-        m_modbusDevice->setConnectionParameter(QModbusDevice::SerialStopBitsParameter, stopBits);
+        m_modbusClient->setConnectionParameter(QModbusDevice::SerialPortNameParameter, port);
+        m_modbusClient->setConnectionParameter(QModbusDevice::SerialParityParameter, parity);
+        m_modbusClient->setConnectionParameter(QModbusDevice::SerialBaudRateParameter, baudRate);
+        m_modbusClient->setConnectionParameter(QModbusDevice::SerialDataBitsParameter, dataBits);
+        m_modbusClient->setConnectionParameter(QModbusDevice::SerialStopBitsParameter, stopBits);
 
-        m_modbusDevice->setTimeout(timeout);
-        m_modbusDevice->setNumberOfRetries(retries);
+        m_modbusClient->setTimeout(timeout);
+        m_modbusClient->setNumberOfRetries(retries);
 
-        connect(m_modbusDevice, &QModbusClient::stateChanged, this, &CommModbusRTU::stateChanged);
+#warning // TODO: fix interface
+        // connect(m_modbusClient, &QModbusClient::stateChanged, this, &CommModbusRTU::stateChanged);
 
-        if (!m_modbusDevice->connectDevice())
+        if (!m_modbusClient->connectDevice())
         {
-            emit error(QString("Connect failed: %1").arg(m_modbusDevice->errorString()).toUtf8());
+            emit error(QString("Connect failed: %1").arg(m_modbusClient->errorString()).toUtf8());
         }
         else
         {

@@ -9,31 +9,32 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(SOURCES main.cpp)
 set(COMPONENTS Core)
-set(LIBRARIES Application Protocols)
-set(PROJECT_SOURCES ${SOURCES} ${RESOURCES})
-
-foreach(library IN LISTS LIBRARIES)
-    add_subdirectory(${library})
-endforeach()
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${COMPONENTS})
 
-add_executable(IIoTGateway ${PROJECT_SOURCES})
-
-target_link_libraries(IIoTGateway Qt${QT_VERSION_MAJOR}::Core)
-
-foreach(component IN LISTS COMPONENTS)
-    target_link_libraries(IIoTGateway Qt${QT_VERSION_MAJOR}::${component})
-endforeach()
-
-foreach(library IN LISTS LIBRARIES)
-    target_link_libraries(IIoTGateway ${library})
-endforeach()
+add_subdirectory(Application)
+add_subdirectory(Protocols)
+add_subdirectory(Main)
+add_subdirectory(Tests)
 
 include(GNUInstallDirs)
+
+include(FetchContent)
+
+FetchContent_Declare(googletest
+    GIT_REPOSITORY https://github.com/google/googletest
+    GIT_TAG v1.15.2
+)
+
+FetchContent_GetProperties(googletest)
+
+if(NOT googletest_POPULATED)
+    FetchContent_Populate(googletest)
+    add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BUILD_DIR})
+endif()
+
 install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

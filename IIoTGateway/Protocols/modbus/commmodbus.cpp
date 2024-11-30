@@ -4,23 +4,22 @@
 
 CommModbus::~CommModbus()
 {
-    if (m_modbusDevice)
+    if (m_modbusClient)
     {
-        m_modbusDevice->disconnectDevice();
-        delete m_modbusDevice;
+        delete m_modbusClient;
     }
 }
 
 void
 CommModbus::disconnectComm()
 {
-    m_modbusDevice->disconnectDevice();
+    m_modbusClient->disconnectDevice();
 }
 
 bool
 CommModbus::isconnected()
 {
-    return (m_modbusDevice->state() == QModbusDevice::ConnectedState);
+    return (m_modbusClient->state() == QModbusDevice::ConnectedState);
 }
 
 void
@@ -78,7 +77,7 @@ CommModbus::readRegisters()
 {
     quint8 address = 240;
 
-    if (auto *reply = m_modbusDevice->sendReadRequest(readRequest(), address))
+    if (auto *reply = m_modbusClient->sendReadRequest(readRequest(), address))
     {
 #warning // TODO: create an event loop
         // while (!reply->isFinished());
@@ -92,7 +91,7 @@ CommModbus::readRegisters()
     }
     else
     {
-        emit error(QString("Read error: %1").arg(m_modbusDevice->errorString()).toUtf8());
+        emit error(QString("Read error: %1").arg(m_modbusClient->errorString()).toUtf8());
     }
 }
 
@@ -119,7 +118,7 @@ CommModbus::writeRegisters()
         }
     }
 
-    if (auto *reply = m_modbusDevice->sendWriteRequest(writeUnit, address))
+    if (auto *reply = m_modbusClient->sendWriteRequest(writeUnit, address))
     {
         if (!reply->isFinished())
         {
@@ -151,7 +150,7 @@ CommModbus::writeRegisters()
     }
     else
     {
-        qDebug() << tr("Write error: ") + m_modbusDevice->errorString();
+        qDebug() << tr("Write error: ") + m_modbusClient->errorString();
     }
 }
 
@@ -194,4 +193,10 @@ CommModbus::readReady()
     reply->deleteLater();
 
     QTimer::singleShot(1000, this, &CommModbus::readRegisters);
+}
+
+void
+CommModbus::setModbusClient(ModbusClientInterface *client)
+{
+    m_modbusClient = client;
 }

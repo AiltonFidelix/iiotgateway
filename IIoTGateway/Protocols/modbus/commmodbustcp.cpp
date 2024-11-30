@@ -1,4 +1,5 @@
 #include "commmodbustcp.h"
+#include "modbusclientwrapper.h"
 #include "commfactory.h"
 
 #include <QTimer>
@@ -8,12 +9,16 @@ int CommModbusTCP::m_typeId = CommFactory::registerInterface<CommModbusTCP*>("MO
 void
 CommModbusTCP::connectComm()
 {
-    if (!m_modbusDevice)
+    if (!m_modbusClient)
     {
-        m_modbusDevice = new QModbusTcpClient();
+        ModbusClientWrapper *wrapper = new ModbusClientWrapper();
+        QModbusTcpClient *client = new QModbusTcpClient();
+        wrapper->setModbusClient(client);
+
+        m_modbusClient = static_cast<ModbusClientInterface*>(wrapper);
     }
 
-    if (m_modbusDevice->state() != QModbusDevice::ConnectedState)
+    if (m_modbusClient->state() != QModbusDevice::ConnectedState)
     {
         QVariant port = qgetenv("MODBUS_TCP_PORT");
         QVariant host = qgetenv("MODBUS_TCP_HOST");
@@ -28,17 +33,18 @@ CommModbusTCP::connectComm()
 
         retries = !ok ? 3 : retries;
 
-        m_modbusDevice->setConnectionParameter(QModbusDevice::NetworkPortParameter, port);
-        m_modbusDevice->setConnectionParameter(QModbusDevice::NetworkAddressParameter, host);
+        m_modbusClient->setConnectionParameter(QModbusDevice::NetworkPortParameter, port);
+        m_modbusClient->setConnectionParameter(QModbusDevice::NetworkAddressParameter, host);
 
-        m_modbusDevice->setTimeout(timeout);
-        m_modbusDevice->setNumberOfRetries(retries);
+        m_modbusClient->setTimeout(timeout);
+        m_modbusClient->setNumberOfRetries(retries);
 
-        connect(m_modbusDevice, &QModbusClient::stateChanged, this, &CommModbusTCP::stateChanged);
+#warning // TODO: fix interface
+        // connect(m_modbusClient, &QModbusClient::stateChanged, this, &CommModbusTCP::stateChanged);
 
-        if (!m_modbusDevice->connectDevice())
+        if (!m_modbusClient->connectDevice())
         {
-            emit error(QString("Connect failed: %1").arg(m_modbusDevice->errorString()).toUtf8());
+            emit error(QString("Connect failed: %1").arg(m_modbusClient->errorString()).toUtf8());
         }
         else
         {

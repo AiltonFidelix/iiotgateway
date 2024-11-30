@@ -13,7 +13,7 @@ set(COMPONENTS Core)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${COMPONENTS})
 
-add_library(Application ${HEADERS} ${SOURCES})
+add_library(Application SHARED ${HEADERS} ${SOURCES})
 
 foreach(component IN LISTS COMPONENTS)
     target_link_libraries(Application Qt${QT_VERSION_MAJOR}::${component})

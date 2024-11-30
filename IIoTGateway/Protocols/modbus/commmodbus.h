@@ -2,6 +2,7 @@
 #define COMMMODBUS_H
 
 #include "../comminterface.h"
+#include "modbusclientinterface.h"
 #include "writeregistermodel.h"
 
 #include <QModbusClient>
@@ -22,6 +23,8 @@ public:
     void disconnectComm();
     bool isconnected();
 
+    void setModbusClient(ModbusClientInterface *client);
+
 public slots:
     void incoming(QByteArray data);
 
@@ -36,7 +39,7 @@ protected slots:
     void readReady();
 
 protected:
-    QModbusClient *m_modbusDevice;
+    ModbusClientInterface *m_modbusClient;
     ReadItems m_readItems;
 
 private:
