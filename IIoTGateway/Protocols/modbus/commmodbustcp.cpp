@@ -1,5 +1,5 @@
 #include "commmodbustcp.h"
-#include "modbusclientwrapper.h"
+#include "modbusclientadapter.h"
 #include "commfactory.h"
 
 #include <QTimer>
@@ -11,11 +11,11 @@ CommModbusTCP::connectComm()
 {
     if (!m_modbusClient)
     {
-        ModbusClientWrapper *wrapper = new ModbusClientWrapper();
+        ModbusClientAdapter *adapter = new ModbusClientAdapter();
         QModbusTcpClient *client = new QModbusTcpClient();
-        wrapper->setModbusClient(client);
+        adapter->setModbusClient(client);
 
-        m_modbusClient = static_cast<ModbusClientInterface*>(wrapper);
+        m_modbusClient = static_cast<ModbusClientInterface*>(adapter);
     }
 
     if (m_modbusClient->state() != QModbusDevice::ConnectedState)
@@ -39,12 +39,11 @@ CommModbusTCP::connectComm()
         m_modbusClient->setTimeout(timeout);
         m_modbusClient->setNumberOfRetries(retries);
 
-#warning // TODO: fix interface
-        // connect(m_modbusClient, &QModbusClient::stateChanged, this, &CommModbusTCP::stateChanged);
+        connect(m_modbusClient, &ModbusClientInterface::stateChanged, this, &CommModbusTCP::stateChanged);
 
         if (!m_modbusClient->connectDevice())
         {
-            emit error(QString("Connect failed: %1").arg(m_modbusClient->errorString()).toUtf8());
+            emit error(QString("Connection failed: %1").arg(m_modbusClient->errorString()).toUtf8());
         }
         else
         {

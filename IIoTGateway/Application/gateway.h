@@ -15,12 +15,10 @@ public slots:
     void start();
     void stop();
 
-signals:
+private slots:
+    void notifyError(QByteArray error);
 
 private:
-    // CommInterface *m_commEdge;
-    // CommInterface *m_commCloud;
-
     QThread *m_threadEdge;
     QThread *m_threadCloud;
 };

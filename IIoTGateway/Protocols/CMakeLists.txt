@@ -1,8 +1,9 @@
 set(HEADERS
     comminterface.h
     commfactory.h
+    modbus/modbusclientadapter.h
     modbus/modbusclientinterface.h
-    modbus/modbusclientwrapper.h
+    modbus/modbusjsonparser.h
     modbus/commmodbus.h
     modbus/commmodbusrtu.h
     modbus/commmodbustcp.h
@@ -11,7 +12,8 @@ set(HEADERS
 
 set(SOURCES
     commfactory.cpp
-    modbus/modbusclientwrapper.cpp
+    modbus/modbusclientadapter.cpp
+    modbus/modbusjsonparser.cpp
     modbus/commmodbus.cpp
     modbus/commmodbusrtu.cpp
     modbus/commmodbustcp.cpp

@@ -5,7 +5,9 @@
 #include "../Protocols/commfactory.h"
 
 Gateway::Gateway(QObject *parent)
-    : QObject{parent}
+    : QObject(parent),
+    m_threadEdge(nullptr),
+    m_threadCloud(nullptr)
 {
     qDebug() << "Creating the gateway object ihul...";
 }
@@ -41,15 +43,16 @@ Gateway::start()
         connect(m_threadEdge, &QThread::started, commEdge, &CommInterface::connectComm);
         // connect(m_threadCloud, &QThread::started, commCloud, &CommInterface::connectComm);
 
-        connect(m_threadEdge, &QThread::finished, commEdge, &CommInterface::deleteLater);
+        connect(m_threadEdge, &QThread::finished, commEdge, &CommInterface::disconnectComm);
+        connect(commEdge, &CommInterface::disconnected, commEdge, &CommInterface::deleteLater);
+        connect(commEdge, &CommInterface::error, this, &Gateway::notifyError, Qt::QueuedConnection);
         // connect(m_threadCloud, &QThread::finished, commCloud, &CommInterface::deleteLater);
 
         m_threadEdge->start();
     }
     catch (std::exception &e)
     {
-        qWarning() << e.what();
-        stop();
+        notifyError(e.what());
     }
 }
 
@@ -69,4 +72,14 @@ Gateway::stop()
         m_threadCloud->wait();
         delete m_threadCloud;
     }
+
+    m_threadEdge = nullptr;
+    m_threadCloud = nullptr;
+}
+
+void
+Gateway::notifyError(QByteArray error)
+{
+    qWarning() << error;
+    stop();
 }

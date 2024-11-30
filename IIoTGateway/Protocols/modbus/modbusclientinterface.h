@@ -1,11 +1,13 @@
 #ifndef MODBUSCLIENTINTERFACE_H
 #define MODBUSCLIENTINTERFACE_H
 
+#include <QObject>
 #include <QModbusDevice>
 #include <QModbusReply>
 
-class ModbusClientInterface
+class ModbusClientInterface : public QObject
 {
+    Q_OBJECT
 public:
     virtual ~ModbusClientInterface() = default;
 
@@ -18,6 +20,9 @@ public:
     virtual QModbusReply *sendWriteRequest(const QModbusDataUnit &write, int serverAddress) = 0;
     virtual QModbusDevice::State state() = 0;
     virtual QString errorString() const = 0;
+
+signals:
+    void stateChanged(QModbusDevice::State state);
 };
 
 #endif // MODBUSCLIENTINTERFACE_H

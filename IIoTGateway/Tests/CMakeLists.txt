@@ -3,10 +3,12 @@ set(EXECUTABLE_NAME TestsRunner)
 set(HEADERS
     mockmodbusclient.h
     testcommmodbus.h
+    testmodbusjsonparser.h
 )
 
 set(SOURCES
     testcommmodbus.cpp
+    testmodbusjsonparser.cpp
 )
 
 set(COMPONENTS Core)

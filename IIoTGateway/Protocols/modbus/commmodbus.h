@@ -23,6 +23,7 @@ public:
     void disconnectComm();
     bool isconnected();
 
+    ModbusClientInterface *modbusClient();
     void setModbusClient(ModbusClientInterface *client);
 
 public slots:

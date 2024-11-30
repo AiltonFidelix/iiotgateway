@@ -22,6 +22,18 @@ CommModbus::isconnected()
     return (m_modbusClient->state() == QModbusDevice::ConnectedState);
 }
 
+ModbusClientInterface*
+CommModbus::modbusClient()
+{
+    return m_modbusClient;
+}
+
+void
+CommModbus::setModbusClient(ModbusClientInterface *client)
+{
+    m_modbusClient = client;
+}
+
 void
 CommModbus::incoming(QByteArray data)
 {
@@ -193,10 +205,4 @@ CommModbus::readReady()
     reply->deleteLater();
 
     QTimer::singleShot(1000, this, &CommModbus::readRegisters);
-}
-
-void
-CommModbus::setModbusClient(ModbusClientInterface *client)
-{
-    m_modbusClient = client;
 }

@@ -1,14 +1,14 @@
-#ifndef MODBUSCLIENTWRAPPER_H
-#define MODBUSCLIENTWRAPPER_H
+#ifndef MODBUSCLIENTADAPTER_H
+#define MODBUSCLIENTADAPTER_H
 
 #include <QModbusClient>
 #include "modbusclientinterface.h"
 
-class ModbusClientWrapper : public ModbusClientInterface
+class ModbusClientAdapter : public ModbusClientInterface
 {
 public:
-    ModbusClientWrapper() = default;
-    ~ModbusClientWrapper();
+    ModbusClientAdapter() = default;
+    ~ModbusClientAdapter();
 
     bool connectDevice();
     void disconnectDevice();
@@ -23,8 +23,11 @@ public:
     QModbusClient *modbusClient() const;
     void setModbusClient(QModbusClient *newModbusClient);
 
+private slots:
+    void emitStateChanged(QModbusDevice::State state);
+
 private:
     QModbusClient *m_modbusClient;
 };
 
-#endif // MODBUSCLIENTWRAPPER_H
+#endif // MODBUSCLIENTADAPTER_H

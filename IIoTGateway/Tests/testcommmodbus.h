@@ -7,12 +7,11 @@
 #include "modbus/commmodbusrtu.h"
 #include "mockmodbusclient.h"
 
-// Test Fixture
-class CommModbusTest : public testing::Test
+class TestCommModbus: public testing::Test
 {
 protected:
-    MockModbusClient *mockModbusClient;
-    CommModbusRTU commModbus;
+    MockModbusClient *m_mockModbusClient;
+    CommModbusRTU m_commModbus;
 
     void SetUp() override;
 };
