@@ -11,13 +11,17 @@ class ModbusJsonParser : public QObject
 public:
     using Request = QMultiHash<quint8, QModbusDataUnit>;
 
-    ModbusJsonParser(const QByteArray &data);
+    ModbusJsonParser(const QByteArray &data, quint16 maxEntries = 10);
 
     Request readRequest() const;
     Request writeRequest() const;
 
 private:
+    QModbusDataUnit::RegisterType getType(const QString &type) const;
+
+private:
     QJsonDocument m_document;
+    quint16 m_maxEntries;
 };
 
 #endif // MODBUSJSONPARSER_H

@@ -4,7 +4,16 @@
 #include <gtest/gtest.h>
 #include "modbus/modbusjsonparser.h"
 
-class TestModbusJsonParserRead: public testing::Test
+class TestModbusJsonParserReadOne: public testing::Test
+{
+protected:
+    ModbusJsonParser *m_parser;
+
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class TestModbusJsonParserReadMultiple: public testing::Test
 {
 protected:
     ModbusJsonParser *m_parser;
