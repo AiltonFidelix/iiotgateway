@@ -2,7 +2,7 @@
 #include "modbusclientadapter.h"
 #include "commfactory.h"
 
-#include <QTimer>
+#include <QVariant>
 
 int CommModbusTCP::m_typeId = CommFactory::registerInterface<CommModbusTCP*>("MODBUS_TCP");
 
@@ -33,6 +33,20 @@ CommModbusTCP::connectComm()
 
         retries = !ok ? 3 : retries;
 
+        QVariant polling = qgetenv("MODBUS_TCP_POLLING");
+
+        int interval = qEnvironmentVariableIntValue("MODBUS_TCP_INTERVAL", &ok);
+
+        interval = !ok ? 1000 : interval;
+
+        if (polling.toString().toLower() == "enabled")
+        {
+            m_polling = new QTimer();
+            m_polling->setInterval(interval);
+
+            connect(this, &CommModbusTCP::connected, this, &CommModbusTCP::initPolling);
+        }
+
         m_modbusClient->setConnectionParameter(QModbusDevice::NetworkPortParameter, port);
         m_modbusClient->setConnectionParameter(QModbusDevice::NetworkAddressParameter, host);
 
@@ -47,8 +61,7 @@ CommModbusTCP::connectComm()
         }
         else
         {
-            QTimer::singleShot(1000, this, &CommModbusTCP::readRegisters);
-            QTimer::singleShot(500, this, &CommModbusTCP::writeRegisters);
+            emit connected();
         }
     }
 }

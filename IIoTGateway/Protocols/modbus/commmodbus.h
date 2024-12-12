@@ -3,20 +3,19 @@
 
 #include "../comminterface.h"
 #include "modbusclientinterface.h"
-#include "writeregistermodel.h"
+#include "modbusjsonparser.h"
 
 #include <QModbusClient>
 #include <QModbusDataUnit>
 #include <QModbusClient>
+#include <QTimer>
+#include <QDebug>
 
 class CommModbus : public CommInterface
 {
     Q_OBJECT
 public:
-    using ReadItems = QHash<quint8, QList<quint16>>;
-    using WriteItems = QHash<quint8, QHash<quint16, quint16>>;
-
-    CommModbus() = default;
+    CommModbus();
     ~CommModbus();
 
     void connectComm() = 0;
@@ -29,22 +28,20 @@ public:
 public slots:
     void incoming(QByteArray data);
 
-protected:
-    QModbusDataUnit readRequest() const;
-    QModbusDataUnit writeRequest() const;
-
 protected slots:
     void stateChanged(QModbusDevice::State state);
     void readRegisters();
     void writeRegisters();
-    void readReady();
+    void readReady(QModbusReply *reply);
+    void initPolling();
+
+private:
+    ModbusJsonParser::Request loadReadRequestSettings();
 
 protected:
     ModbusClientInterface *m_modbusClient;
-    ReadItems m_readItems;
-
-private:
-    WriteRegisterModel m_writeModel;
+    QTimer *m_polling;
+    ModbusJsonParser::Request m_readRequest;
 };
 
 #endif // COMMMODBUS_H

@@ -33,6 +33,20 @@ ModbusJsonParser::readRequest() const
         }
     }
 
+    if (!request.isEmpty())
+    {
+        auto sortRequest = [](const auto &a, const auto &b) -> bool
+        {
+            quint8 addressA = a->key();
+            quint8 addressB = b->key();
+
+            QModbusDataUnit unitA = a->value();
+            QModbusDataUnit unitB = b->value();
+
+            return ((addressA < addressB) && (unitA.startAddress() < unitB.startAddress()));
+        };
+    }
+
     return request;
 }
 

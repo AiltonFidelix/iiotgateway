@@ -1,12 +1,29 @@
 #include "commmodbus.h"
 
-#include <QTimer>
+#include <QEventLoop>
+#include <QFile>
+
+CommModbus::CommModbus()
+{
+    m_modbusClient = nullptr;
+    m_polling = nullptr;
+}
 
 CommModbus::~CommModbus()
 {
     if (m_modbusClient)
     {
+        m_modbusClient->disconnect();
+
         delete m_modbusClient;
+    }
+
+    if (m_polling)
+    {
+        m_polling->disconnect();
+        m_polling->stop();
+
+        delete m_polling;
     }
 }
 
@@ -40,37 +57,6 @@ CommModbus::incoming(QByteArray data)
 
 }
 
-QModbusDataUnit
-CommModbus::readRequest() const
-{
-    const auto table = QModbusDataUnit::HoldingRegisters;
-
-    int startAddress = 0;
-    Q_ASSERT(startAddress >= 0 && startAddress < 10);
-
-    quint16 readSize = 10;
-
-    // do not go beyond 10 entries
-    quint16 numberOfEntries = qMin(readSize, quint16(10 - startAddress));
-    return QModbusDataUnit(table, startAddress, numberOfEntries);
-}
-
-QModbusDataUnit
-CommModbus::writeRequest() const
-{
-    const auto table = QModbusDataUnit::HoldingRegisters;
-
-    int startAddress = 1;
-    Q_ASSERT(startAddress >= 0 && startAddress < 10);
-
-    quint16 readSize = 1;
-
-    // m_writeModel.m_holdingRegisters
-    // do not go beyond 10 entries
-    quint16 numberOfEntries = qMin(readSize, quint16(10 - startAddress));
-    return QModbusDataUnit(table, startAddress, numberOfEntries);
-}
-
 void
 CommModbus::stateChanged(QModbusDevice::State state)
 {
@@ -87,24 +73,36 @@ CommModbus::stateChanged(QModbusDevice::State state)
 void
 CommModbus::readRegisters()
 {
-    quint8 address = 240;
+    m_polling->stop();
 
-    if (auto *reply = m_modbusClient->sendReadRequest(readRequest(), address))
+    qDebug() << "-------------------- Start --------------------";
+
+    ModbusJsonParser::RequestIterator requests(m_readRequest);
+
+    while (requests.hasNext())
     {
-#warning // TODO: create an event loop
-        // while (!reply->isFinished());
+        requests.next();
 
-        // readReady(reply);
+        quint8 address = requests.key();
+        QModbusDataUnit unit = requests.value();
 
-        if (!reply->isFinished())
-            connect(reply, &QModbusReply::finished, this, &CommModbus::readReady);
+        if (auto *reply = m_modbusClient->sendReadRequest(unit, address))
+        {
+            QEventLoop loop;
+            connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+
+            loop.exec();
+            readReady(reply);
+        }
         else
-            delete reply; // broadcast replies return immediately
+        {
+            emit error(QString("Read error: %1").arg(m_modbusClient->errorString()).toUtf8());
+        }
     }
-    else
-    {
-        emit error(QString("Read error: %1").arg(m_modbusClient->errorString()).toUtf8());
-    }
+
+    qDebug() << "-------------------- End --------------------";
+
+    m_polling->start();
 }
 
 void
@@ -113,14 +111,14 @@ CommModbus::writeRegisters()
     quint8 address = 240;
     static qint16 data = 1;
 
-    QModbusDataUnit writeUnit = writeRequest();
+    QModbusDataUnit writeUnit = QModbusDataUnit(); //writeRequest();
     QModbusDataUnit::RegisterType table = writeUnit.registerType();
 
     for (int i = 0, total = int(writeUnit.valueCount()); i < total; ++i)
     {
         if (table == QModbusDataUnit::Coils)
         {
-            writeUnit.setValue(i, m_writeModel.m_coils[i + writeUnit.startAddress()]);
+            // writeUnit.setValue(i, m_writeModel.m_coils[i + writeUnit.startAddress()]);
         }
         else
         {
@@ -167,10 +165,8 @@ CommModbus::writeRegisters()
 }
 
 void
-CommModbus::readReady()
+CommModbus::readReady(QModbusReply *reply)
 {
-    auto reply = qobject_cast<QModbusReply*>(sender());
-
     if (!reply)
     {
         return;
@@ -182,9 +178,10 @@ CommModbus::readReady()
 
         for (int i = 0, total = int(unit.valueCount()); i < total; ++i)
         {
-            const QString entry = tr("Address: %1, Value: %2").arg(unit.startAddress() + i)
-            .arg(QString::number(unit.value(i),
-                                 unit.registerType() <= QModbusDataUnit::Coils ? 10 : 16));
+            // const QString entry = tr("Address: %1, Value: %2").arg(unit.startAddress() + i)
+            // .arg(QString::number(unit.value(i), unit.registerType() <= QModbusDataUnit::Coils ? 10 : 16));
+
+            const QString entry = tr("Address: %1, Value: %2").arg(unit.startAddress() + i).arg(QString::number(unit.value(i)));
 
             qDebug() << entry;
         }
@@ -203,6 +200,35 @@ CommModbus::readReady()
     }
 
     reply->deleteLater();
+}
 
-    QTimer::singleShot(1000, this, &CommModbus::readRegisters);
+void
+CommModbus::initPolling()
+{
+    if (m_polling)
+    {
+        m_readRequest = loadReadRequestSettings();
+
+        connect(m_polling, &QTimer::timeout, this, &CommModbus::readRegisters);
+        m_polling->start();
+    }
+}
+
+ModbusJsonParser::Request
+CommModbus::loadReadRequestSettings()
+{
+    QFile file("read.json");
+
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        emit error("Failed opening read.json");
+
+        return ModbusJsonParser::Request();
+    }
+
+    ModbusJsonParser parser(file.readAll());
+
+    file.close();
+
+    return parser.readRequest();
 }

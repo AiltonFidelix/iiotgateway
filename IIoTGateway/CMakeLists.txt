@@ -28,12 +28,14 @@ FetchContent_Declare(googletest
     GIT_TAG v1.15.2
 )
 
-FetchContent_GetProperties(googletest)
+FetchContent_MakeAvailable(googletest)
 
-if(NOT googletest_POPULATED)
-    FetchContent_Populate(googletest)
-    add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BUILD_DIR})
-endif()
+# FetchContent_Declare(pahomqttcpp
+#     GIT_REPOSITORY https://github.com/eclipse-paho/paho.mqtt.cpp
+#     GIT_TAG v1.4.1
+# )
+
+# FetchContent_MakeAvailable(pahomqttcpp)
 
 install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

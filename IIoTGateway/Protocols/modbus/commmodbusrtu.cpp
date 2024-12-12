@@ -2,7 +2,7 @@
 #include "modbusclientadapter.h"
 #include "commfactory.h"
 
-#include <QTimer>
+#include <QVariant>
 
 int CommModbusRTU::m_typeId = CommFactory::registerInterface<CommModbusRTU*>("MODBUS_RTU");
 
@@ -36,6 +36,20 @@ CommModbusRTU::connectComm()
 
         retries = !ok ? 3 : retries;
 
+        QVariant polling = qgetenv("MODBUS_RTU_POLLING");
+
+        int interval = qEnvironmentVariableIntValue("MODBUS_RTU_INTERVAL", &ok);
+
+        interval = !ok ? 1000 : interval;
+
+        if (polling.toString().toLower() == "enabled")
+        {
+            m_polling = new QTimer();
+            m_polling->setInterval(interval);
+
+            connect(this, &CommModbusRTU::connected, this, &CommModbusRTU::initPolling);
+        }
+
         m_modbusClient->setConnectionParameter(QModbusDevice::SerialPortNameParameter, port);
         m_modbusClient->setConnectionParameter(QModbusDevice::SerialParityParameter, parity);
         m_modbusClient->setConnectionParameter(QModbusDevice::SerialBaudRateParameter, baudRate);
@@ -53,8 +67,7 @@ CommModbusRTU::connectComm()
         }
         else
         {
-            QTimer::singleShot(1000, this, &CommModbusRTU::readRegisters);
-            QTimer::singleShot(5000, this, &CommModbusRTU::writeRegisters);
+            emit connected();
         }
     }
 }

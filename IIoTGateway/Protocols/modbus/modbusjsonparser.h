@@ -10,6 +10,7 @@ class ModbusJsonParser : public QObject
     Q_OBJECT
 public:
     using Request = QMultiHash<quint8, QModbusDataUnit>;
+    using RequestIterator = QMultiHashIterator<quint8, QModbusDataUnit>;
 
     ModbusJsonParser(const QByteArray &data, quint16 maxEntries = 10);
 
