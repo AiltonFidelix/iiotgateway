@@ -1,4 +1,5 @@
 build
+.vscode
 *.txt.user
 *.drawio.bkp
 *.json
