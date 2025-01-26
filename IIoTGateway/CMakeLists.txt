@@ -30,12 +30,14 @@ FetchContent_Declare(googletest
 
 FetchContent_MakeAvailable(googletest)
 
-# FetchContent_Declare(pahomqttcpp
-#     GIT_REPOSITORY https://github.com/eclipse-paho/paho.mqtt.cpp
-#     GIT_TAG v1.4.1
-# )
+FetchContent_Declare(pahomqttcpp
+    GIT_REPOSITORY https://github.com/eclipse-paho/paho.mqtt.cpp
+    GIT_TAG v1.5.0
+)
 
-# FetchContent_MakeAvailable(pahomqttcpp)
+FetchContent_MakeAvailable(pahomqttcpp)
+
+set(PAHO_WITH_MQTT_C ON CACHE BOOL "Enable MQTT C support")
 
 install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

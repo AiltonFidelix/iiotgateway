@@ -29,7 +29,7 @@ add_executable(${EXECUTABLE_NAME} ${PROJECT_SOURCES})
 
 target_link_libraries(${EXECUTABLE_NAME} Qt${QT_VERSION_MAJOR}::Core)
 
-target_sources(TestsRunner PRIVATE)
+target_sources(${EXECUTABLE_NAME} PRIVATE)
 
 foreach(component IN LISTS COMPONENTS)
     target_link_libraries(${EXECUTABLE_NAME} Qt${QT_VERSION_MAJOR}::${component})

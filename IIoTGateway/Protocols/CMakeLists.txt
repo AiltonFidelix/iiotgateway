@@ -1,3 +1,5 @@
+set(LIBRARY_NAME Protocols)
+
 set(HEADERS
     comminterface.h
     commfactory.h
@@ -20,19 +22,25 @@ set(SOURCES
     modbus/writeregistermodel.cpp
 )
 
-set(COMPONENTS
+set(QT_COMPONENTS
     Core
     SerialBus
     SerialPort
 )
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${COMPONENTS})
+set(LIBRARIES paho-mqttpp3)
 
-add_library(Protocols SHARED ${HEADERS} ${SOURCES})
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_COMPONENTS})
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPONENTS})
 
-foreach(component IN LISTS COMPONENTS)
-    target_link_libraries(Protocols Qt${QT_VERSION_MAJOR}::${component})
+add_library(${LIBRARY_NAME} SHARED ${HEADERS} ${SOURCES})
+
+foreach(component IN LISTS QT_COMPONENTS)
+    target_link_libraries(${LIBRARY_NAME} Qt${QT_VERSION_MAJOR}::${component})
 endforeach()
 
-target_include_directories(Protocols PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+foreach(library IN LISTS LIBRARIES)
+    target_link_libraries(${LIBRARY_NAME} ${library})
+endforeach()
+
+target_include_directories(${LIBRARY_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

@@ -1,3 +1,5 @@
+set(LIBRARY_NAME Application)
+
 set(HEADERS
     interface.h
     gateway.h
@@ -8,15 +10,15 @@ set(SOURCES
     gateway.cpp
 )
 
-set(COMPONENTS Core)
+set(QT_COMPONENTS Core)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${COMPONENTS})
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_COMPONENTS})
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPONENTS})
 
-add_library(Application SHARED ${HEADERS} ${SOURCES})
+add_library(${LIBRARY_NAME} SHARED ${HEADERS} ${SOURCES})
 
-foreach(component IN LISTS COMPONENTS)
-    target_link_libraries(Application Qt${QT_VERSION_MAJOR}::${component})
+foreach(component IN LISTS QT_COMPONENTS)
+    target_link_libraries(${LIBRARY_NAME} Qt${QT_VERSION_MAJOR}::${component})
 endforeach()
 
-target_include_directories(Application PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(${LIBRARY_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
