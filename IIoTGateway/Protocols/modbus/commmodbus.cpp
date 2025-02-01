@@ -1,7 +1,10 @@
 #include "commmodbus.h"
 
+#include <QCoreApplication>
 #include <QEventLoop>
 #include <QFile>
+#include <QJsonArray>
+#include <QJsonObject>
 
 CommModbus::CommModbus()
 {
@@ -18,7 +21,7 @@ CommModbus::~CommModbus()
         delete m_modbusClient;
     }
 
-    if (m_polling)
+    if (ispolling())
     {
         m_polling->disconnect();
         m_polling->stop();
@@ -54,7 +57,7 @@ CommModbus::setModbusClient(ModbusClientInterface *client)
 void
 CommModbus::incoming(QByteArray data)
 {
-
+    qDebug() << "Incoming";
 }
 
 void
@@ -71,48 +74,54 @@ CommModbus::stateChanged(QModbusDevice::State state)
 }
 
 void
-CommModbus::readRegisters()
+CommModbus::readRegisters(const ModbusJsonParser::Request &request)
 {
-    m_polling->stop();
+#warning // TODO: Remover QElapsedTimer later
+    QElapsedTimer time;
+    time.start();
 
-    qDebug() << "-------------------- Start --------------------";
+    auto json = QJsonObject();
 
-    ModbusJsonParser::RequestIterator requests(m_readRequest);
+    const auto addresses = ModbusJsonParser::sortedAddress(request);
 
-    while (requests.hasNext())
+    for (const auto &address : addresses)
     {
-        requests.next();
+        auto registers = Registers();
+        auto units = request.value(address);
+        ModbusJsonParser::sortRequestUnits(units);
 
-        quint8 address = requests.key();
-        QModbusDataUnit unit = requests.value();
-
-        if (auto *reply = m_modbusClient->sendReadRequest(unit, address))
+        for (const auto &unit : std::as_const(units))
         {
-            QEventLoop loop;
-            connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+            if (auto *reply = m_modbusClient->sendReadRequest(unit, address))
+            {
+                QEventLoop loop;
+                connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
 
-            loop.exec();
-            readReady(reply);
+                loop.exec();
+                registers.insert(readReady(reply));
+            }
+            else
+            {
+                emit error(QString("Read error: %1").arg(m_modbusClient->errorString()).toUtf8());
+            }
         }
-        else
-        {
-            emit error(QString("Read error: %1").arg(m_modbusClient->errorString()).toUtf8());
-        }
+
+        json.insert(QString::number(address), registersToJsonArray(registers));
     }
 
-    qDebug() << "-------------------- End --------------------";
+    emit outgoing(QJsonDocument(json).toJson(QJsonDocument::Compact));
 
-    m_polling->start();
+    qDebug() << "readRegisters took" << time.elapsed() << "ms";
 }
 
 void
-CommModbus::writeRegisters()
+CommModbus::writeRegisters(const ModbusJsonParser::Request &request)
 {
     quint8 address = 240;
     static qint16 data = 1;
 
-    QModbusDataUnit writeUnit = QModbusDataUnit(); //writeRequest();
-    QModbusDataUnit::RegisterType table = writeUnit.registerType();
+    auto writeUnit = QModbusDataUnit(); //writeRequest();
+    auto table = writeUnit.registerType();
 
     for (int i = 0, total = int(writeUnit.valueCount()); i < total; ++i)
     {
@@ -147,7 +156,7 @@ CommModbus::writeRegisters()
 
                 reply->deleteLater();
 
-                QTimer::singleShot(5000, this, &CommModbus::writeRegisters);
+                // QTimer::singleShot(5000, this, &CommModbus::writeRegisters);
             });
         }
         else
@@ -155,7 +164,7 @@ CommModbus::writeRegisters()
             // broadcast replies return immediately
             reply->deleteLater();
 
-            QTimer::singleShot(5000, this, &CommModbus::writeRegisters);
+            // QTimer::singleShot(5000, this, &CommModbus::writeRegisters);
         }
     }
     else
@@ -164,26 +173,23 @@ CommModbus::writeRegisters()
     }
 }
 
-void
+CommModbus::Registers
 CommModbus::readReady(QModbusReply *reply)
 {
+    auto registers = Registers();
+
     if (!reply)
     {
-        return;
+        return registers;
     }
 
     if (reply->error() == QModbusDevice::NoError)
     {
-        const QModbusDataUnit unit = reply->result();
+        const auto unit = reply->result();
 
         for (int i = 0, total = int(unit.valueCount()); i < total; ++i)
         {
-            // const QString entry = tr("Address: %1, Value: %2").arg(unit.startAddress() + i)
-            // .arg(QString::number(unit.value(i), unit.registerType() <= QModbusDataUnit::Coils ? 10 : 16));
-
-            const QString entry = tr("Address: %1, Value: %2").arg(unit.startAddress() + i).arg(QString::number(unit.value(i)));
-
-            qDebug() << entry;
+            registers.insert(unit.startAddress() + i, unit.value(i));
         }
     }
     else if (reply->error() == QModbusDevice::ProtocolError)
@@ -200,24 +206,43 @@ CommModbus::readReady(QModbusReply *reply)
     }
 
     reply->deleteLater();
+
+    return registers;
+}
+
+bool
+CommModbus::ispolling()
+{
+    return !(m_polling == nullptr);
 }
 
 void
 CommModbus::initPolling()
 {
-    if (m_polling)
+    if (!ispolling())
     {
         m_readRequest = loadReadRequestSettings();
 
-        connect(m_polling, &QTimer::timeout, this, &CommModbus::readRegisters);
+        connect(m_polling, &QTimer::timeout, this, &CommModbus::pollingCallback);
+
         m_polling->start();
     }
+}
+
+void
+CommModbus::pollingCallback()
+{
+    m_polling->stop();
+
+    readRegisters(m_readRequest);
+
+    m_polling->start();
 }
 
 ModbusJsonParser::Request
 CommModbus::loadReadRequestSettings()
 {
-    QFile file("read.json");
+    QFile file(QString("%1/read.json").arg(QCoreApplication::applicationDirPath()));
 
     if (!file.open(QIODevice::ReadOnly))
     {
@@ -231,4 +256,22 @@ CommModbus::loadReadRequestSettings()
     file.close();
 
     return parser.readRequest();
+}
+
+QJsonArray
+CommModbus::registersToJsonArray(const Registers &registers)
+{
+    QJsonArray regs;
+
+    auto keys = registers.keys();
+
+    for (const auto &key : keys)
+    {
+        QJsonObject reg;
+        reg.insert("register", key);
+        reg.insert("value", registers.value(key));
+        regs.append(reg);
+    }
+
+    return regs;
 }

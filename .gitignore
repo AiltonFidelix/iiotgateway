@@ -3,3 +3,4 @@ build
 *.txt.user
 *.drawio.bkp
 *.json
+*.env

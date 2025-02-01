@@ -11,15 +11,15 @@ int main(int argc, char *argv[])
 
     // qDebug() << QCoreApplication::translate("IIoTGateway", "(Press CTRL+C to quit)");
 
-    std::cout << "IIoTGateway (Press q to quit)\n";
-    char input;
+    // std::cout << "IIoTGateway (Press q to quit)\n";
+    // char input;
 
-    do
-    {
-        std::cin >> input;
-    } while ((std::toupper(input) != 'q') && (std::toupper(input) != 'Q'));
+    // do
+    // {
+    //     std::cin >> input;
+    // } while ((std::toupper(input) != 'q') && (std::toupper(input) != 'Q'));
 
-    return 0;
+    // return 0;
 
-    // return app.exec();
+    return app.exec();
 }

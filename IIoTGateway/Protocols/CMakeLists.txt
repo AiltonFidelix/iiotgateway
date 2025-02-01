@@ -10,6 +10,7 @@ set(HEADERS
     modbus/commmodbusrtu.h
     modbus/commmodbustcp.h
     modbus/writeregistermodel.h
+    mqtt/commmqtt.h
 )
 
 set(SOURCES
@@ -20,6 +21,7 @@ set(SOURCES
     modbus/commmodbusrtu.cpp
     modbus/commmodbustcp.cpp
     modbus/writeregistermodel.cpp
+    mqtt/commmqtt.cpp
 )
 
 set(QT_COMPONENTS

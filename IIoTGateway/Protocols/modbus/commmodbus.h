@@ -9,10 +9,11 @@
 #include <QModbusDataUnit>
 #include <QModbusClient>
 #include <QTimer>
-#include <QDebug>
 
 class CommModbus : public CommInterface
 {
+    using Registers = QMap<quint16, quint16>;
+
     Q_OBJECT
 public:
     CommModbus();
@@ -30,13 +31,18 @@ public slots:
 
 protected slots:
     void stateChanged(QModbusDevice::State state);
-    void readRegisters();
-    void writeRegisters();
-    void readReady(QModbusReply *reply);
     void initPolling();
+    void pollingCallback();
 
 private:
+    bool ispolling();
+    void readRegisters(const ModbusJsonParser::Request &request);
+    void writeRegisters(const ModbusJsonParser::Request &request);
+
+    Registers readReady(QModbusReply *reply);
+
     ModbusJsonParser::Request loadReadRequestSettings();
+    QJsonArray registersToJsonArray(const Registers &registers);
 
 protected:
     ModbusClientInterface *m_modbusClient;

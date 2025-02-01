@@ -12,7 +12,7 @@ public:
     Q_INVOKABLE CommModbusTCP() = default;
     ~CommModbusTCP() = default;
 
-    void connectComm();
+    void connectComm() override;
 
 private:
     static int m_typeId;

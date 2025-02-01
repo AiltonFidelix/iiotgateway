@@ -32,13 +32,13 @@ TEST_F(TestModbusJsonParserReadOne, TestReadRequest)
 
     ASSERT_FALSE(readRequest.isEmpty());
 
-    auto uniqueKeys = readRequest.uniqueKeys();
-    ASSERT_EQ(1, uniqueKeys.count());
+    auto addresses = readRequest.keys();
+    ASSERT_EQ(1, addresses.count());
 
-    auto address = uniqueKeys.first();
+    auto address = addresses.first();
     ASSERT_EQ(240, address);
 
-    auto unit = readRequest.value(address);
+    auto unit = readRequest.value(address).at(0);
 
     ASSERT_TRUE(unit.isValid());
     ASSERT_EQ(QModbusDataUnit::HoldingRegisters, unit.registerType());
@@ -96,13 +96,10 @@ TEST_F(TestModbusJsonParserReadMultiple, TestReadRequest)
 
     ASSERT_FALSE(readRequest.isEmpty());
 
-    auto keys = readRequest.keys();
-    ASSERT_EQ(6, keys.count());
+    auto addresses = readRequest.keys();
+    ASSERT_EQ(2, addresses.count());
 
-    auto uniqueKeys = readRequest.uniqueKeys();
-    ASSERT_EQ(2, uniqueKeys.count());
-
-    auto units1 = readRequest.values(1);
+    auto units1 = readRequest.value(1);
     ASSERT_EQ(2, units1.count());
 
     for (const auto &unit : units1)
@@ -110,7 +107,7 @@ TEST_F(TestModbusJsonParserReadMultiple, TestReadRequest)
         testUnit(unit);
     }
 
-    auto units2 = readRequest.values(2);
+    auto units2 = readRequest.value(2);
     ASSERT_EQ(4, units2.count());
 
     for (const auto &unit : units2)
@@ -140,3 +137,48 @@ TEST_F(TestModbusJsonParserReadEmpty, TestReadRequestEmpty)
 
     ASSERT_TRUE(readRequest.isEmpty());
 }
+
+void
+TestModbusJsonParserWriteOne::SetUp()
+{
+    m_parser = new ModbusJsonParser(QByteArray());
+}
+
+void
+TestModbusJsonParserWriteOne::TearDown()
+{
+    if (m_parser)
+    {
+        delete m_parser;
+    }
+}
+
+TEST_F(TestModbusJsonParserWriteOne, TestWriteRequest)
+{
+    auto writeRequest = m_parser->readRequest();
+
+    GTEST_SKIP() << "Implement this test";
+}
+
+void
+TestModbusJsonParserWriteEmpty::SetUp()
+{
+    m_parser = new ModbusJsonParser(QByteArray());
+}
+
+void
+TestModbusJsonParserWriteEmpty::TearDown()
+{
+    if (m_parser)
+    {
+        delete m_parser;
+    }
+}
+
+TEST_F(TestModbusJsonParserWriteEmpty, TestWriteRequestEmpty)
+{
+    auto writeRequest = m_parser->readRequest();
+
+    ASSERT_TRUE(writeRequest.isEmpty());
+}
+

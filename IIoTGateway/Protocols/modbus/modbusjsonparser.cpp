@@ -29,7 +29,7 @@ ModbusJsonParser::readRequest() const
         for (int i = 0, r = startRegister; i < numberOfEntries; i += m_maxEntries, r += m_maxEntries)
         {
             quint16 entries = qMin(m_maxEntries, quint16(numberOfEntries - i));
-            request.insert(address, QModbusDataUnit(type, r, entries));
+            request[address].append(QModbusDataUnit(type, r, entries));
         }
     }
 
@@ -53,7 +53,29 @@ ModbusJsonParser::readRequest() const
 ModbusJsonParser::Request
 ModbusJsonParser::writeRequest() const
 {
+#warning // TODO: implement write request
     return Request();
+}
+
+ModbusJsonParser::Addresses
+ModbusJsonParser::sortedAddress(const Request &request)
+{
+    auto keys = request.keys();
+
+    std::sort(keys.begin(), keys.end());
+
+    return keys;
+}
+
+void
+ModbusJsonParser::sortRequestUnits(ModbusJsonParser::Units &units)
+{
+    auto sort = [](const QModbusDataUnit &a, const QModbusDataUnit &b) -> bool
+    {
+        return a.startAddress() < b.startAddress();
+    };
+
+    std::sort(units.begin(), units.end(), sort);
 }
 
 QModbusDataUnit::RegisterType

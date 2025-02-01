@@ -31,4 +31,22 @@ protected:
     void TearDown() override;
 };
 
+class TestModbusJsonParserWriteOne: public testing::Test
+{
+protected:
+    ModbusJsonParser *m_parser;
+
+    void SetUp() override;
+    void TearDown() override;
+};
+
+class TestModbusJsonParserWriteEmpty: public testing::Test
+{
+protected:
+    ModbusJsonParser *m_parser;
+
+    void SetUp() override;
+    void TearDown() override;
+};
+
 #endif // TESTMODBUSJSONPARSER_H
