@@ -11,6 +11,8 @@ set(SOURCES
     testmodbusjsonparser.cpp
 )
 
+set(RESOURCES tests.qrc)
+
 set(COMPONENTS Core)
 
 set(LIBRARIES
@@ -25,7 +27,7 @@ set(PROJECT_SOURCES ${HEADERS} ${SOURCES})
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${COMPONENTS})
 
-add_executable(${EXECUTABLE_NAME} ${PROJECT_SOURCES})
+add_executable(${EXECUTABLE_NAME} ${PROJECT_SOURCES} ${RESOURCES})
 
 target_link_libraries(${EXECUTABLE_NAME} Qt${QT_VERSION_MAJOR}::Core)
 

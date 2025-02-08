@@ -7,54 +7,76 @@ ModbusJsonParser::ModbusJsonParser(const QByteArray &data, quint16 maxEntries)
 {
     m_document = QJsonDocument::fromJson(data);
     m_maxEntries = maxEntries;
+    m_type = Unknown;
 }
 
 ModbusJsonParser::Request
-ModbusJsonParser::readRequest() const
+ModbusJsonParser::request()
 {
+    auto setValues = [](auto &current, const QJsonArray &values, QModbusDataUnit &unit) -> void
+    {
+        for (int j = 0, total = int(unit.valueCount()); j < total; ++j)
+        {
+            if (current == values.end())
+                break;
+
+            unit.setValue(j, current->toInt());
+            current++;
+        }
+    };
+
     Request request;
 
     QJsonObject jsonObj = m_document.object();
     QJsonArray devices = jsonObj.value("devices").toArray();
 
-    for (const auto device : devices)
+    for (const auto &device : devices)
     {
         QJsonObject deviceObj = device.toObject();
         quint8 address = deviceObj.value("address").toInt(1);
 
-        QModbusDataUnit::RegisterType type = getType(deviceObj.value("type").toString());
+        auto registertype = getType(deviceObj.value("type").toString());
         quint16 startRegister = deviceObj.value("startRegister").toInt(0);
         quint16 numberOfEntries = deviceObj.value("numberOfEntries").toInt(1);
+
+        bool hasValues = deviceObj.contains("values");
+
+        QJsonArray values;
+        QJsonArray::Iterator current;
+
+        if (hasValues)
+        {
+            values = deviceObj.value("values").toArray();
+            current = values.begin();
+            m_type = Write;
+        }
+        else
+        {
+            m_type = Read;
+        }
 
         for (int i = 0, r = startRegister; i < numberOfEntries; i += m_maxEntries, r += m_maxEntries)
         {
             quint16 entries = qMin(m_maxEntries, quint16(numberOfEntries - i));
-            request[address].append(QModbusDataUnit(type, r, entries));
+
+            auto unit = QModbusDataUnit(registertype, r, entries);
+
+            if (hasValues)
+            {
+                setValues(current, values, unit);
+            }
+
+            request[address].append(unit);
         }
-    }
-
-    if (!request.isEmpty())
-    {
-        auto sortRequest = [](const auto &a, const auto &b) -> bool
-        {
-            quint8 addressA = a->key();
-            quint8 addressB = b->key();
-
-            QModbusDataUnit unitA = a->value();
-            QModbusDataUnit unitB = b->value();
-
-            return ((addressA < addressB) && (unitA.startAddress() < unitB.startAddress()));
-        };
     }
 
     return request;
 }
 
-ModbusJsonParser::Request
-ModbusJsonParser::writeRequest() const
+ModbusJsonParser::RequestType
+ModbusJsonParser::type()
 {
-#warning // TODO: implement write request
-    return Request();
+    return m_type;
 }
 
 ModbusJsonParser::Addresses

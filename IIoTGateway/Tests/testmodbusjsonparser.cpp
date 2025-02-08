@@ -1,18 +1,27 @@
 #include "testmodbusjsonparser.h"
 
+#include <QFile>
+
+QByteArray readJsonFile(const QString &filename)
+{
+    QFile file(filename);
+
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        return QByteArray();
+    }
+
+    auto data = file.readAll();
+
+    file.close();
+
+    return data;
+}
+
 void
 TestModbusJsonParserReadOne::SetUp()
 {
-    QByteArray data = "{"
-                      " \"devices\": ["
-                      "     {"
-                      "         \"address\": 240,"
-                      "         \"type\": \"HoldingRegisters\","
-                      "         \"startRegister\": 0,"
-                      "         \"numberOfEntries\": 10"
-                      "     }"
-                      " ]"
-                      "}";
+    auto data = readJsonFile(":/json/readone.json");
 
     m_parser = new ModbusJsonParser(data);
 }
@@ -28,9 +37,11 @@ TestModbusJsonParserReadOne::TearDown()
 
 TEST_F(TestModbusJsonParserReadOne, TestReadRequest)
 {
-    ModbusJsonParser::Request readRequest = m_parser->readRequest();
+    const auto readRequest = m_parser->request();
+    const auto type = m_parser->type();
 
     ASSERT_FALSE(readRequest.isEmpty());
+    ASSERT_EQ(ModbusJsonParser::Read, type);
 
     auto addresses = readRequest.keys();
     ASSERT_EQ(1, addresses.count());
@@ -48,28 +59,7 @@ TEST_F(TestModbusJsonParserReadOne, TestReadRequest)
 void
 TestModbusJsonParserReadMultiple::SetUp()
 {
-    QByteArray data = "{"
-                      " \"devices\": ["
-                      "     {"
-                      "         \"address\": 1,"
-                      "         \"type\": \"HoldingRegisters\","
-                      "         \"startRegister\": 0,"
-                      "         \"numberOfEntries\": 10"
-                      "     },"
-                      "     {"
-                      "         \"address\": 1,"
-                      "         \"type\": \"HoldingRegisters\","
-                      "         \"startRegister\": 10,"
-                      "         \"numberOfEntries\": 10"
-                      "     },"
-                      "     {"
-                      "         \"address\": 2,"
-                      "         \"type\": \"HoldingRegisters\","
-                      "         \"startRegister\": 0,"
-                      "         \"numberOfEntries\": 40"
-                      "     }"
-                      " ]"
-                      "}";
+    auto data = readJsonFile(":/json/readmultiple.json");
 
     m_parser = new ModbusJsonParser(data);
 }
@@ -92,9 +82,11 @@ TEST_F(TestModbusJsonParserReadMultiple, TestReadRequest)
         ASSERT_EQ(10, unit.valueCount());
     };
 
-    ModbusJsonParser::Request readRequest = m_parser->readRequest();
+    const auto readRequest = m_parser->request();
+    const auto type = m_parser->type();
 
     ASSERT_FALSE(readRequest.isEmpty());
+    ASSERT_EQ(ModbusJsonParser::Read, type);
 
     auto addresses = readRequest.keys();
     ASSERT_EQ(2, addresses.count());
@@ -133,7 +125,7 @@ TestModbusJsonParserReadEmpty::TearDown()
 
 TEST_F(TestModbusJsonParserReadEmpty, TestReadRequestEmpty)
 {
-    ModbusJsonParser::Request readRequest = m_parser->readRequest();
+    auto readRequest = m_parser->request();
 
     ASSERT_TRUE(readRequest.isEmpty());
 }
@@ -141,7 +133,9 @@ TEST_F(TestModbusJsonParserReadEmpty, TestReadRequestEmpty)
 void
 TestModbusJsonParserWriteOne::SetUp()
 {
-    m_parser = new ModbusJsonParser(QByteArray());
+    auto data = readJsonFile(":/json/writeone.json");
+
+    m_parser = new ModbusJsonParser(data);
 }
 
 void
@@ -155,9 +149,97 @@ TestModbusJsonParserWriteOne::TearDown()
 
 TEST_F(TestModbusJsonParserWriteOne, TestWriteRequest)
 {
-    auto writeRequest = m_parser->readRequest();
+    const auto writeRequest = m_parser->request();
+    const auto type = m_parser->type();
 
-    GTEST_SKIP() << "Implement this test";
+    ASSERT_FALSE(writeRequest.isEmpty());
+    ASSERT_EQ(ModbusJsonParser::Write, type);
+
+    auto addresses = writeRequest.keys();
+    ASSERT_EQ(1, addresses.count());
+
+    auto address = addresses.first();
+    ASSERT_EQ(55, address);
+
+    auto unit = writeRequest.value(address).at(0);
+
+    ASSERT_TRUE(unit.isValid());
+    ASSERT_EQ(QModbusDataUnit::HoldingRegisters, unit.registerType());
+    ASSERT_EQ(3, unit.startAddress());
+
+    QList<quint16> expected = { 88, 2, 65533, 4, 5, 0, 7, 8, 255, 10 };
+    auto values = unit.values();
+
+    bool result = std::equal(values.begin(), values.end(), expected.begin());
+
+    ASSERT_TRUE(result);
+}
+
+void
+TestModbusJsonParserWriteMultiple::SetUp()
+{
+    auto data = readJsonFile(":/json/writemultiple.json");
+
+    m_parser = new ModbusJsonParser(data);
+}
+
+void
+TestModbusJsonParserWriteMultiple::TearDown()
+{
+    if (m_parser)
+    {
+        delete m_parser;
+    }
+}
+
+TEST_F(TestModbusJsonParserWriteMultiple, TestWriteRequest)
+{
+    auto testUnit = [] (auto type, auto start, auto &expected, auto &unit) -> void
+    {
+        ASSERT_TRUE(unit.isValid());
+        ASSERT_EQ(type, unit.registerType());
+        ASSERT_EQ(start, unit.startAddress());
+
+        auto values = unit.values();
+        bool result = std::equal(values.begin(), values.end(), expected.begin());
+
+        ASSERT_TRUE(result);
+    };
+
+    const auto writeRequest = m_parser->request();
+    const auto type = m_parser->type();
+
+    ASSERT_FALSE(writeRequest.isEmpty());
+    ASSERT_EQ(ModbusJsonParser::Write, type);
+
+    auto addresses = ModbusJsonParser::sortedAddress(writeRequest);
+    ASSERT_EQ(2, addresses.count());
+
+    QList<quint8> expectedAddresses = { 55, 60 };
+
+    bool result = std::equal(addresses.begin(), addresses.end(), expectedAddresses.begin());
+
+    ASSERT_TRUE(result);
+
+    auto unit1 = writeRequest.value(addresses.at(0));
+
+    ASSERT_EQ(1, unit1.count());
+
+    QList<quint16> expected = { 88, 2, 65533, 4, 5, 0, 7, 8, 255, 10 };
+
+    testUnit(QModbusDataUnit::HoldingRegisters, 3, expected, unit1.at(0));
+
+    auto unit2 = writeRequest.value(addresses.at(1));
+
+    ASSERT_EQ(2, unit2.count());
+
+    expected = { 88, 2, 65533, 4, 55, 0, 7, 8, 255, 1080 };
+
+    testUnit(QModbusDataUnit::HoldingRegisters, 0, expected, unit2.at(0));
+
+    expected = { 68, 72, 780, 2556, 101, 99, 0, 23 };
+
+    testUnit(QModbusDataUnit::HoldingRegisters, 10, expected, unit2.at(1));
 }
 
 void
@@ -177,8 +259,7 @@ TestModbusJsonParserWriteEmpty::TearDown()
 
 TEST_F(TestModbusJsonParserWriteEmpty, TestWriteRequestEmpty)
 {
-    auto writeRequest = m_parser->readRequest();
+    auto writeRequest = m_parser->request();
 
     ASSERT_TRUE(writeRequest.isEmpty());
 }
-

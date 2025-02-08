@@ -57,7 +57,19 @@ CommModbus::setModbusClient(ModbusClientInterface *client)
 void
 CommModbus::incoming(QByteArray data)
 {
-    qDebug() << "Incoming";
+    qDebug() << "Incoming" << data;
+
+    auto parser = ModbusJsonParser(data);
+    auto request = parser.request();
+
+    if (parser.type() == ModbusJsonParser::Write)
+    {
+        writeRegisters(request);
+    }
+    else
+    {
+        readRegisters(request);
+    }
 }
 
 void
@@ -117,59 +129,25 @@ CommModbus::readRegisters(const ModbusJsonParser::Request &request)
 void
 CommModbus::writeRegisters(const ModbusJsonParser::Request &request)
 {
-    quint8 address = 240;
-    static qint16 data = 1;
+    const auto addresses = ModbusJsonParser::sortedAddress(request);
 
-    auto writeUnit = QModbusDataUnit(); //writeRequest();
-    auto table = writeUnit.registerType();
-
-    for (int i = 0, total = int(writeUnit.valueCount()); i < total; ++i)
+    for (const auto &address : addresses)
     {
-        if (table == QModbusDataUnit::Coils)
+        const auto units = request.value(address);
+
+        for (const auto &unit : units)
         {
-            // writeUnit.setValue(i, m_writeModel.m_coils[i + writeUnit.startAddress()]);
+            if (auto *reply = m_modbusClient->sendWriteRequest(unit, address))
+            {
+                QEventLoop loop;
+                connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
+                loop.exec();
+            }
+            else
+            {
+                emit error(QString("Write error: %1").arg(m_modbusClient->errorString()).toUtf8());
+            }
         }
-        else
-        {
-            // writeUnit.setValue(i, m_writeModel.m_holdingRegisters[i + writeUnit.startAddress()]);
-            data = data == 1 ? 0 : 1;
-            writeUnit.setValue(i, data);
-        }
-    }
-
-    if (auto *reply = m_modbusClient->sendWriteRequest(writeUnit, address))
-    {
-        if (!reply->isFinished())
-        {
-            connect(reply, &QModbusReply::finished, this, [this, reply](){
-
-                if (reply->error() == QModbusDevice::ProtocolError)
-                {
-                    qDebug() <<tr("Write response error: %1 (Mobus exception: 0x%2)")
-                    .arg(reply->errorString()).arg(reply->rawResult().exceptionCode(), -1, 16);
-                }
-                else if (reply->error() != QModbusDevice::NoError)
-                {
-                    qDebug() << tr("Write response error: %1 (code: 0x%2)").
-                                arg(reply->errorString()).arg(reply->error(), -1, 16);
-                }
-
-                reply->deleteLater();
-
-                // QTimer::singleShot(5000, this, &CommModbus::writeRegisters);
-            });
-        }
-        else
-        {
-            // broadcast replies return immediately
-            reply->deleteLater();
-
-            // QTimer::singleShot(5000, this, &CommModbus::writeRegisters);
-        }
-    }
-    else
-    {
-        qDebug() << tr("Write error: ") + m_modbusClient->errorString();
     }
 }
 
@@ -255,7 +233,7 @@ CommModbus::loadReadRequestSettings()
 
     file.close();
 
-    return parser.readRequest();
+    return parser.request();
 }
 
 QJsonArray
@@ -263,7 +241,7 @@ CommModbus::registersToJsonArray(const Registers &registers)
 {
     QJsonArray regs;
 
-    auto keys = registers.keys();
+    const auto keys = registers.keys();
 
     for (const auto &key : keys)
     {
