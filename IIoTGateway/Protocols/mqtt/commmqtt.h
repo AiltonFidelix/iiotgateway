@@ -2,6 +2,11 @@
 #define COMMMQTT_H
 
 #include "../comminterface.h"
+#include "commmqttcallback.h"
+#include "mqtt/async_client.h"
+
+#include <QThread>
+#include <QTimer>
 
 class CommMQTT : public CommInterface
 {
@@ -19,6 +24,11 @@ public slots:
 
 private:
     static int m_typeId;
+    mqtt::async_client *m_client;
+    std::string m_topic;
+    int m_qos;
+
+    CommMQTTCallback m_callback;
 };
 
 #endif // COMMMQTT_H

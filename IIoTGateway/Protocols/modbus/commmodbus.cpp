@@ -121,6 +121,8 @@ CommModbus::readRegisters(const ModbusJsonParser::Request &request)
         json.insert(QString::number(address), registersToJsonArray(registers));
     }
 
+    // qDebug() << json;
+
     emit outgoing(QJsonDocument(json).toJson(QJsonDocument::Compact));
 
     qDebug() << "readRegisters took" << time.elapsed() << "ms";
@@ -197,7 +199,7 @@ CommModbus::ispolling()
 void
 CommModbus::initPolling()
 {
-    if (!ispolling())
+    if (ispolling())
     {
         m_readRequest = loadReadRequestSettings();
 

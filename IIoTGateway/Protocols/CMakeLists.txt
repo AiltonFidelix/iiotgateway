@@ -11,6 +11,7 @@ set(HEADERS
     modbus/commmodbustcp.h
     modbus/writeregistermodel.h
     mqtt/commmqtt.h
+    mqtt/commmqttcallback.h
 )
 
 set(SOURCES
@@ -22,6 +23,7 @@ set(SOURCES
     modbus/commmodbustcp.cpp
     modbus/writeregistermodel.cpp
     mqtt/commmqtt.cpp
+    mqtt/commmqttcallback.cpp
 )
 
 set(QT_COMPONENTS
