@@ -69,6 +69,7 @@ Gateway::stop()
     {
         m_threadEdge->quit();
         m_threadEdge->wait();
+
         delete m_threadEdge;
     }
 
@@ -76,6 +77,7 @@ Gateway::stop()
     {
         m_threadCloud->quit();
         m_threadCloud->wait();
+
         delete m_threadCloud;
     }
 

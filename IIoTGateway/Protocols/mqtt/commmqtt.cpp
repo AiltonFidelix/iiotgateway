@@ -38,7 +38,6 @@ CommMQTT::connectComm()
         auto connTok = m_client->connect(connOpts);
         qDebug() << "Waiting for the connection...";
         connTok->wait();
-
     }
     catch (const mqtt::exception& ex)
     {

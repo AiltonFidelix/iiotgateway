@@ -92,12 +92,15 @@ CommModbus::readRegisters(const ModbusJsonParser::Request &request)
     QElapsedTimer time;
     time.start();
 
-    auto json = QJsonObject();
+    auto devices = QJsonArray();
 
     const auto addresses = ModbusJsonParser::sortedAddress(request);
 
     for (const auto &address : addresses)
     {
+        auto device = QJsonObject();
+        auto errors = QJsonArray();
+
         auto registers = Registers();
         auto units = request.value(address);
         ModbusJsonParser::sortRequestUnits(units);
@@ -114,16 +117,32 @@ CommModbus::readRegisters(const ModbusJsonParser::Request &request)
             }
             else
             {
-                emit error(QString("Read error: %1").arg(m_modbusClient->errorString()).toUtf8());
+                auto errorMessage = QString("Read error: %1").arg(m_modbusClient->errorString());
+                errors.append(errorMessage);
+                emit error(errorMessage.toUtf8());
             }
         }
 
-        json.insert(QString::number(address), registersToJsonArray(registers));
+        device.insert("address", address);
+        device.insert("registers", registersToJsonArray(registers));
+
+        if (!errors.isEmpty())
+        {
+            device.insert("errors", errors);
+        }
+
+        devices.append(device);
     }
 
-    // qDebug() << json;
+    if (!devices.isEmpty())
+    {
+        auto json = QJsonObject();
 
-    emit outgoing(QJsonDocument(json).toJson(QJsonDocument::Compact));
+        json.insert("datetime", QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss.zzz"));
+        json.insert("devices", devices);
+
+        emit outgoing(QJsonDocument(json).toJson(QJsonDocument::Compact));
+    }
 
     qDebug() << "readRegisters took" << time.elapsed() << "ms";
 }

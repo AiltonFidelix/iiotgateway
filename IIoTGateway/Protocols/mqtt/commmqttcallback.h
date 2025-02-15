@@ -4,9 +4,9 @@
 #include <QObject>
 #include "mqtt/callback.h"
 
-class CommMQTTCallback : public virtual mqtt::callback
+class CommMQTTCallback : public QObject, public virtual mqtt::callback
 {
-    // Q_OBJECT
+    Q_OBJECT
 public:
     // CommMQTTCallback() = default;
     // ~CommMQTTCallback() = default;
@@ -16,11 +16,11 @@ public:
     void message_arrived(mqtt::const_message_ptr ptr) override;
     void delivery_complete(mqtt::delivery_token_ptr token) override;
 
-// signals:
-//     void mqtt_connected();
-//     void mqtt_connection_lost();
-//     void mqtt_message_arrived(const QString &message);
-//     void mqtt_delivery_complete();
+signals:
+    void cbConnected();
+    void cbConnection_lost(const QByteArray &cause);
+    void cbMessage_arrived(const QByteArray &message);
+    void cbDelivery_complete();
 };
 
 #endif // COMMMQTTCALLBACK_H

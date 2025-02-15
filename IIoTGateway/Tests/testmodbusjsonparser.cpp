@@ -2,7 +2,8 @@
 
 #include <QFile>
 
-QByteArray readJsonFile(const QString &filename)
+QByteArray
+readJsonFile(const QString &filename)
 {
     QFile file(filename);
 

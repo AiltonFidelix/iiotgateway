@@ -1,5 +1,27 @@
 #include "testcommmodbus.h"
 
+#include <QObject>
+#include <QFile>
+#include <QModbusReply>
+
+#warning // TODO: move TestUtils
+QByteArray
+readJsonFile2(const QString &filename)
+{
+    QFile file(filename);
+
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        return QByteArray();
+    }
+
+    auto data = file.readAll();
+
+    file.close();
+
+    return data;
+}
+
 void
 TestCommModbus::SetUp()
 {
@@ -36,6 +58,43 @@ TEST_F(TestCommModbus, TestIsConnected)
     EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(testing::Return(QModbusDevice::ConnectedState));
 
     EXPECT_TRUE(m_commModbus.isconnected());
+}
+
+TEST_F(TestCommModbus, TestReadRequest)
+{
+    GTEST_SKIP_("Implement TestReadRequest");
+
+    auto reply = new QModbusReply(QModbusReply::Common, 240);
+
+    auto emitReply = [&reply]() -> void
+    {
+        emit reply->finished();
+    };
+
+    auto unit = QModbusDataUnit(QModbusDataUnit::HoldingRegisters);
+
+    unit.setStartAddress(0);
+    unit.setValueCount(10);
+    unit.setValues({ 1, 50, 58, 100, 6528, 0, 0, 0, 0, 0 });
+
+    reply->setResult(unit);
+
+    EXPECT_CALL(*m_mockModbusClient, sendReadRequest(testing::_, testing::_)).WillOnce(testing::Return(reply));
+
+    auto data = readJsonFile2(":/json/readone.json");
+
+    QTimer::singleShot(10, emitReply);
+
+    QByteArray result;
+
+    auto handleResult = [&result](QByteArray data) -> void
+    {
+        result = data;
+    };
+
+    QObject::connect(&m_commModbus, &CommModbus::outgoing, handleResult);
+
+    m_commModbus.incoming(data);
 }
 
 TEST_F(TestCommModbus, TestDisconnect)
