@@ -2,13 +2,18 @@ set(EXECUTABLE_NAME TestsRunner)
 
 set(HEADERS
     mockmodbusclient.h
+    # mockmqttclient.h
     testcommmodbus.h
     testmodbusjsonparser.h
+    testutils.h
 )
 
 set(SOURCES
+    # mockmqttclient.cpp
     testcommmodbus.cpp
     testmodbusjsonparser.cpp
+    testutils.cpp
+    main.cpp
 )
 
 set(RESOURCES tests.qrc)
@@ -20,6 +25,7 @@ set(LIBRARIES
     Protocols
     gtest_main
     gmock_main
+    paho-mqttpp3
 )
 
 set(PROJECT_SOURCES ${HEADERS} ${SOURCES})

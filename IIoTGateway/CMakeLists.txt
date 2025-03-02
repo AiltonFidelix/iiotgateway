@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(IIoTGateway VERSION 1.0.0  LANGUAGES CXX)
+project(IIoTGateway VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -25,14 +25,14 @@ include(FetchContent)
 
 FetchContent_Declare(googletest
     GIT_REPOSITORY https://github.com/google/googletest
-    GIT_TAG v1.15.2
+    GIT_TAG v1.16.0
 )
 
 FetchContent_MakeAvailable(googletest)
 
 FetchContent_Declare(pahomqttcpp
     GIT_REPOSITORY https://github.com/eclipse-paho/paho.mqtt.cpp
-    GIT_TAG v1.5.0
+    GIT_TAG v1.5.1
 )
 
 FetchContent_MakeAvailable(pahomqttcpp)

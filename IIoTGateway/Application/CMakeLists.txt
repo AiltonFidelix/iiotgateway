@@ -10,7 +10,10 @@ set(SOURCES
     gateway.cpp
 )
 
-set(QT_COMPONENTS Core)
+set(QT_COMPONENTS
+    Core
+    HttpServer
+)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPONENTS})

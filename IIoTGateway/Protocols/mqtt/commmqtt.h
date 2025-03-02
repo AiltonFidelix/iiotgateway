@@ -10,10 +10,20 @@
 
 class CommMQTT : public CommInterface
 {
+    using ConnOptions = struct {
+        std::string username;
+        std::string password;
+        int mqttVersion;
+        int connectTimeout;
+        int keepAliveInterval;
+        bool reconnect;
+        bool cleanSession;
+    };
+
     Q_OBJECT
 public:
-    Q_INVOKABLE CommMQTT() = default;
-    ~CommMQTT() = default;
+    Q_INVOKABLE CommMQTT();
+    ~CommMQTT();
 
     bool isconnected() override;
 
@@ -22,12 +32,20 @@ public slots:
     void disconnectComm() override;
     void incoming(QByteArray data) override;
 
+private slots:
+    void onConnected(QByteArray message);
+    void onMessageArrived(QByteArray message);
+
 private:
     static int m_typeId;
-    mqtt::async_client *m_client;
-    std::string m_topic;
     int m_qos;
+    bool m_subscribe;
 
+    mqtt::async_client *m_client;
+    std::string m_pubTopic;
+    std::string m_subTopic;
+
+    ConnOptions m_connOptions;
     CommMQTTCallback m_callback;
 };
 

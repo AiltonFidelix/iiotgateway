@@ -19,14 +19,14 @@ public:
     CommModbus();
     ~CommModbus();
 
-    void connectComm() = 0;
-    void disconnectComm();
     bool isconnected();
 
     ModbusClientInterface *modbusClient();
     void setModbusClient(ModbusClientInterface *client);
 
 public slots:
+    void connectComm() = 0;
+    void disconnectComm();
     void incoming(QByteArray data);
 
 protected slots:

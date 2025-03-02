@@ -1,4 +1,5 @@
 build
+venv
 .vscode
 *.txt.user
 *.drawio.bkp

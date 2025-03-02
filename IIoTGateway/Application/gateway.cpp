@@ -20,6 +20,8 @@ Gateway::~Gateway()
 void
 Gateway::start()
 {
+    qDebug() << "Starting gateway...";
+
     CommFactory commFactory;
 
     QByteArray edgeProtocol = qgetenv("EDGE_PROTOCOL").toUpper();
@@ -48,10 +50,12 @@ Gateway::start()
         connect(m_threadEdge, &QThread::finished, commEdge, &CommInterface::disconnectComm);
         connect(commEdge, &CommInterface::disconnected, commEdge, &CommInterface::deleteLater);
         connect(commEdge, &CommInterface::error, this, &Gateway::notifyError, Qt::QueuedConnection);
+        connect(commEdge, &CommInterface::connectionFailed, this, &Gateway::stop, Qt::QueuedConnection);
 
         connect(m_threadCloud, &QThread::finished, commCloud, &CommInterface::disconnectComm);
         connect(commCloud, &CommInterface::disconnected, commCloud, &CommInterface::deleteLater);
         connect(commCloud, &CommInterface::error, this, &Gateway::notifyError, Qt::QueuedConnection);
+        connect(commCloud, &CommInterface::connectionFailed, this, &Gateway::stop, Qt::QueuedConnection);
 
         m_threadEdge->start();
         m_threadCloud->start();
@@ -65,24 +69,27 @@ Gateway::start()
 void
 Gateway::stop()
 {
-    if (m_threadEdge)
+    auto quitThread = [](QThread *thread) -> QThread*
     {
-        m_threadEdge->quit();
-        m_threadEdge->wait();
+        if (thread != nullptr)
+        {
+            if (thread->isRunning())
+            {
+                thread->quit();
+                thread->wait();
+            }
 
-        delete m_threadEdge;
-    }
+            delete thread;
+            thread = nullptr;
+        }
 
-    if (m_threadCloud)
-    {
-        m_threadCloud->quit();
-        m_threadCloud->wait();
+        return thread;
+    };
 
-        delete m_threadCloud;
-    }
+    m_threadEdge = quitThread(m_threadEdge);
+    m_threadCloud = quitThread(m_threadCloud);
 
-    m_threadEdge = nullptr;
-    m_threadCloud = nullptr;
+    qDebug() << "Stoping gateway...";
 }
 
 void
@@ -97,5 +104,4 @@ void
 Gateway::notifyError(QByteArray error)
 {
     qWarning() << error;
-    stop();
 }

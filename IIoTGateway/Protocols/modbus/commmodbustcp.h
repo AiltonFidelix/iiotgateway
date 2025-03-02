@@ -12,6 +12,7 @@ public:
     Q_INVOKABLE CommModbusTCP() = default;
     ~CommModbusTCP() = default;
 
+public slots:
     void connectComm() override;
 
 private:

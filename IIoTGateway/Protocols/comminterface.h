@@ -14,6 +14,7 @@ public:
 signals:
     void connected();
     void disconnected();
+    void connectionFailed();
     void outgoing(QByteArray data);
     void error(QByteArray error);
 

@@ -5,29 +5,20 @@
 void
 CommMQTTCallback::connected(const mqtt::string &message)
 {
-    qDebug() << "Connected: " << message;
-
-    emit cbConnected();
+    emit cbConnected(QByteArray::fromStdString(message));
 }
 
 void
 CommMQTTCallback::connection_lost(const std::string &cause)
 {
-    auto message = QByteArray::fromStdString(cause);
-
-    qDebug() << "Connection lost: " << message;
-
-    emit cbConnection_lost(message);
+    emit cbConnection_lost(QByteArray::fromStdString(cause));
 }
 
 void
 CommMQTTCallback::message_arrived(mqtt::const_message_ptr ptr)
 {
     auto message = QByteArray::fromStdString(ptr->to_string());
-
-    qDebug() << "Message arrived: " << message;
-
-    emit cbMessage_arrived(message);
+    emit cbMessageArrived(message);
 }
 
 void
@@ -37,5 +28,5 @@ CommMQTTCallback::delivery_complete(mqtt::delivery_token_ptr token)
     qDebug()  << "Message delivered is complete:" << token->is_complete();
     qDebug()  << "Message delivered code:" << token->get_return_code();
 
-    emit cbDelivery_complete();
+    emit cbDeliveryComplete();
 }

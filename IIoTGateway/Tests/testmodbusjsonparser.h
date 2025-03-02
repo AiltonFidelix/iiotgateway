@@ -22,15 +22,6 @@ protected:
     void TearDown() override;
 };
 
-class TestModbusJsonParserReadEmpty: public testing::Test
-{
-protected:
-    ModbusJsonParser *m_parser;
-
-    void SetUp() override;
-    void TearDown() override;
-};
-
 class TestModbusJsonParserWriteOne: public testing::Test
 {
 protected:
@@ -49,7 +40,7 @@ protected:
     void TearDown() override;
 };
 
-class TestModbusJsonParserWriteEmpty: public testing::Test
+class TestModbusJsonParserEmpty: public testing::Test
 {
 protected:
     ModbusJsonParser *m_parser;

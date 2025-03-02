@@ -1,8 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>json/readone.json</file>
-        <file>json/readmultiple.json</file>
-        <file>json/writeone.json</file>
-        <file>json/writemultiple.json</file>
+        <file>requests/readone.json</file>
+        <file>requests/readmultiple.json</file>
+        <file>requests/writeone.json</file>
+        <file>requests/writemultiple.json</file>
     </qresource>
 </RCC>

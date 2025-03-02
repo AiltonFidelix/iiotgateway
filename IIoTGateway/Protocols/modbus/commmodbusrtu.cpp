@@ -64,6 +64,7 @@ CommModbusRTU::connectComm()
         if (!m_modbusClient->connectDevice())
         {
             emit error(QString("Connection failed: %1").arg(m_modbusClient->errorString()).toUtf8());
+            emit connectionFailed();
         }
         else
         {

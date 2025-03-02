@@ -1,8 +1,9 @@
 #include <QCoreApplication>
 #include <signal.h>
-#include <iostream>
+
 #include "main.h"
 #include "gateway.h"
+#include "interface.h"
 
 static Gateway *gateway = nullptr;
 
@@ -13,13 +14,16 @@ int main(int argc, char *argv[])
 
     setup_unix_signal_handlers();
 
+    // ControlServer server;
+    // server.start();
+
     gateway = new Gateway();
     gateway->start();
 
     return app.exec();
 }
 
-[[ noreturn ]] void quit(int sig)
+Q_NORETURN void quit(int sig)
 {
     const QHash<int, QByteArray> sigNames = {
         {SIGINT, "SIGINT"},
@@ -38,8 +42,11 @@ int main(int argc, char *argv[])
 
     qDebug("Closing all connections and exiting the process...");
 
-    gateway->stop();
-    gateway->deleteLater();
+    if (gateway)
+    {
+        gateway->stop();
+        gateway->deleteLater();
+    }
 
     exit(EXIT_FAILURE);
 }

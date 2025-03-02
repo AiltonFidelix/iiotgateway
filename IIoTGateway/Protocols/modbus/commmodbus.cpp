@@ -33,7 +33,12 @@ CommModbus::~CommModbus()
 void
 CommModbus::disconnectComm()
 {
-    m_modbusClient->disconnectDevice();
+    if (!isconnected())
+    {
+        m_modbusClient->disconnectDevice();
+    }
+
+    emit disconnected();
 }
 
 bool
@@ -57,18 +62,24 @@ CommModbus::setModbusClient(ModbusClientInterface *client)
 void
 CommModbus::incoming(QByteArray data)
 {
-    qDebug() << "Incoming" << data;
-
     auto parser = ModbusJsonParser(data);
     auto request = parser.request();
 
-    if (parser.type() == ModbusJsonParser::Write)
+    auto type = parser.type();
+
+    if (type == ModbusJsonParser::Write)
     {
+        qDebug() << "Received a write request";
         writeRegisters(request);
+    }
+    else if(type == ModbusJsonParser::Read)
+    {
+        qDebug() << "Received a read request";
+        readRegisters(request);
     }
     else
     {
-        readRegisters(request);
+        qWarning() << "Received an unknown request";
     }
 }
 
@@ -88,7 +99,7 @@ CommModbus::stateChanged(QModbusDevice::State state)
 void
 CommModbus::readRegisters(const ModbusJsonParser::Request &request)
 {
-#warning // TODO: Remover QElapsedTimer later
+#warning // TODO: Remove QElapsedTimer later
     QElapsedTimer time;
     time.start();
 
@@ -144,7 +155,7 @@ CommModbus::readRegisters(const ModbusJsonParser::Request &request)
         emit outgoing(QJsonDocument(json).toJson(QJsonDocument::Compact));
     }
 
-    qDebug() << "readRegisters took" << time.elapsed() << "ms";
+    // qDebug() << "readRegisters took" << time.elapsed() << "ms";
 }
 
 void

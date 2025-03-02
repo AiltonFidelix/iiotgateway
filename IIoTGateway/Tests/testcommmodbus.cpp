@@ -1,26 +1,9 @@
 #include "testcommmodbus.h"
+#include "testutils.h"
 
-#include <QObject>
-#include <QFile>
 #include <QModbusReply>
-
-#warning // TODO: move TestUtils
-QByteArray
-readJsonFile2(const QString &filename)
-{
-    QFile file(filename);
-
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        return QByteArray();
-    }
-
-    auto data = file.readAll();
-
-    file.close();
-
-    return data;
-}
+#include <QJsonArray>
+#include <QJsonObject>
 
 void
 TestCommModbus::SetUp()
@@ -62,28 +45,27 @@ TEST_F(TestCommModbus, TestIsConnected)
 
 TEST_F(TestCommModbus, TestReadRequest)
 {
-    GTEST_SKIP_("Implement TestReadRequest");
+    const quint8 expectedAddress = 240;
+    const quint8 maxRegisters = 10;
+    const QList<quint16> expectedValues{ 1, 50, 58, 100, 6528, 2048, 0, 65535, 35, 88 };
 
-    auto reply = new QModbusReply(QModbusReply::Common, 240);
+    auto reply = new QModbusReply(QModbusReply::Common, expectedAddress);
 
-    auto emitReply = [&reply]() -> void
+    auto emitFinished = [&reply]() -> void
     {
         emit reply->finished();
     };
 
-    auto unit = QModbusDataUnit(QModbusDataUnit::HoldingRegisters);
-
-    unit.setStartAddress(0);
-    unit.setValueCount(10);
-    unit.setValues({ 1, 50, 58, 100, 6528, 0, 0, 0, 0, 0 });
+    auto unit = QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 0, maxRegisters);
+    unit.setValues(expectedValues);
 
     reply->setResult(unit);
 
     EXPECT_CALL(*m_mockModbusClient, sendReadRequest(testing::_, testing::_)).WillOnce(testing::Return(reply));
 
-    auto data = readJsonFile2(":/json/readone.json");
+    auto request = TestUtils::readJsonFile(":/requests/readone.json");
 
-    QTimer::singleShot(10, emitReply);
+    QTimer::singleShot(1, emitFinished);
 
     QByteArray result;
 
@@ -94,7 +76,30 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     QObject::connect(&m_commModbus, &CommModbus::outgoing, handleResult);
 
-    m_commModbus.incoming(data);
+    m_commModbus.incoming(request);
+
+    auto jsonResult = QJsonDocument::fromJson(result).object();
+
+    auto devices = jsonResult.value("devices").toArray();
+
+    ASSERT_EQ(1, devices.count());
+
+    auto firstDevice = devices.first().toObject();
+
+    ASSERT_EQ(expectedAddress, firstDevice.value("address").toInt());
+
+    auto registers = firstDevice.value("registers").toArray();
+
+    ASSERT_EQ(maxRegisters, registers.count());
+
+    for (const auto reg : registers)
+    {
+        auto obj = reg.toObject();
+        auto regAddress = obj.value("register").toInt();
+        auto regValue = obj.value("value").toInt();
+
+        ASSERT_EQ(expectedValues.at(regAddress), regValue);
+    }
 }
 
 TEST_F(TestCommModbus, TestDisconnect)
