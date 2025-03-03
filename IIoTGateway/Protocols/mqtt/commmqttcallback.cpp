@@ -24,9 +24,6 @@ CommMQTTCallback::message_arrived(mqtt::const_message_ptr ptr)
 void
 CommMQTTCallback::delivery_complete(mqtt::delivery_token_ptr token)
 {
-    // qDebug()  << "Message delivered" << token->get_message()->to_string();
-    qDebug()  << "Message delivered is complete:" << token->is_complete();
-    qDebug()  << "Message delivered code:" << token->get_return_code();
-
+    Q_UNUSED(token)
     emit cbDeliveryComplete();
 }

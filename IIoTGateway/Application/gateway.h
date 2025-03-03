@@ -11,6 +11,8 @@ public:
     explicit Gateway(QObject *parent = nullptr);
     ~Gateway();
 
+    bool isRunning();
+
 public slots:
     void start();
     void stop();
@@ -20,6 +22,7 @@ private slots:
     void notifyError(QByteArray error);
 
 private:
+    bool m_isRunning;
     QThread *m_threadEdge;
     QThread *m_threadCloud;
 };

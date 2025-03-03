@@ -6,6 +6,7 @@
 
 Gateway::Gateway(QObject *parent)
     : QObject(parent),
+    m_isRunning(false),
     m_threadEdge(nullptr),
     m_threadCloud(nullptr)
 {
@@ -15,6 +16,12 @@ Gateway::Gateway(QObject *parent)
 Gateway::~Gateway()
 {
     stop();
+}
+
+bool
+Gateway::isRunning()
+{
+    return m_isRunning;
 }
 
 void
@@ -59,6 +66,8 @@ Gateway::start()
 
         m_threadEdge->start();
         m_threadCloud->start();
+
+        m_isRunning = true;
     }
     catch (std::exception &e)
     {
@@ -69,6 +78,8 @@ Gateway::start()
 void
 Gateway::stop()
 {
+    m_isRunning = false;
+
     auto quitThread = [](QThread *thread) -> QThread*
     {
         if (thread != nullptr)

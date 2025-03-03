@@ -2,7 +2,7 @@
 #define COMMMQTTCALLBACK_H
 
 #include <QObject>
-#include "mqtt/callback.h"
+#include <mqtt/callback.h>
 
 class CommMQTTCallback : public QObject, public virtual mqtt::callback
 {
@@ -21,3 +21,4 @@ signals:
 };
 
 #endif // COMMMQTTCALLBACK_H
+

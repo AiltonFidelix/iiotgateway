@@ -1,5 +1,6 @@
 #include "commmqtt.h"
 #include "commfactory.h"
+#include "commmqttactionlistener.h"
 
 #include <QDebug>
 #include <QJsonDocument>
@@ -7,11 +8,13 @@
 constexpr int defaultQos = 0;
 constexpr int defaultConnectionTimeout = 10;
 constexpr int defaultKeepAliveInterval = 60;
+constexpr int maxRetries = 5;
 
 int CommMQTT::m_typeId = CommFactory::registerInterface<CommMQTT*>("MQTT");
 
 CommMQTT::CommMQTT()
     : m_qos(defaultQos),
+    m_retries(0),
     m_subscribe(false),
     m_client(nullptr),
     m_pubTopic(std::string()),
@@ -78,6 +81,12 @@ CommMQTT::isconnected()
 void
 CommMQTT::connectComm()
 {
+    if (m_retries++ >= maxRetries)
+    {
+        emit connectionFailed();
+        return;
+    }
+
     mqtt::connect_options connOpts;
 
     if (!m_connOptions.username.empty() && !m_connOptions.password.empty())
@@ -93,19 +102,22 @@ CommMQTT::connectComm()
     connOpts.set_automatic_reconnect(m_connOptions.reconnect);
     connOpts.set_clean_session(m_connOptions.cleanSession);
 
-#warning // TODO: implement reconnect on failure
+    CommMQTTActionListener listener;
+    connect(&listener, &CommMQTTActionListener::connectionFailed, this, &CommMQTT::connectComm);
+
     try
     {
         qDebug() << "Connecting...";
-        auto connTok = m_client->connect(connOpts);
+        auto connTok = m_client->connect(connOpts, nullptr, listener);
         qDebug() << "Waiting for the connection...";
         connTok->wait();
     }
     catch (const mqtt::exception& ex)
     {
         emit error(QString("MQTT Exception: %1").arg(ex.what()).toUtf8());
-        emit connectionFailed();
     }
+
+    listener.disconnect();
 }
 
 void
@@ -123,6 +135,9 @@ CommMQTT::disconnectComm()
 void
 CommMQTT::incoming(QByteArray data)
 {
+    if (!isconnected())
+        return;
+
     auto message = data.toStdString();
 
     try
@@ -140,7 +155,7 @@ CommMQTT::incoming(QByteArray data)
 void
 CommMQTT::onConnected(QByteArray message)
 {
-    qDebug() << "Connected:" << message;
+    qDebug() << "Connected!";
 
     if (m_subscribe)
     {
