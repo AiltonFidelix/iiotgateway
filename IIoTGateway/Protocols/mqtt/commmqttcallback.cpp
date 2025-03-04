@@ -5,13 +5,16 @@
 void
 CommMQTTCallback::connected(const mqtt::string &message)
 {
-    emit cbConnected(QByteArray::fromStdString(message));
+    qDebug() << "Connected:" << message;
+    emit cbConnected();
 }
 
 void
 CommMQTTCallback::connection_lost(const std::string &cause)
 {
-    emit cbConnection_lost(QByteArray::fromStdString(cause));
+    Q_UNUSED(cause)
+    qWarning() << "Connection lost!";
+    emit cbConnectionLost();
 }
 
 void

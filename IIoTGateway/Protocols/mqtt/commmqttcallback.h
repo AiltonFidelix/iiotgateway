@@ -14,8 +14,8 @@ public:
     void delivery_complete(mqtt::delivery_token_ptr token) override;
 
 signals:
-    void cbConnected(QByteArray message);
-    void cbConnection_lost(QByteArray cause);
+    void cbConnected();
+    void cbConnectionLost();
     void cbMessageArrived(QByteArray message);
     void cbDeliveryComplete();
 };

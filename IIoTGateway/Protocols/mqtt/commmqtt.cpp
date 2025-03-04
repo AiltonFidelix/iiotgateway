@@ -1,6 +1,5 @@
 #include "commmqtt.h"
 #include "commfactory.h"
-#include "commmqttactionlistener.h"
 
 #include <QDebug>
 #include <QJsonDocument>
@@ -102,28 +101,25 @@ CommMQTT::connectComm()
     connOpts.set_automatic_reconnect(m_connOptions.reconnect);
     connOpts.set_clean_session(m_connOptions.cleanSession);
 
-    CommMQTTActionListener listener;
-    connect(&listener, &CommMQTTActionListener::connectionFailed, this, &CommMQTT::connectComm);
+    connect(&m_listener, &CommMQTTActionListener::connectionFailed, this, &CommMQTT::connectComm);
 
     try
     {
         qDebug() << "Connecting...";
-        auto connTok = m_client->connect(connOpts, nullptr, listener);
+        auto connTok = m_client->connect(connOpts, nullptr, m_listener);
         qDebug() << "Waiting for the connection...";
         connTok->wait();
     }
     catch (const mqtt::exception& ex)
     {
-        emit error(QString("MQTT Exception: %1").arg(ex.what()).toUtf8());
+        emit error(QString("MQTT connection exception: %1").arg(ex.what()).toUtf8());
     }
-
-    listener.disconnect();
 }
 
 void
 CommMQTT::disconnectComm()
 {
-    if (m_client->is_connected())
+    if (isconnected())
     {
         auto discTok = m_client->disconnect();
         discTok->wait();
@@ -136,7 +132,9 @@ void
 CommMQTT::incoming(QByteArray data)
 {
     if (!isconnected())
+    {
         return;
+    }
 
     auto message = data.toStdString();
 
@@ -148,19 +146,17 @@ CommMQTT::incoming(QByteArray data)
     }
     catch (const mqtt::exception& ex)
     {
-        emit error(QString("MQTT Exception: %1").arg(ex.what()).toUtf8());
+        emit error(QString("MQTT publish exception: %1").arg(ex.what()).toUtf8());
     }
 }
 
 void
-CommMQTT::onConnected(QByteArray message)
+CommMQTT::onConnected()
 {
-    qDebug() << "Connected!";
-
     if (m_subscribe)
     {
-        qDebug() << "Subscribe:" << m_subTopic;
         m_client->subscribe(m_subTopic, m_qos);
+        qDebug() << "Topic subscribed:" << m_subTopic;
     }
 }
 

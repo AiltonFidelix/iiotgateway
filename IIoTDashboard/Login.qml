@@ -5,8 +5,8 @@ import QtQuick.Controls.Material
 Item {
     id: root
 
-    property string username: "admin"
-    property string password: "admin01"
+    property string username: "a"
+    property string password: "a"
     property string status: "Failed!"
 
     Popup {
@@ -85,7 +85,7 @@ Item {
     }
 
     Text {
-        text: qsTr("IIoTGateway - by Ailton Fidelix")
+        text: qsTr("<b>IIoTGateway</b> - by Ailton Fidelix")
         anchors.bottom: root.bottom
         anchors.horizontalCenter: root.horizontalCenter
         anchors.margins: 5

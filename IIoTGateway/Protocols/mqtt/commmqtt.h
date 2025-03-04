@@ -3,6 +3,7 @@
 
 #include "comminterface.h"
 #include "commmqttcallback.h"
+#include "commmqttactionlistener.h"
 
 #include <QThread>
 #include <QTimer>
@@ -33,7 +34,7 @@ public slots:
     void incoming(QByteArray data) override;
 
 private slots:
-    void onConnected(QByteArray message);
+    void onConnected();
     void onMessageArrived(QByteArray message);
 
 private:
@@ -48,6 +49,7 @@ private:
 
     ConnOptions m_connOptions;
     CommMQTTCallback m_callback;
+    CommMQTTActionListener m_listener;
 };
 
 #endif // COMMMQTT_H

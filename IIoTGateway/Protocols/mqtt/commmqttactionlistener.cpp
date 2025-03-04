@@ -8,8 +8,6 @@ CommMQTTActionListener::on_failure(const mqtt::token &asyncActionToken)
 {
     auto type = asyncActionToken.get_type();
 
-    qDebug() << asyncActionToken.get_error_message();
-
     switch (type)
     {
         case mqtt::token::CONNECT:
