@@ -4,5 +4,6 @@
         <file>Login.qml</file>
         <file>Settings.qml</file>
         <file>ModbusRTU.qml</file>
+        <file>MQTT.qml</file>
     </qresource>
 </RCC>

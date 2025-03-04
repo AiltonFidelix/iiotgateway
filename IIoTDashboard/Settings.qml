@@ -7,7 +7,7 @@ Item {
 
     Column {
         anchors.fill: parent
-        spacing: 5
+        spacing: 10
 
         Row {
             id: rowHeader
@@ -36,77 +36,81 @@ Item {
         }
 
         Row {
-            // anchors.fill: parent
             width: parent.width
             height: parent.height - rowHeader.height
-            spacing: 20
+            spacing: 10
 
             Column {
-                id: colInputProtocol
+                id: colEdgeProtocol
                 spacing: 5
-                leftPadding: 20
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.horizontalCenter
                 width: parent.width / 2
                 height: parent.height - rowHeader.height
 
                 Text {
-                    id: txtInputProtocol
-                    text: qsTr("Input Protocol")
+                    id: txtEdgeProtocol
+                    text: qsTr("Edge Protocol")
                     font.pointSize: 15
                     color: Material.color(Material.DeepPurple)
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 ComboBox {
-                    id: cbxInputProtocol
+                    id: cbxEdgeProtocol
                     model: ["Modbus RTU"]
                     width: 150
                     height: 35
-                    anchors.horizontalCenter: txtInputProtocol.horizontalCenter
-                    anchors.top: txtInputProtocol.bottom
+                    anchors.horizontalCenter: txtEdgeProtocol.horizontalCenter
+                    anchors.top: txtEdgeProtocol.bottom
                     anchors.margins: 5
                 }
 
                 ModbusRTU {
-                    id: modbusRTU
-                    anchors.top: cbxInputProtocol.bottom
+                    id: modbusRTUSettings
+                    anchors.top: cbxEdgeProtocol.bottom
+                    anchors.horizontalCenter: cbxEdgeProtocol.horizontalCenter
                     anchors.margins: 5
-                    visible: true
+                    visible: cbxEdgeProtocol.currentText == "Modbus RTU"
                     width: parent.width - 20
-                    height: parent.height - cbxInputProtocol.height - txtInputProtocol.height
+                    height: parent.height - txtEdgeProtocol.height - cbxEdgeProtocol.height
                 }
             }
 
             Column {
-                id: colOutputProtocol
+                id: colCloudProtocol
                 spacing: 5
-                leftPadding: 20
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.horizontalCenter
                 width: parent.width / 2
-                height: parent.height - (txtTitle.height * 2)
+                height: parent.height - rowHeader.height
 
                 Text {
-                    id: txtOutputProtocol
-                    text: qsTr("Output Protocol")
+                    id: txtCloudProtocol
+                    text: qsTr("Cloud Protocol")
                     font.pointSize: 15
                     color: Material.color(Material.DeepPurple)
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 ComboBox {
-                    id: cbxOutputProtocol
+                    id: cbxCloudProtocol
                     model: ["MQTT"]
                     width: 150
                     height: 35
-                    anchors.horizontalCenter: txtOutputProtocol.horizontalCenter
+                    anchors.horizontalCenter: txtCloudProtocol.horizontalCenter
+                    anchors.top: txtCloudProtocol.bottom
+                    anchors.margins: 5
                 }
 
-                GroupBox {
-                    width: 380
-                    height: 380
-                    anchors.horizontalCenter: cbxOutputProtocol.horizontalCenter
+                MQTT {
+                    id: mqttSettings
+                    anchors.top: cbxCloudProtocol.bottom
+                    anchors.horizontalCenter: cbxCloudProtocol.horizontalCenter
+                    anchors.margins: 5
+                    visible: cbxCloudProtocol.currentText == "MQTT"
+                    width: parent.width - 20
+                    height: parent.height - txtCloudProtocol.height - cbxCloudProtocol.height
                 }
             }
         }

@@ -2,6 +2,7 @@
 #include <signal.h>
 
 #include "main.h"
+#include "dbconnection.h"
 #include "gateway.h"
 #include "interface.h"
 
@@ -13,6 +14,11 @@ int main(int argc, char *argv[])
     app.setApplicationName(APP_NAME);
 
     setup_unix_signal_handlers();
+
+    if (!DBConnection::instance()->open())
+    {
+        qFatal() << "Database connection failed:" << DBConnection::instance()->lastError();
+    }
 
     // ControlServer server;
     // server.start();
