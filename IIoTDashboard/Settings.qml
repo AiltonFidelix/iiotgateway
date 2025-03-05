@@ -5,6 +5,8 @@ import QtQuick.Controls.Material
 Item {
     id: root
 
+    signal logout
+
     Column {
         anchors.fill: parent
         spacing: 10
@@ -32,6 +34,7 @@ Item {
                 highlighted: true
                 enabled: true
                 height: parent.height - 8
+                onClicked: root.logout()
             }
         }
 

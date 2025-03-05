@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
+        <file>Main.qml</file>
         <file>Login.qml</file>
         <file>Settings.qml</file>
         <file>ModbusRTU.qml</file>

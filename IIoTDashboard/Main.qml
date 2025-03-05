@@ -12,23 +12,34 @@ Window {
     Material.accent: Material.DeepPurple
     Material.primary: Material.DeepPurple
 
-    // Text {
-    //     id: welcome
-    //     text: qsTr("Welcome to the <b>IIoTGateway</b> system...")
-    //     anchors.centerIn: parent
-    //     color: Material.color(Material.DeepPurple)
-    //     visible: !loginScreen.visible
-    // }
-
-    Settings {
-        id: settingsScreen
-        anchors.fill: parent
-        visible: !loginScreen.visible
-    }
-
     Login {
         id: loginScreen
         anchors.fill: parent
         visible: true
+    }
+
+    Settings {
+        id: settingsScreen
+        anchors.fill: parent
+        visible: false
+    }
+
+    Connections {
+        target: loginScreen
+
+        function onLogin() {
+            settingsScreen.visible = true
+            loginScreen.visible = false
+        }
+    }
+
+    Connections {
+        target: settingsScreen
+
+        function onLogout() {
+            settingsScreen.visible = false
+            loginScreen.visible = true
+            loginScreen.clear()
+        }
     }
 }

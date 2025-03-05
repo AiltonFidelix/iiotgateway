@@ -9,6 +9,13 @@ Item {
     property string password: "a"
     property string status: "Failed!"
 
+    signal login
+
+    function clear() {
+        usernameField.clear()
+        passwordField.clear()
+    }
+
     Popup {
         id: statusPopup
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
@@ -98,13 +105,12 @@ Item {
         function onClicked() {
             // TODO: get credentials from C++ side
             if ((usernameField.text == root.username) && (passwordField.text == root.password)) {
-                root.visible = false
+                root.login()
             }
             else {
                 root.status = "Login failed, wrong credentials!"
                 statusPopup.open()
-                usernameField.clear()
-                passwordField.clear()
+                root.clear()
             }
         }
     }
