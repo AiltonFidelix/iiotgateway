@@ -11,6 +11,7 @@ public:
     static DBConnection *instance();
 
     bool isOpen();
+    bool verifyScripts();
 
     QString lastError() const;
 

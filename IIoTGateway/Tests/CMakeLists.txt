@@ -2,14 +2,12 @@ set(EXECUTABLE_NAME TestsRunner)
 
 set(HEADERS
     mockmodbusclient.h
-    # mockmqttclient.h
     testcommmodbus.h
     testmodbusjsonparser.h
     testutils.h
 )
 
 set(SOURCES
-    # mockmqttclient.cpp
     testcommmodbus.cpp
     testmodbusjsonparser.cpp
     testutils.cpp

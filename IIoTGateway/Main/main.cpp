@@ -15,10 +15,14 @@ int main(int argc, char *argv[])
 
     setup_unix_signal_handlers();
 
-    if (!DBConnection::instance()->open())
+    auto dbConn = DBConnection::instance();
+
+    if (!dbConn->open())
     {
-        qFatal() << "Database connection failed:" << DBConnection::instance()->lastError();
+        qFatal() << "Database connection failed:" << dbConn->lastError();
     }
+
+    dbConn->verifyScripts();
 
     // ControlServer server;
     // server.start();

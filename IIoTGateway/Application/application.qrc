@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>scripts/history.sql</file>
+        <file>scripts/protocols.sql</file>
+        <file>scripts/settings.sql</file>
+    </qresource>
+</RCC>

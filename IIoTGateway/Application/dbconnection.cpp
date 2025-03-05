@@ -1,7 +1,9 @@
 #include "dbconnection.h"
 
 #include <QCoreApplication>
+#include <QDir>
 #include <QSqlError>
+#include <QSqlQuery>
 
 DBConnection *DBConnection::m_instance = nullptr;
 
@@ -54,6 +56,105 @@ bool
 DBConnection::isOpen()
 {
     return m_database.isOpen();
+}
+
+bool
+DBConnection::verifyScripts()
+{
+    auto insertHistory = [](const QString &script) -> bool
+    {
+        QSqlQuery query;
+        return (!query.exec(QString("INSERT INTO history(id, script) VALUES(NULL, '%1')").arg(script)));
+    };
+
+    auto scriptExec = [](const QString &fileName) -> bool
+    {
+        QFile file(fileName);
+
+        if (!file.open(QIODevice::ReadOnly))
+            return false;
+
+        auto script = file.readAll();
+        file.close();
+
+        QSqlQuery query;
+        return query.exec(script);
+    };
+
+    auto scriptExists = [](const QString &script) -> bool
+    {
+        QSqlQuery query;
+
+        if (!query.exec(QString("SELECT count(script) FROM history WHERE script '%1'").arg(script)))
+            return false;
+
+        if (!query.next())
+            return false;
+
+        return (query.value(0).toInt() == 1);
+    };
+
+    auto tableExists = [](const QString &table) -> bool
+    {
+        QSqlQuery query;
+
+        if (!query.exec(QString("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='%1'").arg(table)))
+            return false;
+
+        if (!query.next())
+            return false;
+
+        return (query.value(0).toInt() == 1);
+    };
+
+    const QString historyScript = "history.sql";
+
+    QDir dir(":/scripts");
+
+    if (!dir.exists())
+        return false;
+
+    auto files = dir.entryList(QDir::Files);
+
+    if (!files.contains(historyScript))
+        return false;
+
+    files.removeOne(historyScript);
+
+    if (!tableExists("history"))
+    {
+        qDebug() << "Executing" << historyScript;
+
+        if (!scriptExec(QString("%1/%2").arg(dir.absolutePath(), historyScript)))
+        {
+            qWarning() << "Failed to execute" << historyScript;
+            return false;
+        }
+
+        insertHistory(historyScript);
+    }
+
+    auto ok = true;
+
+    for (const auto &fileName : files)
+    {
+        if (!scriptExists(fileName))
+        {
+            qDebug() << "Executing" << fileName;
+
+            if (!scriptExec(QString("%1/%2").arg(dir.absolutePath(), fileName)))
+            {
+                qWarning() << "Failed to execute" << fileName;
+                ok = false;
+            }
+            else
+            {
+                insertHistory(fileName);
+            }
+        }
+    }
+
+    return ok;
 }
 
 QString

@@ -1,8 +1,9 @@
 set(EXECUTABLE_NAME IIoTGateway)
-set(SOURCES main.h main.cpp)
+set(HEADERS main.h)
+set(SOURCES main.cpp)
 set(QT_COMPONENTS Core)
 set(LIBRARIES Application Protocols)
-set(PROJECT_SOURCES ${SOURCES} ${RESOURCES})
+set(PROJECT_SOURCES ${HEADERS} ${SOURCES})
 
 add_compile_definitions(APP_NAME="${EXECUTABLE_NAME}")
 

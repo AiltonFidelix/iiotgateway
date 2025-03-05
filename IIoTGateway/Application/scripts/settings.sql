@@ -1,5 +1,5 @@
 CREATE TABLE settings (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     edge_protocol VARCHAR(30),
     cloud_protocol VARCHAR(30),
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
