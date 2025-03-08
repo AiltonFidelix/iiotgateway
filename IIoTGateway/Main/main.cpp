@@ -1,37 +1,11 @@
 #include <QCoreApplication>
 #include <signal.h>
 
-#include "main.h"
-#include "dbconnection.h"
+#include "control.h"
+#include "dbstorage.h"
 #include "gateway.h"
-#include "interface.h"
 
 static Gateway *gateway = nullptr;
-
-int main(int argc, char *argv[])
-{
-    QCoreApplication app(argc, argv);
-    app.setApplicationName(APP_NAME);
-
-    setup_unix_signal_handlers();
-
-    auto dbConn = DBConnection::instance();
-
-    if (!dbConn->open())
-    {
-        qFatal() << "Database connection failed:" << dbConn->lastError();
-    }
-
-    dbConn->verifyScripts();
-
-    // ControlServer server;
-    // server.start();
-
-    gateway = new Gateway();
-    gateway->start();
-
-    return app.exec();
-}
 
 Q_NORETURN void quit(int sig)
 {
@@ -47,7 +21,7 @@ Q_NORETURN void quit(int sig)
     if (sigNames.contains(sig))
     {
         auto sigName = sigNames.value(sig);
-        qWarning("Received %s", sigName.data());
+        qCritical("Received %s", sigName.data());
     }
 
     qDebug("Closing all connections and exiting the process...");
@@ -69,4 +43,28 @@ void setup_unix_signal_handlers()
     {
         signal(sig, quit);
     }
+}
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication app(argc, argv);
+    app.setApplicationName(APP_NAME);
+
+    setup_unix_signal_handlers();
+
+    DBStorage dbstorage;
+
+    if (!dbstorage.verify())
+    {
+        qFatal() << "Failed to verify storage!";
+        return -1;
+    }
+
+    Control control;
+    // control.start();
+
+    gateway = new Gateway(&dbstorage);
+    gateway->start();
+
+    return app.exec();
 }

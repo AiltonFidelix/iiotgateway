@@ -85,7 +85,7 @@ DBConnection::verifyScripts()
     {
         QSqlQuery query;
 
-        if (!query.exec(QString("SELECT count(script) FROM history WHERE script '%1'").arg(script)))
+        if (!query.exec(QString("SELECT count(script) FROM history WHERE script = '%1'").arg(script)))
             return false;
 
         if (!query.next())
@@ -98,7 +98,7 @@ DBConnection::verifyScripts()
     {
         QSqlQuery query;
 
-        if (!query.exec(QString("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='%1'").arg(table)))
+        if (!query.exec(QString("SELECT count(name) FROM sqlite_master WHERE type = 'table' AND name = '%1'").arg(table)))
             return false;
 
         if (!query.next())

@@ -1,15 +1,15 @@
-#ifndef INTERFACE_H
-#define INTERFACE_H
+#ifndef CONTROL_H
+#define CONTROL_H
 
 #include <QObject>
 #include <QHttpServer>
 
-class ControlServer : public QObject
+class Control : public QObject
 {
     Q_OBJECT
 public:
-    explicit ControlServer(QObject *parent = nullptr);
-    ~ControlServer();
+    explicit Control(QObject *parent = nullptr);
+    ~Control();
 
     bool start(int port = 8083);
 
@@ -22,4 +22,4 @@ private:
     QHttpServer m_httpServer;
 };
 
-#endif // INTERFACE_H
+#endif // CONTROL_H

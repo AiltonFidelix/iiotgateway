@@ -8,6 +8,33 @@ class DBConnection : public QObject
 {
     Q_OBJECT
 public:
+
+    // History table enum
+    enum class History {
+        Id = 0,
+        Script,
+        Created
+    };
+
+    // Settings table enum
+    enum class Settings {
+        Id = 0,
+        Active,
+        CloudProtocol,
+        EdgeProtocol,
+        Created,
+        Updated
+    };
+
+    // Protocols table enum
+    enum class Protocols {
+        Id = 0,
+        Type,
+        Settings,
+        Created,
+        Updated
+    };
+
     static DBConnection *instance();
 
     bool isOpen();

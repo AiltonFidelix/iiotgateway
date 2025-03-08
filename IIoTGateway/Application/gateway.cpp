@@ -4,18 +4,20 @@
 
 #include "../Protocols/commfactory.h"
 
-Gateway::Gateway(QObject *parent)
+Gateway::Gateway(Storage *storage, QObject *parent)
     : QObject(parent),
     m_isRunning(false),
     m_threadEdge(nullptr),
-    m_threadCloud(nullptr)
+    m_threadCloud(nullptr),
+    m_storage(storage)
 {
-    qDebug() << "Creating the gateway object ihul...";
+    qInfo() << "Creating gateway object...";
 }
 
 Gateway::~Gateway()
 {
-    stop();
+    if (m_isRunning)
+        stop();
 }
 
 bool
@@ -24,15 +26,33 @@ Gateway::isRunning()
     return m_isRunning;
 }
 
-void
+bool
 Gateway::start()
 {
     qDebug() << "Starting gateway...";
 
-    CommFactory commFactory;
+    if (m_storage == nullptr)
+    {
+        qWarning() << "Failed to start: No settings storage!";
+        return false;
+    }
 
-    QByteArray edgeProtocol = qgetenv("EDGE_PROTOCOL").toUpper();
-    QByteArray cloudProtocol = qgetenv("CLOUD_PROTOCOL").toUpper();
+    if (!m_storage->active())
+    {
+        qWarning() << "Failed to start: Is not active!";
+        return false;
+    }
+
+    QByteArray cloudProtocol = m_storage->cloudProtocol().toUtf8();
+    QByteArray edgeProtocol = m_storage->edgeProtocol().toUtf8();
+
+    if (cloudProtocol.isEmpty() || edgeProtocol.isEmpty())
+    {
+        qWarning() << "Failed to start: Missing Protocol configuration!";
+        return false;
+    }
+
+    CommFactory commFactory;
 
     try
     {
@@ -72,14 +92,15 @@ Gateway::start()
     catch (std::exception &e)
     {
         notifyError(e.what());
+        return false;
     }
+
+    return true;
 }
 
 void
 Gateway::stop()
 {
-    m_isRunning = false;
-
     auto quitThread = [](QThread *thread) -> QThread*
     {
         if (thread != nullptr)
@@ -100,15 +121,17 @@ Gateway::stop()
     m_threadEdge = quitThread(m_threadEdge);
     m_threadCloud = quitThread(m_threadCloud);
 
+    m_isRunning = false;
+
     qDebug() << "Stoping gateway...";
 }
 
-void
+bool
 Gateway::restart()
 {
     qDebug() << "Restarting gateway...";
     stop();
-    start();
+    return start();
 }
 
 void

@@ -1,23 +1,23 @@
-#include "interface.h"
+#include "control.h"
 
 #include <QTcpServer>
 #include <QJsonDocument>
 #include <QJsonObject>
 
-ControlServer::ControlServer(QObject *parent)
+Control::Control(QObject *parent)
     : QObject(parent)
 {
 
 }
 
-ControlServer::~ControlServer()
+Control::~Control()
 {
     auto servers = m_httpServer.servers();
     qDeleteAll(servers);
 }
 
 bool
-ControlServer::start(int port)
+Control::start(int port)
 {
     registerRoutes();
 
@@ -35,7 +35,7 @@ ControlServer::start(int port)
 }
 
 void
-ControlServer::registerRoutes()
+Control::registerRoutes()
 {
     auto index = [](const QHttpServerRequest &request)
     {

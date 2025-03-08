@@ -2,13 +2,16 @@ set(LIBRARY_NAME Application)
 
 set(HEADERS
     dbconnection.h
-    interface.h
+    dbstorage.h
+    control.h
     gateway.h
+    storage.h
 )
 
 set(SOURCES
     dbconnection.cpp
-    interface.cpp
+    dbstorage.cpp
+    control.cpp
     gateway.cpp
 )
 
