@@ -1,13 +1,13 @@
-#ifndef STORAGE_H
-#define STORAGE_H
+#ifndef STORAGEINTERFACE_H
+#define STORAGEINTERFACE_H
 
 #include <QString>
 #include <QJsonDocument>
 
-class Storage
+class StorageInterface
 {
 public:
-    virtual ~Storage() = default;
+    virtual ~StorageInterface() = default;
 
     virtual bool verify() = 0;
 
@@ -22,4 +22,4 @@ public:
     virtual QJsonDocument protocolSettings(const QString &protocol) = 0;
 };
 
-#endif // STORAGE_H
+#endif // STORAGEINTERFACE_H

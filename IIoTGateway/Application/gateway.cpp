@@ -4,7 +4,7 @@
 
 #include "../Protocols/commfactory.h"
 
-Gateway::Gateway(Storage *storage, QObject *parent)
+Gateway::Gateway(StorageInterface *storage, QObject *parent)
     : QObject(parent),
     m_isRunning(false),
     m_threadEdge(nullptr),

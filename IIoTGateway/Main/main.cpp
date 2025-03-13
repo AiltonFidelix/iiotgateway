@@ -29,7 +29,7 @@ Q_NORETURN void quit(int sig)
     if (gateway)
     {
         gateway->stop();
-        gateway->deleteLater();
+        delete gateway;
     }
 
     exit(EXIT_FAILURE);

@@ -4,13 +4,13 @@
 #include <QObject>
 #include <QThread>
 
-#include "storage.h"
+#include "storageinterface.h"
 
 class Gateway : public QObject
 {
     Q_OBJECT
 public:
-    explicit Gateway(Storage *storage = nullptr, QObject *parent = nullptr);
+    explicit Gateway(StorageInterface *storage = nullptr, QObject *parent = nullptr);
     ~Gateway();
 
     bool isRunning();
@@ -27,7 +27,7 @@ private:
     bool m_isRunning;
     QThread *m_threadEdge;
     QThread *m_threadCloud;
-    Storage *m_storage;
+    StorageInterface *m_storage;
 };
 
 #endif // GATEWAY_H

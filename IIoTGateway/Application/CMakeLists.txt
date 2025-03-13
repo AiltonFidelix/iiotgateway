@@ -5,7 +5,7 @@ set(HEADERS
     dbstorage.h
     control.h
     gateway.h
-    storage.h
+    storageinterface.h
 )
 
 set(SOURCES

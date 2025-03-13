@@ -51,7 +51,7 @@ DBStorage::setProtocolSettings(const QString &protocol, const QJsonDocument &set
     auto currentDT = currentDateTime();
     auto strSettings = settings.toJson(QJsonDocument::Compact);
 
-    QString query = QString("INSERT INTO protocols (settings, updated) VALUES ('%1', '%2') WHERE type = '%3'")
+    QString query = QString("UPDATE protocols SET settings = '%1', updated = '%2' WHERE type = '%3'")
                         .arg(strSettings, currentDT, protocol);
 
     auto ret = insert(query);
@@ -109,7 +109,14 @@ DBStorage::edgeProtocol()
 QJsonDocument
 DBStorage::protocolSettings(const QString &protocol)
 {
-    return QJsonDocument();
+    QSqlQuery sqlquery;
+
+    sqlquery.prepare(QString("SELECT settings FROM protocols WHERE type = '%1'").arg(protocol));
+
+    if (!sqlquery.exec() || !sqlquery.next())
+        return QJsonDocument();
+
+    return sqlquery.value(0).toJsonDocument();
 }
 
 bool

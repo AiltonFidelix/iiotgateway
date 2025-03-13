@@ -1,10 +1,10 @@
 #ifndef DBSTORAGE_H
 #define DBSTORAGE_H
 
-#include "storage.h"
+#include "storageinterface.h"
 #include "dbconnection.h"
 
-class DBStorage : public Storage
+class DBStorage : public StorageInterface
 {
 public:
     DBStorage();
