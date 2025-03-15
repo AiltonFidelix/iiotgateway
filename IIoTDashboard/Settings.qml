@@ -18,15 +18,16 @@ Item {
 
             Text {
                 id: txtTitle
+                anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.margins: 15
+                anchors.margins: 5
                 text: qsTr("IIoTGateway Settings")
                 font.pointSize: 20
                 color: Material.color(Material.DeepPurple)
             }
 
             Button {
-                id: logoutButton
+                id: btnLogout
                 text: qsTr("Logout")
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
@@ -62,7 +63,7 @@ Item {
                 ComboBox {
                     id: cbxEdgeProtocol
                     model: ["Modbus RTU"]
-                    width: 150
+                    width: 200
                     height: 35
                     anchors.horizontalCenter: txtEdgeProtocol.horizontalCenter
                     anchors.top: txtEdgeProtocol.bottom
@@ -99,7 +100,7 @@ Item {
                 ComboBox {
                     id: cbxCloudProtocol
                     model: ["MQTT"]
-                    width: 150
+                    width: 200
                     height: 35
                     anchors.horizontalCenter: txtCloudProtocol.horizontalCenter
                     anchors.top: txtCloudProtocol.bottom
@@ -116,6 +117,17 @@ Item {
                     height: parent.height - txtCloudProtocol.height - cbxCloudProtocol.height
                 }
             }
+        }
+
+        Button {
+            id: btnSave
+            text: qsTr("Save")
+            anchors.bottom: parent.bottom
+            anchors.margins: 5
+            anchors.right: parent.right
+            height: btnLogout.height
+            highlighted: true
+            enabled: true
         }
     }
 }

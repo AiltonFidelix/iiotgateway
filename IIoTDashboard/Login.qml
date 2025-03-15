@@ -28,14 +28,14 @@ Item {
         Label {
             id: statusLabel
             anchors.horizontalCenter: parent.horizontalCenter
-            y: (root.y / 2) + statusButton.height
+            y: (root.y / 2) + btnStatus.height
             text: root.status
             font.bold: true
             color: Material.color(Material.DeepPurple)
         }
 
         Button {
-            id: statusButton
+            id: btnStatus
             text: qsTr("Close")
             anchors.bottom: parent.bottom
             anchors.margins: 2
@@ -45,7 +45,7 @@ Item {
         }
 
         Connections {
-            target: statusButton
+            target: btnStatus
 
             function onClicked() {
                 statusPopup.close()
@@ -80,7 +80,7 @@ Item {
         }
 
         Button {
-            id: loginButton
+            id: btnLogin
             text: qsTr("Login")
             anchors.top: passwordField.bottom
             anchors.margins: 5
@@ -100,7 +100,7 @@ Item {
     }
 
     Connections {
-        target: loginButton
+        target: btnLogin
 
         function onClicked() {
             // TODO: get credentials from C++ side
