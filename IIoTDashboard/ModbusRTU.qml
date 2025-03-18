@@ -8,8 +8,18 @@ Item {
     property int itemsHeight: 35
 
     GroupBox {
+        id: gpbModbusRTU
         width: root.width
         height: root.height
+
+        background: Rectangle {
+            y: gpbModbusRTU.topPadding - gpbModbusRTU.bottomPadding
+            width: parent.width
+            height: parent.height - gpbModbusRTU.topPadding + gpbModbusRTU.bottomPadding
+            color: "transparent"
+            border.color: Material.color(Material.DeepPurple)
+            radius: 8
+        }
 
         Row {
             id: rowPolling
@@ -17,7 +27,7 @@ Item {
             width: parent.width
             height: root.itemsHeight
 
-            CheckBox {
+            Switch {
                 id: chbPolling
                 text: "Enable reading polling"
                 anchors.verticalCenter: parent.verticalCenter
@@ -36,13 +46,13 @@ Item {
             }
 
             Text {
-                text: "ms"
+                text: "(ms)"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
 
         Row {
-            id: rowPortAndBaud
+            id: rowPort
             spacing: 10
             width: parent.width
             height: root.itemsHeight
@@ -52,25 +62,37 @@ Item {
             Text {
                 id: lblSerialPort
                 text: qsTr("Serial Port")
+                // color: Material.color(Material.DeepPurple)
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             TextField {
                 id: txtSerialPort
-                width: ((parent.width / 2) - 15) - lblSerialPort.width
+                width: (parent.width - 15) - lblSerialPort.width
                 height: parent.height
                 text: "default"
             }
+        }
+
+        Row {
+            id: rowBaud
+            spacing: 10
+            width: parent.width
+            height: root.itemsHeight
+            anchors.top: rowPort.bottom
+            anchors.margins: 10
 
             Text {
                 id: lblBaudrate
+                width: lblSerialPort.width
                 text: qsTr("Baudrate")
+                // color: Material.color(Material.DeepPurple)
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             TextField {
                 id: txtBaudrate
-                width: ((parent.width / 2) - 15) - lblBaudrate.width
+                width: (parent.width - 15) - lblBaudrate.width
                 height: parent.height
                 text: "115200"
             }
@@ -81,7 +103,7 @@ Item {
             spacing: 10
             width: parent.width
             height: root.itemsHeight
-            anchors.top: rowPortAndBaud.bottom
+            anchors.top: rowBaud.bottom
             anchors.margins: 10
 
             Text {
@@ -93,7 +115,7 @@ Item {
             ComboBox {
                 id: cbxParity
                 model: ["None", "Even", "Odd"]
-                width: 150
+                width: parent.width / 6
                 height: root.itemsHeight
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -106,7 +128,7 @@ Item {
 
             SpinBox {
                 id: spbDatabits
-                width: 150
+                width: parent.width / 6
                 height: parent.height
                 value: 8
                 from: 5
@@ -117,14 +139,13 @@ Item {
 
             Text {
                 id: txtStopbits
-                // width: 60
                 text: qsTr("Stopbits")
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             SpinBox {
                 id: spbStopbits
-                width: 150
+                width: parent.width / 6
                 height: parent.height
                 value: 1
                 from: 1
@@ -142,16 +163,34 @@ Item {
             anchors.top: rowParams.bottom
             anchors.margins: 10
 
+
+            Text {
+                width: lblSerialPort.width
+                text: qsTr("Retries")
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            SpinBox {
+                id: spbRetries
+                width: parent.width / 6
+                height: parent.height
+                value: 5
+                from: 1
+                to: 100
+                stepSize: 1
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
             Text {
                 id: txtTimeout
-                width: lblSerialPort.width
+                width: lblDatabits.width
                 text: qsTr("Timeout")
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             SpinBox {
                 id: spbTimeout
-                width: 150
+                width: parent.width / 6
                 height: parent.height
                 value: 1000
                 from: 10
@@ -161,19 +200,7 @@ Item {
             }
 
             Text {
-                width: lblDatabits.width
-                text: qsTr("Retries")
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            SpinBox {
-                id: spbRetries
-                width: 150
-                height: parent.height
-                value: 5
-                from: 1
-                to: 100
-                stepSize: 1
+                text: "(ms)"
                 anchors.verticalCenter: parent.verticalCenter
             }
         }

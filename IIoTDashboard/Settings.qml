@@ -5,7 +5,48 @@ import QtQuick.Controls.Material
 Item {
     id: root
 
+    property string statusText: "Failed!"
+    property color statusColor: Material.color(Material.Red)
+
     signal logout
+
+    Popup {
+        id: statusPopup
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        anchors.centerIn: parent
+        width: 280
+        height: 180
+        modal: true
+        focus: true
+
+        Label {
+            id: statusLabel
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: (root.y / 2) + btnStatus.height
+            text: root.statusText
+            font.bold: true
+            color: root.statusColor
+        }
+
+        Button {
+            id: btnStatus
+            text: qsTr("Close")
+            anchors.bottom: parent.bottom
+            anchors.margins: 2
+            anchors.horizontalCenter: parent.horizontalCenter
+            highlighted: true
+            enabled: true
+        }
+
+        Connections {
+            target: btnStatus
+
+            function onClicked() {
+                statusPopup.close()
+            }
+        }
+    }
+
 
     Column {
         anchors.fill: parent
@@ -22,6 +63,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.margins: 5
                 text: qsTr("IIoTGateway Settings")
+                font.bold: true
                 font.pointSize: 20
                 color: Material.color(Material.DeepPurple)
             }
@@ -46,7 +88,7 @@ Item {
 
             Column {
                 id: colEdgeProtocol
-                spacing: 5
+                spacing: 8
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.horizontalCenter
                 width: parent.width / 2
@@ -75,7 +117,7 @@ Item {
                     anchors.top: cbxEdgeProtocol.bottom
                     anchors.horizontalCenter: cbxEdgeProtocol.horizontalCenter
                     anchors.margins: 5
-                    visible: cbxEdgeProtocol.currentText == "Modbus RTU"
+                    visible: cbxEdgeProtocol.currentText === "Modbus RTU"
                     width: parent.width - 20
                     height: parent.height - txtEdgeProtocol.height - cbxEdgeProtocol.height
                 }
@@ -83,7 +125,7 @@ Item {
 
             Column {
                 id: colCloudProtocol
-                spacing: 5
+                spacing: 8
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.horizontalCenter
                 width: parent.width / 2
@@ -112,7 +154,7 @@ Item {
                     anchors.top: cbxCloudProtocol.bottom
                     anchors.horizontalCenter: cbxCloudProtocol.horizontalCenter
                     anchors.margins: 5
-                    visible: cbxCloudProtocol.currentText == "MQTT"
+                    visible: cbxCloudProtocol.currentText === "MQTT"
                     width: parent.width - 20
                     height: parent.height - txtCloudProtocol.height - cbxCloudProtocol.height
                 }
@@ -128,6 +170,22 @@ Item {
             height: btnLogout.height
             highlighted: true
             enabled: true
+        }
+
+        Footer {
+            anchors.bottom: parent.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.margins: 5
+        }
+    }
+
+    Connections {
+        target: btnSave
+
+        function onClicked() {
+            root.statusText = "Failed to save!"
+            // root.statusColor
+            statusPopup.open()
         }
     }
 }

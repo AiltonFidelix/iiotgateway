@@ -91,12 +91,10 @@ Item {
         }
     }
 
-    Text {
-        text: qsTr("<b>IIoTGateway</b> - by Ailton Fidelix")
+    Footer {
         anchors.bottom: root.bottom
         anchors.horizontalCenter: root.horizontalCenter
         anchors.margins: 5
-        color: Material.color(Material.DeepPurple)
     }
 
     Connections {
@@ -104,7 +102,7 @@ Item {
 
         function onClicked() {
             // TODO: get credentials from C++ side
-            if ((usernameField.text == root.username) && (passwordField.text == root.password)) {
+            if ((usernameField.text === root.username) && (passwordField.text === root.password)) {
                 root.login()
             }
             else {
