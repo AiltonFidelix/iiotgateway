@@ -7,6 +7,35 @@ Item {
 
     property int itemsHeight: 35
 
+    function getSettings() {
+        const data = {
+            pollingEnabled: chbPolling.checked,
+            pollingTimeout: spbPolling.value,
+            port: txtSerialPort.text,
+            baudrate: txtBaudrate.text,
+            parity: cbxParity.currentText,
+            dataBits: spbDatabits.value,
+            stopBits: spbStopbits.value,
+            retries: spbRetries.value,
+            timeout: spbTimeout.value
+        }
+
+        return data
+    }
+
+    function setSettings(data) {
+        let json = JSON.parse(data)
+
+        chbPolling.checked = json.pollingEnabled
+        spbPolling.value = json.pollingTimeout
+        txtSerialPort.text = json.port
+        txtBaudrate.text = json.baudrate
+        cbxParity.currentIndex = cbxParity.find(json.parity)
+        spbDatabits.value = json.dataBits
+        spbStopbits.value = json.retries
+        spbTimeout.value = json.timeout
+    }
+
     GroupBox {
         id: gpbModbusRTU
         width: root.width
@@ -41,7 +70,7 @@ Item {
                 value: 1000
                 from: 1000
                 to: 1000 * 1000
-                stepSize: 100
+                stepSize: 50
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -62,7 +91,6 @@ Item {
             Text {
                 id: lblSerialPort
                 text: qsTr("Serial Port")
-                // color: Material.color(Material.DeepPurple)
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -86,7 +114,6 @@ Item {
                 id: lblBaudrate
                 width: lblSerialPort.width
                 text: qsTr("Baudrate")
-                // color: Material.color(Material.DeepPurple)
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -195,7 +222,7 @@ Item {
                 value: 1000
                 from: 10
                 to: 1000 * 1000
-                stepSize: 1
+                stepSize: 50
                 anchors.verticalCenter: parent.verticalCenter
             }
 

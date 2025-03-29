@@ -7,6 +7,40 @@ Item {
 
     property int itemsHeight: 35
 
+    function getSettings() {
+        const data = {
+            protocol: cbxHost.currentText,
+            host: txtHost.text,
+            port: spbPort.value,
+            clientId: txtClientId.text,
+            username: txtUsername.text,
+            password: txtPassword.text,
+            version: cbxVersion.currentText,
+            connectionTimeout: spbTimeout.value,
+            keepAlive: spbKeepAlive.value,
+            autoReconnect: chbAutoReconnect.checked,
+            cleanStart: chbCleanStart.checked
+        }
+
+        return data
+    }
+
+    function setSettings(data) {
+        let json = JSON.parse(data)
+
+        cbxHost.currentIndex =  cbxHost.find(json.protocol)
+        txtHost.text = json.host
+        spbPort.value = json.port
+        txtClientId.text = json.clientId
+        txtUsername.text = json.username
+        txtPassword.text = json.password
+        cbxVersion.currentIndex = cbxVersion.find(json.version)
+        spbTimeout.value = json.connectionTimeout
+        spbKeepAlive.value = json.keepAlive
+        chbAutoReconnect.checked = json.autoReconnect
+        chbCleanStart.checked = json.cleanStart
+    }
+
     GroupBox {
         id: gpbMqtt
         width: root.width

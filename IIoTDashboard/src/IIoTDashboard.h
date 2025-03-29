@@ -1,4 +1,0 @@
-#ifndef IIOTDASHBOARD_H
-#define IIOTDASHBOARD_H
-
-#endif // IIOTDASHBOARD_H

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
+import IIoTDashboard 1.0
 
 Item {
     id: root
@@ -9,6 +10,17 @@ Item {
     property color statusColor: Material.color(Material.Red)
 
     signal logout
+
+    DeviceClient {
+        id: deviceClient
+
+        // onDeviceSettings: {
+        //     let json = JSON.parse(settings)
+
+        //     mqttSettings.setSettings(json.MQTT)
+        //     modbusRTUSettings.setSettings(json.ModbusRTU)
+        // }
+    }
 
     Popup {
         id: statusPopup
@@ -30,7 +42,7 @@ Item {
 
         Button {
             id: btnStatus
-            text: qsTr("Close")
+            text: qsTr("Ok")
             anchors.bottom: parent.bottom
             anchors.margins: 2
             anchors.horizontalCenter: parent.horizontalCenter
@@ -179,12 +191,48 @@ Item {
         }
     }
 
+    // Slots Connections
+
     Connections {
         target: btnSave
 
         function onClicked() {
-            root.statusText = "Failed to save!"
-            // root.statusColor
+            let deviceSettings = {
+                MQTT: mqttSettings.getSettings(),
+                ModbusRTU: modbusRTUSettings.getSettings()
+            }
+
+            deviceClient.setDeviceSettings(JSON.stringify(deviceSettings))
+        }
+    }
+
+    Connections {
+        target: deviceClient
+
+        function onDeviceSettings(settings) {
+            let json = JSON.parse(settings)
+
+            mqttSettings.setSettings(json.MQTT)
+            modbusRTUSettings.setSettings(json.ModbusRTU)
+        }
+    }
+
+    Connections {
+        target: deviceClient
+
+        function onSuccess(message) {
+            root.statusText = message
+            root.statusColor = Material.color(Material.Green)
+            statusPopup.open()
+        }
+    }
+
+    Connections {
+        target: deviceClient
+
+        function onError(error) {
+            root.statusText = error
+            root.statusColor = Material.color(Material.Red)
             statusPopup.open()
         }
     }
