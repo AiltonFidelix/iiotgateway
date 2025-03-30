@@ -8,18 +8,12 @@ Item {
 
     property string statusText: "Failed!"
     property color statusColor: Material.color(Material.Red)
+    property bool gtwRunning: false
 
     signal logout
 
-    DeviceClient {
-        id: deviceClient
-
-        // onDeviceSettings: {
-        //     let json = JSON.parse(settings)
-
-        //     mqttSettings.setSettings(json.MQTT)
-        //     modbusRTUSettings.setSettings(json.ModbusRTU)
-        // }
+    GatewayController {
+        id: deviceController
     }
 
     Popup {
@@ -49,25 +43,44 @@ Item {
             highlighted: true
             enabled: true
         }
-
-        Connections {
-            target: btnStatus
-
-            function onClicked() {
-                statusPopup.close()
-            }
-        }
     }
-
 
     Column {
         anchors.fill: parent
-        spacing: 10
+        spacing: 20
 
         Row {
             id: rowHeader
             width: parent.width
             height: 50
+
+            Rectangle {
+                id: gtwStatusIndicator
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: 5
+                width: 20
+                height: 20
+                radius: gtwStatusIndicator.width
+                color: Material.color(Material.Red)
+
+                Timer {
+                    id: gtwStatusTimer
+                    interval: 500
+                    running: root.gtwRunning
+                    repeat: true
+                }
+            }
+
+            Text {
+                id: txtGtwStatus
+                anchors.left: gtwStatusIndicator.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: 5
+                text: root.gtwRunning ? qsTr("Gateway running") : qsTr("Gateway stopped")
+                font.pointSize: 12
+                color: Material.color(Material.DeepPurple)
+            }
 
             Text {
                 id: txtTitle
@@ -184,6 +197,48 @@ Item {
             enabled: true
         }
 
+
+        Button {
+            id: btnRestart
+            text: qsTr("Restart")
+            anchors.bottom: parent.bottom
+            anchors.margins: 5
+            anchors.right: btnSave.left
+            height: btnLogout.height
+            highlighted: root.gtwRunning
+            enabled: root.gtwRunning
+
+            onClicked: deviceController.restart()
+        }
+
+        Button {
+            id: btnStart
+            text: qsTr("Start")
+            anchors.bottom: parent.bottom
+            anchors.margins: 5
+            anchors.right: btnRestart.left
+            height: btnLogout.height
+            visible: !root.gtwRunning
+            highlighted: !root.gtwRunning
+            enabled: !root.gtwRunning
+
+            onClicked: deviceController.start()
+        }
+
+        Button {
+            id: btnStop
+            text: qsTr("Stop")
+            anchors.bottom: parent.bottom
+            anchors.margins: 5
+            anchors.right: btnRestart.left
+            height: btnLogout.height
+            visible: root.gtwRunning
+            highlighted: root.gtwRunning
+            enabled: root.gtwRunning
+
+            onClicked: deviceController.stop()
+        }
+
         Footer {
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
@@ -194,6 +249,14 @@ Item {
     // Slots Connections
 
     Connections {
+        target: btnStatus
+
+        function onClicked() {
+            statusPopup.close()
+        }
+    }
+
+    Connections {
         target: btnSave
 
         function onClicked() {
@@ -202,12 +265,12 @@ Item {
                 ModbusRTU: modbusRTUSettings.getSettings()
             }
 
-            deviceClient.setDeviceSettings(JSON.stringify(deviceSettings))
+            deviceController.setSettings(JSON.stringify(deviceSettings))
         }
     }
 
     Connections {
-        target: deviceClient
+        target: deviceController
 
         function onDeviceSettings(settings) {
             let json = JSON.parse(settings)
@@ -218,7 +281,7 @@ Item {
     }
 
     Connections {
-        target: deviceClient
+        target: deviceController
 
         function onSuccess(message) {
             root.statusText = message
@@ -228,12 +291,32 @@ Item {
     }
 
     Connections {
-        target: deviceClient
+        target: deviceController
 
         function onError(error) {
             root.statusText = error
             root.statusColor = Material.color(Material.Red)
             statusPopup.open()
+        }
+    }
+
+    Connections {
+        target: gtwStatusIndicator
+
+        function onColorChanged() {
+            root.gtwRunning = !(gtwStatusIndicator.color === Material.color(Material.Red))
+        }
+    }
+
+    Connections {
+        target: gtwStatusTimer
+
+        function onTriggered() {
+            if (gtwStatusIndicator.color === Material.color(Material.Green)) {
+                gtwStatusIndicator.color = "white";
+            } else {
+                gtwStatusIndicator.color = Material.color(Material.Green);
+            }
         }
     }
 }

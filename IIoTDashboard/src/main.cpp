@@ -2,7 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 
-#include "deviceclient.h"
+#include "gatewaycontroller.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 
     const QUrl url(QStringLiteral("qrc:/Main.qml"));
 
-    qmlRegisterType<DeviceClient>("IIoTDashboard", 1, 0, "DeviceClient");
+    qmlRegisterType<GatewayController>("IIoTDashboard", 1, 0, "GatewayController");
 
     QObject::connect(
         &engine,
