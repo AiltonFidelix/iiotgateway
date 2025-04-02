@@ -4,6 +4,8 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 
+#include <QJsonDocument>
+
 DBStorage::DBStorage()
 {
     m_connection = DBConnection::instance();
@@ -46,22 +48,34 @@ DBStorage::setEdgeProtocol(const QString &protocol)
 }
 
 bool
-DBStorage::setProtocolSettings(const QString &protocol, const QJsonDocument &settings)
+DBStorage::setProtocolSettings(const QString &protocol, const QJsonObject &settings)
 {
-    auto currentDT = currentDateTime();
-    auto strSettings = settings.toJson(QJsonDocument::Compact);
-
-    QString query = QString("UPDATE protocols SET settings = '%1', updated = '%2' WHERE type = '%3'")
-                        .arg(strSettings, currentDT, protocol);
-
-    auto ret = insert(query);
-
-    if (!ret)
+    auto settingsExist = [](const QString &protocol) -> bool
     {
-        query = QString("INSERT INTO protocols (id, type, settings, updated) VALUES (NULL, '%1', '%2', '%3', '%4')")
-                    .arg(protocol, strSettings, currentDT, currentDT);
+        QSqlQuery sqlquery;
 
-        ret = insert(query);
+        auto ret = sqlquery.exec(QString("SELECT count(*) FROM protocols WHERE type = '%1'").arg(protocol));
+
+        ret &= sqlquery.next();
+        ret &= sqlquery.value(0).toInt() == 1;
+
+        return ret;
+    };
+
+    auto currentDT = currentDateTime();
+    auto strSettings = QJsonDocument(settings).toJson(QJsonDocument::Compact);
+
+    auto ret = false;
+
+    if (settingsExist(protocol))
+    {
+        ret = insert(QString("UPDATE protocols SET settings = '%1', updated = '%2' WHERE type = '%3'")
+                         .arg(strSettings, currentDT, protocol));
+    }
+    else
+    {
+        ret = insert(QString("INSERT INTO protocols (id, type, settings, created, updated) VALUES (NULL, '%1', '%2', '%3', '%4')")
+                         .arg(protocol, strSettings, currentDT, currentDT));
     }
 
     return ret;
@@ -106,7 +120,7 @@ DBStorage::edgeProtocol()
     return record.value(index).toString();
 }
 
-QJsonDocument
+QJsonObject
 DBStorage::protocolSettings(const QString &protocol)
 {
     QSqlQuery sqlquery;
@@ -114,22 +128,12 @@ DBStorage::protocolSettings(const QString &protocol)
     sqlquery.prepare(QString("SELECT settings FROM protocols WHERE type = '%1'").arg(protocol));
 
     if (!sqlquery.exec() || !sqlquery.next())
-        return QJsonDocument();
+        return QJsonObject();
 
-    return sqlquery.value(0).toJsonDocument();
-}
+    const auto settings = sqlquery.value(0).toByteArray();
+    const auto doc = QJsonDocument::fromJson(settings);
 
-bool
-DBStorage::settingsExist()
-{
-    QSqlQuery sqlquery;
-
-    auto ret = sqlquery.exec("SELECT count(*) FROM settings");
-
-    ret &= sqlquery.next();
-    ret &= sqlquery.value(0).toInt() == 1;
-
-    return ret;
+    return doc.object();
 }
 
 bool
@@ -142,6 +146,18 @@ DBStorage::insert(const QString &query)
 bool
 DBStorage::insertSettings(const QString &field, const QString &value)
 {
+    auto settingsExist = []() -> bool
+    {
+        QSqlQuery sqlquery;
+
+        auto ret = sqlquery.exec("SELECT count(*) FROM settings");
+
+        ret &= sqlquery.next();
+        ret &= sqlquery.value(0).toInt() == 1;
+
+        return ret;
+    };
+
     auto currentDT = currentDateTime();
     auto ret = false;
 

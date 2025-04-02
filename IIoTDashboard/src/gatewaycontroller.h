@@ -13,13 +13,14 @@ public:
 
 signals:
     void settings(QByteArray settings);
-    void status(QByteArray status);
-    void success(QByteArray message);
-    void error(QByteArray error);
+    void status(QString status);
+    void success(QString message);
+    void error(QString error);
 
 public slots:
+    void login(const QString &username, const QString &password);
     void setSettings(const QByteArray &settings);
-    void requestSettings();
+    void requestSettings(const QStringList &protocols);
     void requestStatus();
     void start();
     void stop();
@@ -27,9 +28,7 @@ public slots:
 
 private:
     void sendCommand(const QString &command);
-
-private slots:
-    void errorHandler(QNetworkReply::NetworkError e);
+    QString errorHandler(QNetworkReply::NetworkError e);
 
 private:
     QNetworkAccessManager m_manager;

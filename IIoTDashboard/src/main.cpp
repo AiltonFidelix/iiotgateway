@@ -17,7 +17,8 @@ int main(int argc, char *argv[])
 
     const QUrl url(QStringLiteral("qrc:/Main.qml"));
 
-    qmlRegisterType<GatewayController>("IIoTDashboard", 1, 0, "GatewayController");
+    GatewayController gtwController;
+    engine.rootContext()->setContextProperty("deviceController", &gtwController);
 
     QObject::connect(
         &engine,

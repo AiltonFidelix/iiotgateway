@@ -24,16 +24,14 @@ Item {
     }
 
     function setSettings(data) {
-        let json = JSON.parse(data)
-
-        chbPolling.checked = json.pollingEnabled
-        spbPolling.value = json.pollingTimeout
-        txtSerialPort.text = json.port
-        txtBaudrate.text = json.baudrate
-        cbxParity.currentIndex = cbxParity.find(json.parity)
-        spbDatabits.value = json.dataBits
-        spbStopbits.value = json.retries
-        spbTimeout.value = json.timeout
+        chbPolling.checked = data.pollingEnabled
+        spbPolling.value = data.pollingTimeout
+        txtSerialPort.text = data.port
+        txtBaudrate.text = data.baudrate
+        cbxParity.currentIndex = cbxParity.find(data.parity)
+        spbDatabits.value = data.dataBits
+        spbStopbits.value = data.retries
+        spbTimeout.value = data.timeout
     }
 
     GroupBox {

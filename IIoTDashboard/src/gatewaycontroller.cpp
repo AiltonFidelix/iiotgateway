@@ -30,17 +30,69 @@ GatewayController::GatewayController(QObject *parent)
 }
 
 void
+GatewayController::login(const QString &username, const QString &password)
+{
+    QJsonObject obj;
+    obj.insert("username", username);
+    obj.insert("password", password);
+
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/login").arg(m_serverUrl)));
+    request.setRawHeader("Content-Type", "application/json");
+
+    auto reply = m_manager.post(request, QJsonDocument(obj).toJson(QJsonDocument::Compact));
+
+    connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError e){
+        const QString errorOcurred = errorHandler(e);
+        const QString errorMessage = QString("Login failed!\n\n%1").arg(errorOcurred);
+        emit error(errorMessage);
+    });
+
+    connect(reply, &QNetworkReply::finished, this, [this](){
+        auto reply = qobject_cast<QNetworkReply*>(sender());
+        reply->disconnect();
+
+        auto data = reply->readAll();
+
+        reply->deleteLater();
+
+        QJsonParseError parser;
+        auto doc = QJsonDocument::fromJson(data, &parser);
+
+        if (parser.error != QJsonParseError::NoError)
+        {
+            const QString errorMessage = QString("Login failed!\n\n%1").arg(parser.errorString());
+            emit error(errorMessage);
+            return;
+        }
+
+        auto obj = doc.object();
+        auto status = obj.value("status").toString();
+
+        if (status.toLower() == "error")
+        {
+            const QString errorOcurred = obj.value("message").toString();
+            const QString errorMessage = QString("Login failed!\n\n%1").arg(errorOcurred);
+            emit error(errorMessage);
+            return;
+        }
+
+        emit success(QByteArray());
+    });
+}
+
+void
 GatewayController::setSettings(const QByteArray &settings)
 {
-    QHttpHeaders headers;
-    headers.append("Content-Type", "application/json");
-
-    QNetworkRequest request((QUrl(m_serverUrl)));
-    request.setHeaders(headers);
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/settings").arg(m_serverUrl)));
+    request.setRawHeader("Content-Type", "application/json");
 
     auto reply = m_manager.post(request, settings);
 
-    connect(reply, &QNetworkReply::errorOccurred, this, &GatewayController::errorHandler);
+    connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError e){
+        const QString errorOcurred = errorHandler(e);
+        const QString errorMessage = QString("Failed to save device settings!\n\n%1").arg(errorOcurred);
+        emit error(errorMessage);
+    });
 
     connect(reply, &QNetworkReply::finished, this, [this](){
         auto reply = qobject_cast<QNetworkReply*>(sender());
@@ -52,24 +104,33 @@ GatewayController::setSettings(const QByteArray &settings)
 }
 
 void
-GatewayController::requestSettings()
+GatewayController::requestSettings(const QStringList &protocols)
 {
-    QHttpHeaders headers;
-    headers.append("Content-Type", "application/json");
+    QString query = !protocols.isEmpty() ? "?" : "";
 
-    QNetworkRequest request((QUrl(m_serverUrl)));
-    request.setHeaders(headers);
+    for (const auto &protocol : protocols)
+    {
+        query.append(QString("protocol=%1&").arg(protocol));
+    }
+
+    query.removeLast();
+
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/settings%2").arg(m_serverUrl, query)));
+    request.setRawHeader("Content-Type", "application/json");
 
     auto reply = m_manager.get(request);
 
-    connect(reply, &QNetworkReply::errorOccurred, this, &GatewayController::errorHandler);
+    connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError e){
+        const QString errorOcurred = errorHandler(e);
+        const QString errorMessage = QString("Failed to load device settings!\n\n%1").arg(errorOcurred);
+        emit error(errorMessage);
+    });
 
     connect(reply, &QNetworkReply::finished, this, [this](){
         auto reply = qobject_cast<QNetworkReply*>(sender());
         reply->disconnect();
 
         auto data = reply->readAll();
-
         reply->deleteLater();
 
         emit settings(data);
@@ -79,11 +140,8 @@ GatewayController::requestSettings()
 void
 GatewayController::requestStatus()
 {
-    QHttpHeaders headers;
-    headers.append("Content-Type", "application/json");
-
-    QNetworkRequest request((QUrl(QString("%1/iiotgateway/status").arg(m_serverUrl))));
-    request.setHeaders(headers);
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/status").arg(m_serverUrl)));
+    request.setRawHeader("Content-Type", "application/json");
 
     auto reply = m_manager.get(request);
 
@@ -123,18 +181,19 @@ GatewayController::restart()
 void
 GatewayController::sendCommand(const QString &command)
 {
-    QHttpHeaders headers;
-    headers.append("Content-Type", "application/json");
-
-    QNetworkRequest request((QUrl(QString("%1/iiotgateway/command").arg(m_serverUrl))));
-    request.setHeaders(headers);
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/command").arg(m_serverUrl)));
+    request.setRawHeader("Content-Type", "application/json");
 
     QJsonObject obj;
     obj.insert("command", command);
 
     auto reply = m_manager.post(request, QJsonDocument(obj).toJson(QJsonDocument::Compact));
 
-    connect(reply, &QNetworkReply::errorOccurred, this, &GatewayController::errorHandler);
+    connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError e){
+        const QString errorOcurred = errorHandler(e);
+        const QString errorMessage = QString("Failed to execute command!\n\n%1").arg(errorOcurred);
+        emit error(errorMessage);
+    });
 
     connect(reply, &QNetworkReply::finished, this, [this](){
         auto reply = qobject_cast<QNetworkReply*>(sender());
@@ -143,7 +202,7 @@ GatewayController::sendCommand(const QString &command)
     });
 }
 
-void
+QString
 GatewayController::errorHandler(QNetworkReply::NetworkError e)
 {
     auto reply = qobject_cast<QNetworkReply*>(sender());
@@ -153,6 +212,6 @@ GatewayController::errorHandler(QNetworkReply::NetworkError e)
     auto metaEnum = QMetaEnum::fromType<QNetworkReply::NetworkError>();
     auto errorMessage = metaEnum.valueToKey(e);
 
-    emit error(QString("Error occurred: %1").arg(errorMessage).toUtf8());
+    return QString("Error occurred: %1").arg(errorMessage);
 }
 

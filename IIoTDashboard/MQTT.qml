@@ -26,19 +26,17 @@ Item {
     }
 
     function setSettings(data) {
-        let json = JSON.parse(data)
-
-        cbxHost.currentIndex =  cbxHost.find(json.protocol)
-        txtHost.text = json.host
-        spbPort.value = json.port
-        txtClientId.text = json.clientId
-        txtUsername.text = json.username
-        txtPassword.text = json.password
-        cbxVersion.currentIndex = cbxVersion.find(json.version)
-        spbTimeout.value = json.connectionTimeout
-        spbKeepAlive.value = json.keepAlive
-        chbAutoReconnect.checked = json.autoReconnect
-        chbCleanStart.checked = json.cleanStart
+        cbxHost.currentIndex =  cbxHost.find(data.protocol)
+        txtHost.text = data.host
+        spbPort.value = data.port
+        txtClientId.text = data.clientId
+        txtUsername.text = data.username
+        txtPassword.text = data.password
+        cbxVersion.currentIndex = cbxVersion.find(data.version)
+        spbTimeout.value = data.connectionTimeout
+        spbKeepAlive.value = data.keepAlive
+        chbAutoReconnect.checked = data.autoReconnect
+        chbCleanStart.checked = data.cleanStart
     }
 
     GroupBox {

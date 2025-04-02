@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
-import IIoTDashboard 1.0
 
 Item {
     id: root
@@ -11,10 +10,6 @@ Item {
     property bool gtwRunning: false
 
     signal logout
-
-    GatewayController {
-        id: deviceController
-    }
 
     Popup {
         id: statusPopup
@@ -102,7 +97,6 @@ Item {
                 highlighted: true
                 enabled: true
                 height: parent.height - 8
-                onClicked: root.logout()
             }
         }
 
@@ -249,6 +243,16 @@ Item {
     // Slots Connections
 
     Connections {
+        target: root
+
+        function onVisibleChanged() {
+            if (root.visible) {
+                deviceController.requestSettings(["MQTT", "MODBUS_RTU"])
+            }
+        }
+    }
+
+    Connections {
         target: btnStatus
 
         function onClicked() {
@@ -262,41 +266,65 @@ Item {
         function onClicked() {
             let deviceSettings = {
                 MQTT: mqttSettings.getSettings(),
-                ModbusRTU: modbusRTUSettings.getSettings()
+                MODBUS_RTU: modbusRTUSettings.getSettings()
             }
-
             deviceController.setSettings(JSON.stringify(deviceSettings))
         }
     }
 
     Connections {
-        target: deviceController
+        target: btnLogout
 
-        function onDeviceSettings(settings) {
-            let json = JSON.parse(settings)
-
-            mqttSettings.setSettings(json.MQTT)
-            modbusRTUSettings.setSettings(json.ModbusRTU)
+        function onClicked() {
+            root.logout()
         }
     }
 
     Connections {
         target: deviceController
+
+        function onStatus(status) {
+            let data = JSON.parse(String(status))
+            root.gtwRunning = (data.status  === "running")
+        }
+    }
+
+    Connections {
+        target: deviceController
+
+        function onSettings(settings) {
+            let data = JSON.parse(String(settings))
+
+            mqttSettings.setSettings(data.MQTT)
+            modbusRTUSettings.setSettings(data.MODBUS_RTU)
+        }
+    }
+
+    Connections {
+        id: connSuccess
+        target: deviceController
+        enabled: root.visible
 
         function onSuccess(message) {
-            root.statusText = message
-            root.statusColor = Material.color(Material.Green)
-            statusPopup.open()
+            if (message.length > 0) {
+                root.statusText = qsTr(message)
+                root.statusColor = Material.color(Material.Green)
+                statusPopup.open()
+            }
         }
     }
 
     Connections {
+        id: connError
         target: deviceController
+        enabled: root.visible
 
         function onError(error) {
-            root.statusText = error
-            root.statusColor = Material.color(Material.Red)
-            statusPopup.open()
+            if (error.length > 0) {
+                root.statusText = qsTr(error)
+                root.statusColor = Material.color(Material.Red)
+                statusPopup.open()
+            }
         }
     }
 

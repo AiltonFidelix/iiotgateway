@@ -24,6 +24,8 @@ Window {
         visible: false
     }
 
+    // Slots Connections
+
     Connections {
         target: loginScreen
 

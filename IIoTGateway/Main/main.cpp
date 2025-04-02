@@ -26,6 +26,7 @@ Q_NORETURN void quit(int sig)
 
     qDebug("Closing all connections and exiting the process...");
 
+#warning // TODO: Stop and remove control instead of gateway
     if (gateway)
     {
         gateway->stop();
@@ -60,11 +61,14 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    Control control;
-    // control.start();
-
+#warning // TODO: move gateway to control, control will handle the gateway
     gateway = new Gateway(&dbstorage);
     gateway->start();
+
+    Control control;
+    control.setGateway(gateway); // Still needs to change the behavior
+    control.setStorage(&dbstorage);
+    control.start();
 
     return app.exec();
 }

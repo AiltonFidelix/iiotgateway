@@ -67,18 +67,42 @@ DBConnection::verifyScripts()
         return (!query.exec(QString("INSERT INTO history(id, script) VALUES(NULL, '%1')").arg(script)));
     };
 
-    auto scriptExec = [](const QString &fileName) -> bool
+    auto scriptExec = [this](const QString &fileName) -> bool
     {
         QFile file(fileName);
 
         if (!file.open(QIODevice::ReadOnly))
             return false;
 
-        auto script = file.readAll();
+        const auto data = file.readAll();
+        const auto scripts = data.trimmed().split(';');
+
         file.close();
 
-        QSqlQuery query;
-        return query.exec(script);
+        m_database.transaction();
+
+        auto ok = true;
+
+        for (const auto &script : scripts)
+        {
+            if (script.isEmpty())
+                continue;
+
+            QSqlQuery query;
+
+            const auto ret = query.exec(script);
+
+            if (!ret)
+            {
+                qWarning() << query.lastError().text();
+            }
+
+            ok &= ret;
+        }
+
+        ok ? m_database.commit() : m_database.rollback();
+
+        return ok;
     };
 
     auto scriptExists = [](const QString &script) -> bool
@@ -86,7 +110,10 @@ DBConnection::verifyScripts()
         QSqlQuery query;
 
         if (!query.exec(QString("SELECT count(script) FROM history WHERE script = '%1'").arg(script)))
+        {
+            qWarning() << query.lastError().text();
             return false;
+        }
 
         if (!query.next())
             return false;
@@ -136,7 +163,7 @@ DBConnection::verifyScripts()
 
     auto ok = true;
 
-    for (const auto &fileName : files)
+    for (const auto &fileName : std::as_const(files))
     {
         if (!scriptExists(fileName))
         {

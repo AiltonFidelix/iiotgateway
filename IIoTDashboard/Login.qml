@@ -7,7 +7,7 @@ Item {
 
     property string username: "a"
     property string password: "a"
-    property string status: "Failed!"
+    property string error: "Failed!"
 
     signal login
 
@@ -17,39 +17,31 @@ Item {
     }
 
     Popup {
-        id: statusPopup
+        id: errorPopup
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         anchors.centerIn: parent
-        width: 280
-        height: 180
+        width: 380
+        height: 220
         modal: true
         focus: true
 
         Label {
-            id: statusLabel
+            id: errorLabel
             anchors.horizontalCenter: parent.horizontalCenter
-            y: (root.y / 2) + btnStatus.height
-            text: root.status
+            y: (root.y / 2) + btnPopup.height
+            text: root.error
             font.bold: true
-            color: Material.color(Material.DeepPurple)
+            color: Material.color(Material.Red)
         }
 
         Button {
-            id: btnStatus
-            text: qsTr("Close")
+            id: btnPopup
+            text: qsTr("Ok")
             anchors.bottom: parent.bottom
             anchors.margins: 2
             anchors.horizontalCenter: parent.horizontalCenter
             highlighted: true
             enabled: true
-        }
-
-        Connections {
-            target: btnStatus
-
-            function onClicked() {
-                statusPopup.close()
-            }
         }
     }
 
@@ -97,19 +89,43 @@ Item {
         anchors.margins: 5
     }
 
+    // Slots Connections
+
+    Connections {
+        target: btnPopup
+
+        function onClicked() {
+            errorPopup.close()
+        }
+    }
+
+    Connections {
+        id: connSuccess
+        target: deviceController
+        enabled: root.visible
+
+        function onSuccess(message) {
+            root.login()
+        }
+    }
+
+    Connections {
+        id: connError
+        target: deviceController
+        enabled: root.visible
+
+        function onError(error) {
+            root.error = qsTr(error)
+            errorPopup.open()
+            root.clear()
+        }
+    }
+
     Connections {
         target: btnLogin
 
         function onClicked() {
-            // TODO: get credentials from C++ side
-            if ((usernameField.text === root.username) && (passwordField.text === root.password)) {
-                root.login()
-            }
-            else {
-                root.status = "Login failed, wrong credentials!"
-                statusPopup.open()
-                root.clear()
-            }
+            deviceController.login(usernameField.text, passwordField.text)
         }
     }
 }
