@@ -1,8 +1,8 @@
 build
 venv
+old
 .vscode
 *.txt.user
 *.drawio.bkp
-*.json
 *.env
 *.db

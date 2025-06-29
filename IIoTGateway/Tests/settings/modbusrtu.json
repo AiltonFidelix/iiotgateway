@@ -1,0 +1,11 @@
+{
+    "baudrate": "115200",
+    "dataBits": 8,
+    "parity": "None",
+    "pollingEnabled": false,
+    "pollingTimeout": 1000,
+    "port": "default",
+    "retries": 5,
+    "stopBits": 1,
+    "timeout": 1000
+}

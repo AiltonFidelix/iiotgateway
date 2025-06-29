@@ -13,7 +13,7 @@ TestCommModbus::SetUp()
     m_commModbus.setModbusClient(m_mockModbusClient);
 }
 
-TEST_F(TestCommModbus, TestConnectiongSuccess)
+TEST_F(TestCommModbus, TestConnectionSuccess)
 {
     EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(testing::Return(QModbusDevice::UnconnectedState));
     EXPECT_CALL(*m_mockModbusClient, setConnectionParameter(testing::_, testing::_)).Times(5);
@@ -24,7 +24,7 @@ TEST_F(TestCommModbus, TestConnectiongSuccess)
     m_commModbus.connectComm();
 }
 
-TEST_F(TestCommModbus, TestConnectiongFailed)
+TEST_F(TestCommModbus, TestConnectionFailed)
 {
     EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(testing::Return(QModbusDevice::UnconnectedState));
     EXPECT_CALL(*m_mockModbusClient, setConnectionParameter(testing::_, testing::_)).Times(5);
@@ -69,7 +69,7 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     QByteArray result;
 
-    auto handleResult = [&result](QByteArray data) -> void
+    auto handleResult = [&result](const QByteArray &data) -> void
     {
         result = data;
     };
@@ -88,7 +88,7 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     ASSERT_EQ(expectedAddress, firstDevice.value("address").toInt());
 
-    auto registers = firstDevice.value("registers").toArray();
+    const auto registers = firstDevice.value("registers").toArray();
 
     ASSERT_EQ(maxRegisters, registers.count());
 

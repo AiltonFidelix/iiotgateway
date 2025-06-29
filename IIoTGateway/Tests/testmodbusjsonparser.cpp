@@ -74,7 +74,7 @@ TEST_F(TestModbusJsonParserReadMultiple, TestReadRequest)
     auto addresses = readRequest.keys();
     ASSERT_EQ(2, addresses.count());
 
-    auto units1 = readRequest.value(1);
+    const auto units1 = readRequest.value(1);
     ASSERT_EQ(2, units1.count());
 
     for (const auto &unit : units1)
@@ -82,7 +82,7 @@ TEST_F(TestModbusJsonParserReadMultiple, TestReadRequest)
         testUnit(unit);
     }
 
-    auto units2 = readRequest.value(2);
+    const auto units2 = readRequest.value(2);
     ASSERT_EQ(4, units2.count());
 
     for (const auto &unit : units2)

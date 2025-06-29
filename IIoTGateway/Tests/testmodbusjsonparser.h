@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include "modbus/modbusjsonparser.h"
 
-class TestModbusJsonParserReadOne: public testing::Test
+class TestModbusJsonParserReadOne : public testing::Test
 {
 protected:
     ModbusJsonParser *m_parser;
@@ -13,7 +13,7 @@ protected:
     void TearDown() override;
 };
 
-class TestModbusJsonParserReadMultiple: public testing::Test
+class TestModbusJsonParserReadMultiple : public testing::Test
 {
 protected:
     ModbusJsonParser *m_parser;
@@ -22,7 +22,7 @@ protected:
     void TearDown() override;
 };
 
-class TestModbusJsonParserWriteOne: public testing::Test
+class TestModbusJsonParserWriteOne : public testing::Test
 {
 protected:
     ModbusJsonParser *m_parser;
@@ -31,7 +31,7 @@ protected:
     void TearDown() override;
 };
 
-class TestModbusJsonParserWriteMultiple: public testing::Test
+class TestModbusJsonParserWriteMultiple : public testing::Test
 {
 protected:
     ModbusJsonParser *m_parser;
@@ -40,7 +40,7 @@ protected:
     void TearDown() override;
 };
 
-class TestModbusJsonParserEmpty: public testing::Test
+class TestModbusJsonParserEmpty : public testing::Test
 {
 protected:
     ModbusJsonParser *m_parser;

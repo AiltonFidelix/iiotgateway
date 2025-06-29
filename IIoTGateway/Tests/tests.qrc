@@ -4,5 +4,7 @@
         <file>requests/readmultiple.json</file>
         <file>requests/writeone.json</file>
         <file>requests/writemultiple.json</file>
+        <file>settings/modbusrtu.json</file>
+        <file>settings/mqtt.json</file>
     </qresource>
 </RCC>
