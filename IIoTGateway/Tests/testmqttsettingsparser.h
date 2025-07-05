@@ -2,7 +2,7 @@
 #define TESTMQTTSETTINGSPARSER_H
 
 #include <gtest/gtest.h>
-#include "mqtt/mqttsettingsparser.h"
+#include "mqtt/commmqttsettingsparser.h"
 
 class TestMQTTSettingsParser : public testing::Test
 {

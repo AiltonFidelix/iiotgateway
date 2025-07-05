@@ -5,7 +5,8 @@
 #include "dbstorage.h"
 #include "gateway.h"
 
-static Gateway *gateway = nullptr;
+// static Gateway *gateway = nullptr;
+static Control *control = nullptr;
 
 Q_NORETURN void quit(int sig)
 {
@@ -26,11 +27,10 @@ Q_NORETURN void quit(int sig)
 
     qDebug("Closing all connections and exiting the process...");
 
-#warning // TODO: Stop and remove control instead of gateway
-    if (gateway)
+    if (control)
     {
-        gateway->stop();
-        delete gateway;
+        control->stop();
+        delete control;
     }
 
     exit(EXIT_FAILURE);
@@ -61,14 +61,13 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-#warning // TODO: move gateway to control, control will handle the gateway
-    gateway = new Gateway(&dbstorage);
-    gateway->start();
+    Gateway gateway(&dbstorage);
 
-    Control control;
-    control.setGateway(gateway); // Still needs to change the behavior
-    control.setStorage(&dbstorage);
-    control.start();
+    control = new Control();
+
+    control->setGateway(&gateway);
+    control->setStorage(&dbstorage);
+    control->start();
 
     return app.exec();
 }

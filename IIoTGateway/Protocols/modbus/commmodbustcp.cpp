@@ -1,25 +1,32 @@
 #include "commmodbustcp.h"
-#include "modbusclientadapter.h"
+#include "commmodbusclientadapter.h"
 #include "commfactory.h"
 
 #include <QVariant>
 
-int CommModbusTCP::m_typeId = CommFactory::registerInterface<CommModbusTCP*>("MODBUS_TCP");
+COMM_MODBUS_BEGIN_NAMESPACE
 
-void
-CommModbusTCP::connectComm()
+int CommModbusTCP::m_typeId = comm::CommFactory::registerInterface<CommModbusTCP*>("MODBUS_TCP");
+
+CommModbusTCP::CommModbusTCP(QJsonObject settings)
+    : CommModbus{settings}
+{
+}
+
+void CommModbusTCP::connectComm()
 {
     if (!m_modbusClient)
     {
-        ModbusClientAdapter *adapter = new ModbusClientAdapter();
-        QModbusTcpClient *client = new QModbusTcpClient();
+        auto adapter = new CommModbusClientAdapter{};
+        auto client = new QModbusTcpClient{};
         adapter->setModbusClient(client);
 
-        m_modbusClient = static_cast<ModbusClientInterface*>(adapter);
+        m_modbusClient = static_cast<CommModbusClientInterface*>(adapter);
     }
 
     if (m_modbusClient->state() != QModbusDevice::ConnectedState)
     {
+#warning // TODO: change to settings on JSON
         QVariant port = qgetenv("MODBUS_TCP_PORT");
         QVariant host = qgetenv("MODBUS_TCP_HOST");
 
@@ -53,7 +60,7 @@ CommModbusTCP::connectComm()
         m_modbusClient->setTimeout(timeout);
         m_modbusClient->setNumberOfRetries(retries);
 
-        connect(m_modbusClient, &ModbusClientInterface::stateChanged, this, &CommModbusTCP::stateChanged);
+        connect(m_modbusClient, &CommModbusClientInterface::stateChanged, this, &CommModbusTCP::stateChanged);
 
         if (!m_modbusClient->connectDevice())
         {
@@ -66,3 +73,5 @@ CommModbusTCP::connectComm()
         }
     }
 }
+
+COMM_MODBUS_END_NAMESPACE

@@ -6,7 +6,7 @@
 void
 CommMQTTActionListener::on_failure(const mqtt::token &asyncActionToken)
 {
-    auto type = asyncActionToken.get_type();
+    const auto type = asyncActionToken.get_type();
 
     switch (type)
     {

@@ -6,10 +6,13 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-CommModbus::CommModbus()
+COMM_MODBUS_BEGIN_NAMESPACE
+
+CommModbus::CommModbus(QJsonObject settings)
+    : m_modbusClient{nullptr},
+    m_polling{nullptr}
 {
-    m_modbusClient = nullptr;
-    m_polling = nullptr;
+#warning // TODO: set settings into the parser
 }
 
 CommModbus::~CommModbus()
@@ -30,8 +33,7 @@ CommModbus::~CommModbus()
     }
 }
 
-void
-CommModbus::disconnectComm()
+void CommModbus::disconnectComm()
 {
     if (!isconnected())
     {
@@ -41,50 +43,44 @@ CommModbus::disconnectComm()
     emit disconnected();
 }
 
-bool
-CommModbus::isconnected()
+bool CommModbus::isconnected()
 {
     return (m_modbusClient->state() == QModbusDevice::ConnectedState);
 }
 
-ModbusClientInterface*
-CommModbus::modbusClient()
+CommModbusClientInterface *CommModbus::modbusClient()
 {
     return m_modbusClient;
 }
 
-void
-CommModbus::setModbusClient(ModbusClientInterface *client)
+void CommModbus::setModbusClient(CommModbusClientInterface *client)
 {
     m_modbusClient = client;
 }
 
-void
-CommModbus::incoming(QByteArray data)
+void CommModbus::incoming(QByteArray data)
 {
-    auto parser = ModbusJsonParser(data);
-    auto request = parser.request();
+    CommModbusSettingsParser parser{data};
 
-    auto type = parser.type();
+    const Request request = parser.request();
+    const RequestType type = parser.type();
 
-    if (type == ModbusJsonParser::Write)
+    switch (type)
     {
-        qDebug() << "Received a write request";
-        writeRegisters(request);
-    }
-    else if(type == ModbusJsonParser::Read)
-    {
-        qDebug() << "Received a read request";
-        readRegisters(request);
-    }
-    else
-    {
-        qWarning() << "Received an unknown request";
+        case Write:
+            qDebug() << "Received a write request";
+            writeRegisters(request);
+            break;
+        case Read:
+            qDebug() << "Received a read request";
+            readRegisters(request);
+        default:
+            qWarning() << "Received an unknown request";
+            break;
     }
 }
 
-void
-CommModbus::stateChanged(QModbusDevice::State state)
+void CommModbus::stateChanged(QModbusDevice::State state)
 {
     if (state == QModbusDevice::UnconnectedState)
     {
@@ -96,25 +92,20 @@ CommModbus::stateChanged(QModbusDevice::State state)
     }
 }
 
-void
-CommModbus::readRegisters(const ModbusJsonParser::Request &request)
+void CommModbus::readRegisters(const Request &request)
 {
-#warning // TODO: Remove QElapsedTimer later
-    QElapsedTimer time;
-    time.start();
+    QJsonArray devices{};
 
-    auto devices = QJsonArray();
-
-    const auto addresses = ModbusJsonParser::sortedAddress(request);
+    const auto addresses = CommModbusSettingsParser::sortedAddress(request);
 
     for (const auto &address : addresses)
     {
-        auto device = QJsonObject();
-        auto errors = QJsonArray();
+        QJsonObject device{};
+        QJsonArray errors{};
 
-        auto registers = Registers();
+        Registers registers{};
         auto units = request.value(address);
-        ModbusJsonParser::sortRequestUnits(units);
+        CommModbusSettingsParser::sortRequestUnits(units);
 
         for (const auto &unit : std::as_const(units))
         {
@@ -147,21 +138,18 @@ CommModbus::readRegisters(const ModbusJsonParser::Request &request)
 
     if (!devices.isEmpty())
     {
-        auto json = QJsonObject();
+        QJsonObject json{};
 
         json.insert("datetime", QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss.zzz"));
         json.insert("devices", devices);
 
-        emit outgoing(QJsonDocument(json).toJson(QJsonDocument::Compact));
+        emit outgoing(QJsonDocument{json}.toJson(QJsonDocument::Compact));
     }
-
-    // qDebug() << "readRegisters took" << time.elapsed() << "ms";
 }
 
-void
-CommModbus::writeRegisters(const ModbusJsonParser::Request &request)
+void CommModbus::writeRegisters(const Request &request)
 {
-    const auto addresses = ModbusJsonParser::sortedAddress(request);
+    const auto addresses = CommModbusSettingsParser::sortedAddress(request);
 
     for (const auto &address : addresses)
     {
@@ -169,7 +157,7 @@ CommModbus::writeRegisters(const ModbusJsonParser::Request &request)
 
         for (const auto &unit : units)
         {
-            if (auto *reply = m_modbusClient->sendWriteRequest(unit, address))
+            if (const QModbusReply *reply = m_modbusClient->sendWriteRequest(unit, address))
             {
                 QEventLoop loop;
                 connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
@@ -183,10 +171,9 @@ CommModbus::writeRegisters(const ModbusJsonParser::Request &request)
     }
 }
 
-CommModbus::Registers
-CommModbus::readReady(QModbusReply *reply)
+Registers CommModbus::readReady(QModbusReply *reply)
 {
-    auto registers = Registers();
+    Registers registers{};
 
     if (!reply)
     {
@@ -220,14 +207,12 @@ CommModbus::readReady(QModbusReply *reply)
     return registers;
 }
 
-bool
-CommModbus::ispolling()
+bool CommModbus::ispolling()
 {
     return !(m_polling == nullptr);
 }
 
-void
-CommModbus::initPolling()
+void CommModbus::initPolling()
 {
     if (ispolling())
     {
@@ -239,8 +224,7 @@ CommModbus::initPolling()
     }
 }
 
-void
-CommModbus::pollingCallback()
+void CommModbus::pollingCallback()
 {
     m_polling->stop();
 
@@ -249,35 +233,33 @@ CommModbus::pollingCallback()
     m_polling->start();
 }
 
-ModbusJsonParser::Request
-CommModbus::loadReadRequestSettings()
+Request CommModbus::loadReadRequestSettings()
 {
-    QFile file(QString("%1/read.json").arg(QCoreApplication::applicationDirPath()));
+    QFile file{QString("%1/read.json").arg(QCoreApplication::applicationDirPath())};
 
     if (!file.open(QIODevice::ReadOnly))
     {
         emit error("Failed opening read.json");
 
-        return ModbusJsonParser::Request();
+        return Request{};
     }
 
-    ModbusJsonParser parser(file.readAll());
+    CommModbusSettingsParser parser{file.readAll()};
 
     file.close();
 
     return parser.request();
 }
 
-QJsonArray
-CommModbus::registersToJsonArray(const Registers &registers)
+QJsonArray CommModbus::registersToJsonArray(const Registers &registers)
 {
-    QJsonArray regs;
+    QJsonArray regs{};
 
     const auto keys = registers.keys();
 
     for (const auto &key : keys)
     {
-        QJsonObject reg;
+        QJsonObject reg{};
         reg.insert("register", key);
         reg.insert("value", registers.value(key));
         regs.append(reg);
@@ -285,3 +267,5 @@ CommModbus::registersToJsonArray(const Registers &registers)
 
     return regs;
 }
+
+COMM_MODBUS_END_NAMESPACE

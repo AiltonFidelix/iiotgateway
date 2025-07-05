@@ -12,7 +12,7 @@ DBConnection::instance()
 {
     if (m_instance == nullptr)
     {
-        m_instance = new DBConnection();
+        m_instance = new DBConnection{};
 
         connect(qApp, &QCoreApplication::aboutToQuit, m_instance, &DBConnection::close);
     }
@@ -20,8 +20,7 @@ DBConnection::instance()
     return m_instance;
 }
 
-bool
-DBConnection::open()
+bool DBConnection::open()
 {
     auto dbType = qgetenv("DB_TYPE");
     auto dbName = qgetenv("DB_NAME");
@@ -29,8 +28,8 @@ DBConnection::open()
     auto dbUser = qgetenv("DB_USER");
     auto dbPass = qgetenv("DB_PASS");
 
-    auto ok = false;
-    auto port = qEnvironmentVariableIntValue("DB_PORT", &ok);
+    bool ok = false;
+    const int port = qEnvironmentVariableIntValue("DB_PORT", &ok);
 
     m_database = QSqlDatabase::addDatabase(dbType);
     m_database.setDatabaseName(dbName);
@@ -46,20 +45,17 @@ DBConnection::open()
     return m_database.open();
 }
 
-void
-DBConnection::close()
+void DBConnection::close()
 {
     m_database.close();
 }
 
-bool
-DBConnection::isOpen()
+bool DBConnection::isOpen()
 {
     return m_database.isOpen();
 }
 
-bool
-DBConnection::verifyScripts()
+bool DBConnection::verifyScripts()
 {
     auto insertHistory = [](const QString &script) -> bool
     {
@@ -69,7 +65,7 @@ DBConnection::verifyScripts()
 
     auto scriptExec = [this](const QString &fileName) -> bool
     {
-        QFile file(fileName);
+        QFile file{fileName};
 
         if (!file.open(QIODevice::ReadOnly))
             return false;
@@ -79,9 +75,10 @@ DBConnection::verifyScripts()
 
         file.close();
 
-        m_database.transaction();
+        bool ok = m_database.transaction();
 
-        auto ok = true;
+        if (!ok)
+            return ok;
 
         for (const auto &script : scripts)
         {
@@ -134,9 +131,9 @@ DBConnection::verifyScripts()
         return (query.value(0).toInt() == 1);
     };
 
-    const QString historyScript = "history.sql";
+    const QString historyScript{"history.sql"};
 
-    QDir dir(":/scripts");
+    QDir dir{":/scripts"};
 
     if (!dir.exists())
         return false;
@@ -161,7 +158,7 @@ DBConnection::verifyScripts()
         insertHistory(historyScript);
     }
 
-    auto ok = true;
+    bool ok = true;
 
     for (const auto &fileName : std::as_const(files))
     {
@@ -184,8 +181,7 @@ DBConnection::verifyScripts()
     return ok;
 }
 
-QString
-DBConnection::lastError() const
+QString DBConnection::lastError() const
 {
     return m_database.lastError().text();
 }

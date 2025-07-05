@@ -6,6 +6,13 @@
 
 class DBStorage : public StorageInterface
 {
+    DBConnection *m_connection;
+
+    bool insert(const QString &query);
+    bool insertSettings(const QString &field, const QString &value);
+    QSqlRecord selectSettings();
+    QString currentDateTime();
+
 public:
     DBStorage();
     ~DBStorage();
@@ -21,15 +28,7 @@ public:
     QString cloudProtocol() override;
     QString edgeProtocol() override;
     QJsonObject protocolSettings(const QString &protocol) override;
-
-private:
-    bool insert(const QString &query);
-    bool insertSettings(const QString &field, const QString &value);
-    QSqlRecord selectSettings();
-    QString currentDateTime();
-
-private:
-    DBConnection *m_connection;
+    QPair<QString, QString> userCredentials() override;
 };
 
 #endif // DBSTORAGE_H

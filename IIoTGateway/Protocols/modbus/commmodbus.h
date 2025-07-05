@@ -1,53 +1,58 @@
 #ifndef COMMMODBUS_H
 #define COMMMODBUS_H
 
-#include "../comminterface.h"
-#include "modbusclientinterface.h"
-#include "modbusjsonparser.h"
-
 #include <QModbusClient>
 #include <QModbusDataUnit>
 #include <QModbusClient>
 #include <QTimer>
+#include <QJsonObject>
+
+#include "comminterface.h"
+#include "commmodbus_global.h"
+#include "commmodbusclientinterface.h"
+#include "commmodbussettingsparser.h"
+
+COMM_MODBUS_BEGIN_NAMESPACE
+
+using Registers = QMap<quint16, quint16>;
 
 class CommModbus : public CommInterface
 {
-    using Registers = QMap<quint16, quint16>;
-
     Q_OBJECT
+
+    bool ispolling();
+    void readRegisters(const Request &request);
+    void writeRegisters(const Request &request);
+
+    Registers readReady(QModbusReply *reply);
+
+    Request loadReadRequestSettings();
+    QJsonArray registersToJsonArray(const Registers &registers);
+
 public:
-    CommModbus();
+    explicit CommModbus(QJsonObject settings = QJsonObject{});
     ~CommModbus();
 
-    bool isconnected();
+    bool isconnected() override;
 
-    ModbusClientInterface *modbusClient();
-    void setModbusClient(ModbusClientInterface *client);
+    CommModbusClientInterface *modbusClient();
+    void setModbusClient(CommModbusClientInterface *client);
 
 public slots:
-    void connectComm() = 0;
-    void disconnectComm();
-    void incoming(QByteArray data);
+    void disconnectComm() override;
+    void incoming(QByteArray data) override;
 
 protected slots:
     void stateChanged(QModbusDevice::State state);
     void initPolling();
     void pollingCallback();
 
-private:
-    bool ispolling();
-    void readRegisters(const ModbusJsonParser::Request &request);
-    void writeRegisters(const ModbusJsonParser::Request &request);
-
-    Registers readReady(QModbusReply *reply);
-
-    ModbusJsonParser::Request loadReadRequestSettings();
-    QJsonArray registersToJsonArray(const Registers &registers);
-
 protected:
-    ModbusClientInterface *m_modbusClient;
+    CommModbusClientInterface *m_modbusClient;
     QTimer *m_polling;
-    ModbusJsonParser::Request m_readRequest;
+    Request m_readRequest;
 };
+
+COMM_MODBUS_END_NAMESPACE
 
 #endif // COMMMODBUS_H

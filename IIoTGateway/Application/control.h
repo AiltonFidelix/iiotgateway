@@ -10,6 +10,13 @@ class Gateway;
 class Control : public QObject
 {
     Q_OBJECT
+
+    QHttpServer m_httpServer;
+    Gateway *m_gateway;
+    StorageInterface *m_storage;
+
+    void registerRoutes();
+
 public:
     explicit Control(QObject *parent = nullptr);
     ~Control();
@@ -19,14 +26,6 @@ public:
 
     void setGateway(Gateway *gateway);
     void setStorage(StorageInterface *storage);
-
-private:
-    void registerRoutes();
-
-private:
-    QHttpServer m_httpServer;
-    Gateway *m_gateway;
-    StorageInterface *m_storage;
 };
 
 #endif // CONTROL_H

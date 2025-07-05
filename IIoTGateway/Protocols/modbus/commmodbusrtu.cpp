@@ -1,25 +1,32 @@
 #include "commmodbusrtu.h"
-#include "modbusclientadapter.h"
+#include "commmodbusclientadapter.h"
 #include "commfactory.h"
 
 #include <QVariant>
 
-int CommModbusRTU::m_typeId = CommFactory::registerInterface<CommModbusRTU*>("MODBUS_RTU");
+COMM_MODBUS_BEGIN_NAMESPACE
 
-void
-CommModbusRTU::connectComm()
+int CommModbusRTU::m_typeId = comm::CommFactory::registerInterface<CommModbusRTU*>("MODBUS_RTU");
+
+CommModbusRTU::CommModbusRTU(QJsonObject settings)
+    : CommModbus{settings}
+{
+}
+
+void CommModbusRTU::connectComm()
 {
     if (!m_modbusClient)
     {
-        ModbusClientAdapter *adapter = new ModbusClientAdapter();
-        QModbusRtuSerialClient *client = new QModbusRtuSerialClient();
+        auto adapter = new CommModbusClientAdapter{};
+        auto client = new QModbusRtuSerialClient{};
         adapter->setModbusClient(client);
 
-        m_modbusClient = static_cast<ModbusClientInterface*>(adapter);
+        m_modbusClient = static_cast<CommModbusClientInterface*>(adapter);
     }
 
     if (m_modbusClient->state() != QModbusDevice::ConnectedState)
     {
+#warning // TODO: change to settings on JSON
         QVariant port = qgetenv("MODBUS_RTU_PORT");
         QVariant parity = qgetenv("MODBUS_RTU_PARITY");
         QVariant baudRate = qgetenv("MODBUS_RTU_BAUDRATE");
@@ -59,7 +66,7 @@ CommModbusRTU::connectComm()
         m_modbusClient->setTimeout(timeout);
         m_modbusClient->setNumberOfRetries(retries);
 
-        connect(m_modbusClient, &ModbusClientInterface::stateChanged, this, &CommModbusRTU::stateChanged);
+        connect(m_modbusClient, &CommModbusClientInterface::stateChanged, this, &CommModbusRTU::stateChanged);
 
         if (!m_modbusClient->connectDevice())
         {
@@ -72,3 +79,5 @@ CommModbusRTU::connectComm()
         }
     }
 }
+
+COMM_MODBUS_END_NAMESPACE

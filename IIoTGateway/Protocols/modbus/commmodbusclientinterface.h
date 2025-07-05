@@ -1,15 +1,19 @@
-#ifndef MODBUSCLIENTINTERFACE_H
-#define MODBUSCLIENTINTERFACE_H
+#ifndef COMMMODBUSCLIENTINTERFACE_H
+#define COMMMODBUSCLIENTINTERFACE_H
 
 #include <QObject>
 #include <QModbusDevice>
 #include <QModbusReply>
 
-class ModbusClientInterface : public QObject
+#include "commmodbus_global.h"
+
+COMM_MODBUS_BEGIN_NAMESPACE
+
+class CommModbusClientInterface : public QObject
 {
     Q_OBJECT
 public:
-    virtual ~ModbusClientInterface() = default;
+    virtual ~CommModbusClientInterface() = default;
 
     virtual bool connectDevice() = 0;
     virtual void disconnectDevice() = 0;
@@ -25,4 +29,6 @@ signals:
     void stateChanged(QModbusDevice::State state);
 };
 
-#endif // MODBUSCLIENTINTERFACE_H
+COMM_MODBUS_END_NAMESPACE
+
+#endif // COMMMODBUSCLIENTINTERFACE_H

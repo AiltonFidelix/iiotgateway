@@ -8,9 +8,18 @@
 void
 TestCommModbus::SetUp()
 {
-    m_mockModbusClient = new MockModbusClient();
+    m_mockModbusClient = new MockModbusClient{};
+    m_commModbus = new CommModbusRTU{};
 
-    m_commModbus.setModbusClient(m_mockModbusClient);
+    m_commModbus->setModbusClient(m_mockModbusClient);
+}
+
+void TestCommModbus::TearDown()
+{
+    if (m_commModbus)
+    {
+        delete m_commModbus;
+    }
 }
 
 TEST_F(TestCommModbus, TestConnectionSuccess)
@@ -21,7 +30,7 @@ TEST_F(TestCommModbus, TestConnectionSuccess)
     EXPECT_CALL(*m_mockModbusClient, setNumberOfRetries(testing::_)).Times(1);
     EXPECT_CALL(*m_mockModbusClient, connectDevice()).WillOnce(testing::Return(true));
 
-    m_commModbus.connectComm();
+    m_commModbus->connectComm();
 }
 
 TEST_F(TestCommModbus, TestConnectionFailed)
@@ -33,14 +42,14 @@ TEST_F(TestCommModbus, TestConnectionFailed)
     EXPECT_CALL(*m_mockModbusClient, connectDevice()).WillOnce(testing::Return(false));
     EXPECT_CALL(*m_mockModbusClient, errorString()).WillOnce(testing::Return("Error from GTEST"));
 
-    m_commModbus.connectComm();
+    m_commModbus->connectComm();
 }
 
 TEST_F(TestCommModbus, TestIsConnected)
 {
     EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(testing::Return(QModbusDevice::ConnectedState));
 
-    EXPECT_TRUE(m_commModbus.isconnected());
+    EXPECT_TRUE(m_commModbus->isconnected());
 }
 
 TEST_F(TestCommModbus, TestReadRequest)
@@ -63,32 +72,32 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     EXPECT_CALL(*m_mockModbusClient, sendReadRequest(testing::_, testing::_)).WillOnce(testing::Return(reply));
 
-    auto request = TestUtils::readJsonFile(":/requests/readone.json");
+    const QByteArray request = TestUtils::readJsonFile(":/requests/readone.json");
 
     QTimer::singleShot(1, emitFinished);
 
-    QByteArray result;
+    QByteArray result{};
 
     auto handleResult = [&result](const QByteArray &data) -> void
     {
         result = data;
     };
 
-    QObject::connect(&m_commModbus, &CommModbus::outgoing, handleResult);
+    QObject::connect(m_commModbus, &CommModbus::outgoing, handleResult);
 
-    m_commModbus.incoming(request);
+    m_commModbus->incoming(request);
 
-    auto jsonResult = QJsonDocument::fromJson(result).object();
+    const QJsonObject jsonResult = QJsonDocument::fromJson(result).object();
 
-    auto devices = jsonResult.value("devices").toArray();
+    const QJsonArray devices = jsonResult.value("devices").toArray();
 
     ASSERT_EQ(1, devices.count());
 
-    auto firstDevice = devices.first().toObject();
+    const QJsonObject firstDevice = devices.first().toObject();
 
     ASSERT_EQ(expectedAddress, firstDevice.value("address").toInt());
 
-    const auto registers = firstDevice.value("registers").toArray();
+    const QJsonArray registers = firstDevice.value("registers").toArray();
 
     ASSERT_EQ(maxRegisters, registers.count());
 
@@ -106,5 +115,5 @@ TEST_F(TestCommModbus, TestDisconnect)
 {
     EXPECT_CALL(*m_mockModbusClient, disconnectDevice()).Times(1);
 
-    m_commModbus.disconnectComm();
+    m_commModbus->disconnectComm();
 }

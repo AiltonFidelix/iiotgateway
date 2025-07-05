@@ -4,9 +4,9 @@
 void
 TestModbusJsonParserReadOne::SetUp()
 {
-    auto data = TestUtils::readJsonFile(":/requests/readone.json");
+    const QByteArray data = TestUtils::readJsonFile(":/requests/readone.json");
 
-    m_parser = new ModbusJsonParser(data);
+    m_parser = new CommModbusSettingsParser{data};
 }
 
 void
@@ -24,7 +24,7 @@ TEST_F(TestModbusJsonParserReadOne, TestReadRequest)
     const auto type = m_parser->type();
 
     ASSERT_FALSE(readRequest.isEmpty());
-    ASSERT_EQ(ModbusJsonParser::Read, type);
+    ASSERT_EQ(Read, type);
 
     auto addresses = readRequest.keys();
     ASSERT_EQ(1, addresses.count());
@@ -42,9 +42,9 @@ TEST_F(TestModbusJsonParserReadOne, TestReadRequest)
 void
 TestModbusJsonParserReadMultiple::SetUp()
 {
-    auto data = TestUtils::readJsonFile(":/requests/readmultiple.json");
+    const QByteArray data = TestUtils::readJsonFile(":/requests/readmultiple.json");
 
-    m_parser = new ModbusJsonParser(data);
+    m_parser = new CommModbusSettingsParser{data};
 }
 
 void
@@ -69,7 +69,7 @@ TEST_F(TestModbusJsonParserReadMultiple, TestReadRequest)
     const auto type = m_parser->type();
 
     ASSERT_FALSE(readRequest.isEmpty());
-    ASSERT_EQ(ModbusJsonParser::Read, type);
+    ASSERT_EQ(Read, type);
 
     auto addresses = readRequest.keys();
     ASSERT_EQ(2, addresses.count());
@@ -94,9 +94,9 @@ TEST_F(TestModbusJsonParserReadMultiple, TestReadRequest)
 void
 TestModbusJsonParserWriteOne::SetUp()
 {
-    auto data = TestUtils::readJsonFile(":/requests/writeone.json");
+    const QByteArray data = TestUtils::readJsonFile(":/requests/writeone.json");
 
-    m_parser = new ModbusJsonParser(data);
+    m_parser = new CommModbusSettingsParser{data};
 }
 
 void
@@ -114,7 +114,7 @@ TEST_F(TestModbusJsonParserWriteOne, TestWriteRequest)
     const auto type = m_parser->type();
 
     ASSERT_FALSE(writeRequest.isEmpty());
-    ASSERT_EQ(ModbusJsonParser::Write, type);
+    ASSERT_EQ(Write, type);
 
     auto addresses = writeRequest.keys();
     ASSERT_EQ(1, addresses.count());
@@ -139,9 +139,9 @@ TEST_F(TestModbusJsonParserWriteOne, TestWriteRequest)
 void
 TestModbusJsonParserWriteMultiple::SetUp()
 {
-    auto data = TestUtils::readJsonFile(":/requests/writemultiple.json");
+    const QByteArray data = TestUtils::readJsonFile(":/requests/writemultiple.json");
 
-    m_parser = new ModbusJsonParser(data);
+    m_parser = new CommModbusSettingsParser{data};
 }
 
 void
@@ -174,9 +174,9 @@ TEST_F(TestModbusJsonParserWriteMultiple, TestWriteRequest)
     const auto type = m_parser->type();
 
     ASSERT_FALSE(writeRequest.isEmpty());
-    ASSERT_EQ(ModbusJsonParser::Write, type);
+    ASSERT_EQ(Write, type);
 
-    auto addresses = ModbusJsonParser::sortedAddress(writeRequest);
+    auto addresses = CommModbusSettingsParser::sortedAddress(writeRequest);
     ASSERT_EQ(2, addresses.count());
 
     QList<quint8> expectedAddresses = { 55, 60 };
@@ -211,7 +211,7 @@ TEST_F(TestModbusJsonParserWriteMultiple, TestWriteRequest)
 void
 TestModbusJsonParserEmpty::SetUp()
 {
-    m_parser = new ModbusJsonParser(QByteArray());
+    m_parser = new CommModbusSettingsParser{QByteArray{}};
 }
 
 void
@@ -228,6 +228,6 @@ TEST_F(TestModbusJsonParserEmpty, TestRequestEmpty)
     auto readRequest = m_parser->request();
     auto type = m_parser->type();
 
-    ASSERT_EQ(ModbusJsonParser::Unknown, type);
+    ASSERT_EQ(Unknown, type);
     ASSERT_TRUE(readRequest.isEmpty());
 }

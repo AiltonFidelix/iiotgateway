@@ -7,6 +7,13 @@
 class DBConnection : public QObject
 {
     Q_OBJECT
+
+    static DBConnection *m_instance;
+    QSqlDatabase m_database;
+
+    DBConnection() = default;
+    ~DBConnection() = default;
+
 public:
 
     // History table enum
@@ -45,14 +52,6 @@ public:
 public slots:
     bool open();
     void close();
-
-private:
-    DBConnection() = default;
-    ~DBConnection() = default;
-
-private:
-    static DBConnection *m_instance;
-    QSqlDatabase m_database;
 };
 
 #endif // DBCONNECTION_H

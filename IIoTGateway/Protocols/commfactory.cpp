@@ -1,31 +1,31 @@
 #include "commfactory.h"
 
-QSet<QByteArray>* CommFactory::m_commInterfaces;
+COMM_BEGIN_NAMESPACE
 
-QSet<QByteArray>*
-CommFactory::commInterfaces()
+QSet<QByteArray> *CommFactory::m_commInterfaces = nullptr;
+
+QSet<QByteArray> *CommFactory::commInterfaces()
 {
     return m_commInterfaces;
 }
 
-CommInterface*
-CommFactory::getCommInterface(const QByteArray &commInterface)
+CommInterface *CommFactory::getCommInterface(const QByteArray &commInterface, QJsonObject settings)
 {
-    QMetaType type = QMetaType::fromName(commInterface.toUpper());
+    const QMetaType type = QMetaType::fromName(commInterface.toUpper());
 
     if (!m_commInterfaces->contains(commInterface) || !type.isRegistered())
     {
         throw std::runtime_error("Comm Interface not found");
     }
 
-    QObject *interfaceObject = type.metaObject()->newInstance();
+    QObject *interfaceObject = type.metaObject()->newInstance(settings);
 
     if (interfaceObject == nullptr)
     {
         throw std::runtime_error("Failed to invoke Comm Interface");
     }
 
-    CommInterface *interface = qobject_cast<CommInterface*>(interfaceObject);
-
-    return interface;
+    return qobject_cast<CommInterface*>(interfaceObject);;
 }
+
+COMM_END_NAMESPACE

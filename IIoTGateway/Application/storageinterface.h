@@ -20,6 +20,7 @@ public:
     virtual QString cloudProtocol() = 0;
     virtual QString edgeProtocol() = 0;
     virtual QJsonObject protocolSettings(const QString &protocol) = 0;
+    virtual QPair<QString, QString> userCredentials() = 0;
 };
 
 #endif // STORAGEINTERFACE_H

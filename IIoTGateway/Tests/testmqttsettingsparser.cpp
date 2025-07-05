@@ -10,7 +10,7 @@ TestMQTTSettingsParser::SetUp()
     const auto bytearray = TestUtils::readJsonFile(":/settings/mqtt.json");
     const auto object = QJsonDocument::fromJson(bytearray).object();
 
-    m_parser = new MQTTSettingsParser(object);
+    m_parser = new MQTTSettingsParser{object};
 }
 
 void

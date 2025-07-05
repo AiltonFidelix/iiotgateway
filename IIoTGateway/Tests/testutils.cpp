@@ -2,17 +2,16 @@
 
 #include <QFile>
 
-QByteArray
-TestUtils::readJsonFile(const QString &filename)
+QByteArray TestUtils::readJsonFile(const QString &filename)
 {
-    QFile file(filename);
+    QFile file{filename};
 
     if (!file.open(QIODevice::ReadOnly))
     {
-        return QByteArray();
+        return QByteArray{};
     }
 
-    auto data = file.readAll();
+    const QByteArray data{file.readAll()};
 
     file.close();
 

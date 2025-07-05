@@ -4,12 +4,14 @@
 
 #include "../Protocols/commfactory.h"
 
+using namespace comm;
+
 Gateway::Gateway(StorageInterface *storage, QObject *parent)
-    : QObject(parent),
-    m_isRunning(false),
-    m_threadEdge(nullptr),
-    m_threadCloud(nullptr),
-    m_storage(storage)
+    : QObject{parent},
+    m_isRunning{false},
+    m_threadEdge{nullptr},
+    m_threadCloud{nullptr},
+    m_storage{storage}
 {
     qInfo() << "Creating gateway object...";
 }
@@ -20,14 +22,12 @@ Gateway::~Gateway()
         stop();
 }
 
-bool
-Gateway::isRunning()
+bool Gateway::isRunning()
 {
     return m_isRunning;
 }
 
-bool
-Gateway::start()
+bool Gateway::start()
 {
     qDebug() << "Starting gateway...";
 
@@ -37,14 +37,11 @@ Gateway::start()
         return false;
     }
 
-    if (!m_storage->active())
-    {
-        qWarning() << "Failed to start: Is not active!";
-        return false;
-    }
+    const QByteArray cloudProtocol = m_storage->cloudProtocol().toUtf8();
+    const QByteArray edgeProtocol = m_storage->edgeProtocol().toUtf8();
 
-    QByteArray cloudProtocol = m_storage->cloudProtocol().toUtf8();
-    QByteArray edgeProtocol = m_storage->edgeProtocol().toUtf8();
+    const QJsonObject settingsCloudProtocol = m_storage->protocolSettings(cloudProtocol);
+    const QJsonObject settingsEdgeProtocol = m_storage->protocolSettings(edgeProtocol);
 
     if (cloudProtocol.isEmpty() || edgeProtocol.isEmpty())
     {
@@ -52,42 +49,41 @@ Gateway::start()
         return false;
     }
 
-    CommFactory commFactory;
-
     try
     {
-        m_threadEdge = new QThread();
-        m_threadEdge->setObjectName(edgeProtocol);
-
-        CommInterface *commEdge = commFactory.getCommInterface(edgeProtocol);
-        commEdge->moveToThread(m_threadEdge);
-
-        m_threadCloud = new QThread();
+        m_threadCloud = new QThread{};
         m_threadCloud->setObjectName(cloudProtocol);
 
-        CommInterface *commCloud = commFactory.getCommInterface(cloudProtocol);
+        CommInterface *commCloud = CommFactory::getCommInterface(cloudProtocol, settingsCloudProtocol);
         commCloud->moveToThread(m_threadCloud);
 
-        connect(commEdge, &CommInterface::outgoing, commCloud, &CommInterface::incoming, Qt::QueuedConnection);
+        m_threadEdge = new QThread{};
+        m_threadEdge->setObjectName(edgeProtocol);
+
+        CommInterface *commEdge = CommFactory::getCommInterface(edgeProtocol, settingsEdgeProtocol);
+        commEdge->moveToThread(m_threadEdge);
+
         connect(commCloud, &CommInterface::outgoing, commEdge, &CommInterface::incoming, Qt::QueuedConnection);
+        connect(commEdge, &CommInterface::outgoing, commCloud, &CommInterface::incoming, Qt::QueuedConnection);
 
-        connect(m_threadEdge, &QThread::started, commEdge, &CommInterface::connectComm);
         connect(m_threadCloud, &QThread::started, commCloud, &CommInterface::connectComm);
-
-        connect(m_threadEdge, &QThread::finished, commEdge, &CommInterface::disconnectComm);
-        connect(commEdge, &CommInterface::disconnected, commEdge, &CommInterface::deleteLater);
-        connect(commEdge, &CommInterface::error, this, &Gateway::notifyError, Qt::QueuedConnection);
-        connect(commEdge, &CommInterface::connectionFailed, this, &Gateway::stop, Qt::QueuedConnection);
+        connect(m_threadEdge, &QThread::started, commEdge, &CommInterface::connectComm);
 
         connect(m_threadCloud, &QThread::finished, commCloud, &CommInterface::disconnectComm);
         connect(commCloud, &CommInterface::disconnected, commCloud, &CommInterface::deleteLater);
         connect(commCloud, &CommInterface::error, this, &Gateway::notifyError, Qt::QueuedConnection);
         connect(commCloud, &CommInterface::connectionFailed, this, &Gateway::stop, Qt::QueuedConnection);
 
-        m_threadEdge->start();
+        connect(m_threadEdge, &QThread::finished, commEdge, &CommInterface::disconnectComm);
+        connect(commEdge, &CommInterface::disconnected, commEdge, &CommInterface::deleteLater);
+        connect(commEdge, &CommInterface::error, this, &Gateway::notifyError, Qt::QueuedConnection);
+        connect(commEdge, &CommInterface::connectionFailed, this, &Gateway::stop, Qt::QueuedConnection);
+
         m_threadCloud->start();
+        m_threadEdge->start();
 
         m_isRunning = true;
+        m_storage->setActive(m_isRunning);
     }
     catch (std::exception &e)
     {
@@ -98,8 +94,7 @@ Gateway::start()
     return true;
 }
 
-void
-Gateway::stop()
+void Gateway::stop()
 {
     auto quitThread = [](QThread *thread) -> QThread*
     {
@@ -122,20 +117,19 @@ Gateway::stop()
     m_threadCloud = quitThread(m_threadCloud);
 
     m_isRunning = false;
+    m_storage->setActive(m_isRunning);
 
     qDebug() << "Stoping gateway...";
 }
 
-bool
-Gateway::restart()
+bool Gateway::restart()
 {
     qDebug() << "Restarting gateway...";
     stop();
     return start();
 }
 
-void
-Gateway::notifyError(QByteArray error)
+void Gateway::notifyError(const QByteArray &error)
 {
     qWarning() << error;
 }

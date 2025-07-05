@@ -6,8 +6,7 @@
 class TestUtils
 {
 public:
-    TestUtils() = default;
-    ~TestUtils() = default;
+    TestUtils() = delete;
 
     static QByteArray readJsonFile(const QString &filename);
 };

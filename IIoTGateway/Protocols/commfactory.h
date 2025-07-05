@@ -3,34 +3,39 @@
 
 #include <QObject>
 #include <QSet>
+#include <QJsonObject>
 
+#include "comm_global.h"
 #include "comminterface.h"
+
+COMM_BEGIN_NAMESPACE
 
 class CommFactory : public QObject
 {
     Q_OBJECT
+
+    static QSet<QByteArray> *m_commInterfaces;
+
 public:
-    CommFactory() = default;
-    virtual ~CommFactory() = default;
+    CommFactory() = delete;
 
     static QSet<QByteArray> *commInterfaces();
 
-    CommInterface *getCommInterface(const QByteArray &commInterface);
+    static CommInterface *getCommInterface(const QByteArray &commInterface, QJsonObject settings = QJsonObject{});
 
     template<typename T> static int registerInterface(QByteArray commInterface)
     {
         if (m_commInterfaces == nullptr)
         {
-            m_commInterfaces = new QSet<QByteArray>();
+            m_commInterfaces = new QSet<QByteArray>{};
         }
 
         m_commInterfaces->insert(commInterface);
 
         return qRegisterMetaType<T>(commInterface);
     }
-
-private:
-    static QSet<QByteArray>* m_commInterfaces;
 };
+
+COMM_END_NAMESPACE
 
 #endif // COMMFACTORY_H

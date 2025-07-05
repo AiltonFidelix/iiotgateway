@@ -1,17 +1,18 @@
-#include "modbusjsonparser.h"
+#include "commmodbussettingsparser.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
 
-ModbusJsonParser::ModbusJsonParser(const QByteArray &data, quint16 maxEntries)
+COMM_MODBUS_BEGIN_NAMESPACE
+
+CommModbusSettingsParser::CommModbusSettingsParser(const QByteArray &data, quint16 maxEntries) :
+    m_document{QJsonDocument::fromJson(data)},
+    m_maxEntries{maxEntries},
+    m_type{Unknown}
 {
-    m_document = QJsonDocument::fromJson(data);
-    m_maxEntries = maxEntries;
-    m_type = Unknown;
 }
 
-ModbusJsonParser::Request
-ModbusJsonParser::request()
+Request CommModbusSettingsParser::request()
 {
     auto setValues = [](auto &current, const QJsonArray &values, QModbusDataUnit &unit) -> void
     {
@@ -25,15 +26,15 @@ ModbusJsonParser::request()
         }
     };
 
-    Request request;
+    Request request{};
 
-    QJsonObject jsonObj = m_document.object();
-    QJsonArray devices = jsonObj.value("devices").toArray();
+    const QJsonObject jsonObj = m_document.object();
+    const QJsonArray devices = jsonObj.value("devices").toArray();
 
     for (const auto &device : devices)
     {
-        QJsonObject deviceObj = device.toObject();
-        quint8 address = deviceObj.value("address").toInt(1);
+        const QJsonObject deviceObj = device.toObject();
+        const quint8 address = deviceObj.value("address").toInt(1);
 
         auto registertype = getType(deviceObj.value("type").toString());
         quint16 startRegister = deviceObj.value("startRegister").toInt(0);
@@ -41,8 +42,8 @@ ModbusJsonParser::request()
 
         bool hasValues = deviceObj.contains("values");
 
-        QJsonArray values;
-        QJsonArray::Iterator current;
+        QJsonArray values{};
+        QJsonArray::Iterator current{};
 
         if (hasValues)
         {
@@ -57,9 +58,9 @@ ModbusJsonParser::request()
 
         for (int i = 0, r = startRegister; i < numberOfEntries; i += m_maxEntries, r += m_maxEntries)
         {
-            quint16 entries = qMin(m_maxEntries, quint16(numberOfEntries - i));
+            const quint16 entries = qMin(m_maxEntries, quint16(numberOfEntries - i));
 
-            auto unit = QModbusDataUnit(registertype, r, entries);
+            auto unit = QModbusDataUnit{registertype, r, entries};
 
             if (hasValues)
             {
@@ -73,14 +74,12 @@ ModbusJsonParser::request()
     return request;
 }
 
-ModbusJsonParser::RequestType
-ModbusJsonParser::type()
+RequestType CommModbusSettingsParser::type()
 {
     return m_type;
 }
 
-ModbusJsonParser::Addresses
-ModbusJsonParser::sortedAddress(const Request &request)
+Addresses CommModbusSettingsParser::sortedAddress(const Request &request)
 {
     auto keys = request.keys();
 
@@ -89,8 +88,7 @@ ModbusJsonParser::sortedAddress(const Request &request)
     return keys;
 }
 
-void
-ModbusJsonParser::sortRequestUnits(ModbusJsonParser::Units &units)
+void CommModbusSettingsParser::sortRequestUnits(Units &units)
 {
     auto sort = [](const QModbusDataUnit &a, const QModbusDataUnit &b) -> bool
     {
@@ -100,8 +98,7 @@ ModbusJsonParser::sortRequestUnits(ModbusJsonParser::Units &units)
     std::sort(units.begin(), units.end(), sort);
 }
 
-QModbusDataUnit::RegisterType
-ModbusJsonParser::getType(const QString &type) const
+QModbusDataUnit::RegisterType CommModbusSettingsParser::getType(const QString &type) const
 {
     if (type.toLower() == "coils")
     {
@@ -122,3 +119,5 @@ ModbusJsonParser::getType(const QString &type) const
 
     return QModbusDataUnit::Invalid;
 }
+
+COMM_MODBUS_END_NAMESPACE
