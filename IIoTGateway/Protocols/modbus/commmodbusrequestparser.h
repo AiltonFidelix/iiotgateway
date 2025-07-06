@@ -1,5 +1,5 @@
-#ifndef COMMMODBUSSETTINGSPARSER_H
-#define COMMMODBUSSETTINGSPARSER_H
+#ifndef COMMMODBUSREQUESTPARSER_H
+#define COMMMODBUSREQUESTPARSER_H
 
 #include <QObject>
 #include <QJsonDocument>
@@ -13,13 +13,13 @@ using Addresses = QList<quint8>;
 using Units = QList<QModbusDataUnit>;
 using Request = QHash<quint8, Units>;
 
-enum RequestType {
+enum class RequestType : quint8 {
     Unknown = 0,
     Read,
     Write
 };
 
-class CommModbusSettingsParser : public QObject
+class CommModbusRequestParser : public QObject
 {
     Q_OBJECT
 
@@ -30,7 +30,7 @@ class CommModbusSettingsParser : public QObject
     QModbusDataUnit::RegisterType getType(const QString &type) const;
 
 public:
-    explicit CommModbusSettingsParser(const QByteArray &data, quint16 maxEntries = 10);
+    explicit CommModbusRequestParser(const QByteArray &data, quint16 maxEntries = 10);
 
     Request request();
 
@@ -46,4 +46,4 @@ public:
 
 COMM_MODBUS_END_NAMESPACE
 
-#endif // COMMMODBUSSETTINGSPARSER_H
+#endif // COMMMODBUSREQUESTPARSER_H

@@ -16,13 +16,13 @@ int CommMQTT::m_typeId = comm::CommFactory::registerInterface<CommMQTT*>("MQTT")
 CommMQTT::CommMQTT(QJsonObject settings) :
     m_pubQos{defaultQos},
     m_subQos{defaultQos},
-    m_retries{},
+    m_retries{0},
     m_publish{false},
     m_subscribe{false},
     m_client{nullptr},
     m_pubTopic{},
     m_subTopic{},
-    m_settingsParser{MQTTSettingsParser{settings}}
+    m_settingsParser{settings}
 {
     const auto protocol = m_settingsParser.protocol();
     const auto host = m_settingsParser.host();

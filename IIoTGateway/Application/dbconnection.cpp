@@ -5,6 +5,10 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
+constexpr const char *SCRIPTS_PATH = ":/scripts";
+constexpr const char *HISTORY_SCRIPT = "history.sql";
+constexpr const char *HISTORY_TABLE = "history";
+
 DBConnection *DBConnection::m_instance = nullptr;
 
 DBConnection*
@@ -12,7 +16,7 @@ DBConnection::instance()
 {
     if (m_instance == nullptr)
     {
-        m_instance = new DBConnection{};
+        m_instance = new DBConnection();
 
         connect(qApp, &QCoreApplication::aboutToQuit, m_instance, &DBConnection::close);
     }
@@ -65,12 +69,12 @@ bool DBConnection::verifyScripts()
 
     auto scriptExec = [this](const QString &fileName) -> bool
     {
-        QFile file{fileName};
+        QFile file(fileName);
 
         if (!file.open(QIODevice::ReadOnly))
             return false;
 
-        const auto data = file.readAll();
+        const QByteArray data = file.readAll();
         const auto scripts = data.trimmed().split(';');
 
         file.close();
@@ -87,7 +91,7 @@ bool DBConnection::verifyScripts()
 
             QSqlQuery query;
 
-            const auto ret = query.exec(script);
+            const bool ret = query.exec(script);
 
             if (!ret)
             {
@@ -131,9 +135,9 @@ bool DBConnection::verifyScripts()
         return (query.value(0).toInt() == 1);
     };
 
-    const QString historyScript{"history.sql"};
+    const QString historyScript(HISTORY_SCRIPT);
 
-    QDir dir{":/scripts"};
+    QDir dir(SCRIPTS_PATH);
 
     if (!dir.exists())
         return false;
@@ -145,7 +149,7 @@ bool DBConnection::verifyScripts()
 
     files.removeOne(historyScript);
 
-    if (!tableExists("history"))
+    if (!tableExists(HISTORY_TABLE))
     {
         qDebug() << "Executing" << historyScript;
 

@@ -7,11 +7,11 @@
 using namespace comm;
 
 Gateway::Gateway(StorageInterface *storage, QObject *parent)
-    : QObject{parent},
-    m_isRunning{false},
-    m_threadEdge{nullptr},
-    m_threadCloud{nullptr},
-    m_storage{storage}
+    : QObject(parent),
+    m_isRunning(false),
+    m_threadEdge(nullptr),
+    m_threadCloud(nullptr),
+    m_storage(storage)
 {
     qInfo() << "Creating gateway object...";
 }
@@ -51,13 +51,13 @@ bool Gateway::start()
 
     try
     {
-        m_threadCloud = new QThread{};
+        m_threadCloud = new QThread();
         m_threadCloud->setObjectName(cloudProtocol);
 
         CommInterface *commCloud = CommFactory::getCommInterface(cloudProtocol, settingsCloudProtocol);
         commCloud->moveToThread(m_threadCloud);
 
-        m_threadEdge = new QThread{};
+        m_threadEdge = new QThread();
         m_threadEdge->setObjectName(edgeProtocol);
 
         CommInterface *commEdge = CommFactory::getCommInterface(edgeProtocol, settingsEdgeProtocol);

@@ -8,7 +8,7 @@ set(HEADERS
     modbus/commmodbus_global.h
     modbus/commmodbusclientadapter.h
     modbus/commmodbusclientinterface.h
-    modbus/commmodbussettingsparser.h
+    modbus/commmodbusrequestparser.h
     modbus/commmodbus.h
     modbus/commmodbusrtu.h
     modbus/commmodbustcp.h
@@ -22,7 +22,7 @@ set(HEADERS
 set(SOURCES
     commfactory.cpp
     modbus/commmodbusclientadapter.cpp
-    modbus/commmodbussettingsparser.cpp
+    modbus/commmodbusrequestparser.cpp
     modbus/commmodbus.cpp
     modbus/commmodbusrtu.cpp
     modbus/commmodbustcp.cpp

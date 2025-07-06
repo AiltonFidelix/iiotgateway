@@ -4,6 +4,10 @@
 #include <QObject>
 #include <mqtt/iaction_listener.h>
 
+#include "commmqtt_global.h"
+
+COMM_MQTT_BEGIN_NAMESPACE
+
 class CommMQTTActionListener : public QObject, public virtual mqtt::iaction_listener
 {
     Q_OBJECT
@@ -18,5 +22,7 @@ signals:
     void unsubscribeFailed();
     void disconnectFailed();
 };
+
+COMM_MQTT_END_NAMESPACE
 
 #endif // COMMMQTTACTIONLISTENER_H

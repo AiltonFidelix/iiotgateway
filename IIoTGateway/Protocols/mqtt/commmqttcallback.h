@@ -4,6 +4,10 @@
 #include <QObject>
 #include <mqtt/callback.h>
 
+#include "commmqtt_global.h"
+
+COMM_MQTT_BEGIN_NAMESPACE
+
 class CommMQTTCallback : public QObject, public virtual mqtt::callback
 {
     Q_OBJECT
@@ -19,6 +23,8 @@ signals:
     void cbMessageArrived(QByteArray message);
     void cbDeliveryComplete();
 };
+
+COMM_MQTT_END_NAMESPACE
 
 #endif // COMMMQTTCALLBACK_H
 

@@ -2,8 +2,10 @@
 
 #include <MQTTAsync.h>
 
+COMM_MQTT_BEGIN_NAMESPACE
+
 MQTTSettingsParser::MQTTSettingsParser(QJsonObject settings) :
-    m_settings{settings}
+    m_settings(settings)
 {
 }
 
@@ -29,7 +31,7 @@ bool MQTTSettingsParser::subscribe() const
 
 QString MQTTSettingsParser::protocol() const
 {
-    const auto protocol = m_settings.value("protocol").toString();
+    const QString protocol = m_settings.value("protocol").toString();
     return protocol.split(':').first();
 }
 
@@ -81,7 +83,7 @@ int MQTTSettingsParser::port() const
 
 int MQTTSettingsParser::version() const
 {
-    const auto version = m_settings.value("version").toString();
+    const QString version = m_settings.value("version").toString();
 
     if (version == "5.0")
     {
@@ -108,3 +110,5 @@ int MQTTSettingsParser::subscribeQos() const
 {
     return m_settings.value("subscribeQos").toInt(0);
 }
+
+COMM_MQTT_END_NAMESPACE

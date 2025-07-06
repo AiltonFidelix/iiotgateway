@@ -10,7 +10,7 @@
 #include "comminterface.h"
 #include "commmodbus_global.h"
 #include "commmodbusclientinterface.h"
-#include "commmodbussettingsparser.h"
+#include "commmodbusrequestparser.h"
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
@@ -30,7 +30,7 @@ class CommModbus : public CommInterface
     QJsonArray registersToJsonArray(const Registers &registers);
 
 public:
-    explicit CommModbus(QJsonObject settings = QJsonObject{});
+    explicit CommModbus(QJsonObject settings = QJsonObject());
     ~CommModbus();
 
     bool isconnected() override;

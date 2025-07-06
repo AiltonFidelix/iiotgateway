@@ -8,7 +8,7 @@
 #include <QJsonDocument>
 
 DBStorage::DBStorage()
-    : m_connection{DBConnection::instance()}
+    : m_connection(DBConnection::instance())
 {
 }
 
@@ -30,8 +30,7 @@ bool DBStorage::verify()
 
 bool DBStorage::setActive(bool active)
 {
-    const QString value = active ? "Y" : "N";
-    return insertSettings("active", value);
+    return insertSettings("active", active ? "Y" : "N");
 }
 
 bool DBStorage::setCloudProtocol(const QString &protocol)
@@ -58,9 +57,9 @@ bool DBStorage::setProtocolSettings(const QString &protocol, const QJsonObject &
         return ret;
     };
 
-    const QString currentDT{currentDateTime()};
+    const QString currentDT(currentDateTime());
 
-    auto strSettings = QJsonDocument{settings}.toJson(QJsonDocument::Compact);
+    const auto strSettings = QJsonDocument(settings).toJson(QJsonDocument::Compact);
 
     bool ret = false;
 
@@ -80,7 +79,7 @@ bool DBStorage::setProtocolSettings(const QString &protocol, const QJsonObject &
 
 bool DBStorage::active()
 {
-    QSqlRecord record = selectSettings();
+    const QSqlRecord record = selectSettings();
 
     if (record.isEmpty())
         return false;
@@ -92,10 +91,10 @@ bool DBStorage::active()
 
 QString DBStorage::cloudProtocol()
 {
-    QSqlRecord record = selectSettings();
+    const QSqlRecord record = selectSettings();
 
     if (record.isEmpty())
-        return QString{};
+        return QString();
 
     auto index = static_cast<int>(DBConnection::Settings::CloudProtocol);
 
@@ -104,10 +103,10 @@ QString DBStorage::cloudProtocol()
 
 QString DBStorage::edgeProtocol()
 {
-    QSqlRecord record = selectSettings();
+    const QSqlRecord record = selectSettings();
 
     if (record.isEmpty())
-        return QString{};
+        return QString();
 
     auto index = static_cast<int>(DBConnection::Settings::EdgeProtocol);
 
@@ -128,7 +127,7 @@ QJsonObject DBStorage::protocolSettings(const QString &protocol)
     ret &= sqlquery.next();
 
     if (!ret)
-        return QJsonObject{};
+        return QJsonObject();
 
     const auto settings = sqlquery.value(0).toByteArray();
     const auto doc = QJsonDocument::fromJson(settings);
@@ -150,9 +149,9 @@ QPair<QString, QString> DBStorage::userCredentials()
     ret &= sqlquery.next();
 
     if (!ret)
-        return QPair<QString, QString>{};
+        return QPair<QString, QString>();
 
-    const QPair<QString, QString> credentials{sqlquery.value(0).toString(), sqlquery.value(1).toString()};
+    const QPair<QString, QString> credentials(sqlquery.value(0).toString(), sqlquery.value(1).toString());
 
     return credentials;
 }
@@ -177,7 +176,7 @@ bool DBStorage::insertSettings(const QString &field, const QString &value)
         return ret;
     };
 
-    const QString currentDT = currentDateTime();
+    const QString currentDT(currentDateTime());
     bool ret = false;
 
     if (settingsExist())
@@ -200,7 +199,7 @@ QSqlRecord DBStorage::selectSettings()
 
     if (!sqlquery.exec("SELECT * FROM settings") || !sqlquery.next())
     {
-        return QSqlRecord{};
+        return QSqlRecord();
     }
 
     return sqlquery.record();

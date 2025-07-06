@@ -21,13 +21,13 @@ public:
 
     static QSet<QByteArray> *commInterfaces();
 
-    static CommInterface *getCommInterface(const QByteArray &commInterface, QJsonObject settings = QJsonObject{});
+    static CommInterface *getCommInterface(const QByteArray &commInterface, QJsonObject settings = QJsonObject());
 
     template<typename T> static int registerInterface(QByteArray commInterface)
     {
         if (m_commInterfaces == nullptr)
         {
-            m_commInterfaces = new QSet<QByteArray>{};
+            m_commInterfaces = new QSet<QByteArray>();
         }
 
         m_commInterfaces->insert(commInterface);

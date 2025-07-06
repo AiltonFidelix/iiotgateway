@@ -3,12 +3,17 @@
 
 #include <QJsonObject>
 
+#include "commmqtt_global.h"
+
+COMM_MQTT_BEGIN_NAMESPACE
+
 class MQTTSettingsParser
 {
     QJsonObject m_settings;
 
 public:
-    MQTTSettingsParser(QJsonObject settings = QJsonObject{});
+    explicit MQTTSettingsParser(QJsonObject settings = QJsonObject());
+    ~MQTTSettingsParser() = default;
 
     bool autoReconnect() const;
     bool cleanStart() const;
@@ -30,5 +35,7 @@ public:
     int publishQos() const;
     int subscribeQos() const;
 };
+
+COMM_MQTT_END_NAMESPACE
 
 #endif // COMMMQTTSETTINGSPARSER_H

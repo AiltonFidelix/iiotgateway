@@ -7,10 +7,10 @@
 #include <QJsonObject>
 
 Control::Control(QObject *parent)
-    : QObject{parent},
-    m_httpServer{},
-    m_gateway{nullptr},
-    m_storage{nullptr}
+    : QObject(parent),
+    m_httpServer(),
+    m_gateway(nullptr),
+    m_storage(nullptr)
 {
 }
 
@@ -24,7 +24,7 @@ bool Control::start(int port)
 {
     registerRoutes();
 
-    auto tcpserver = new QTcpServer{};
+    auto tcpserver = new QTcpServer();
 
     if (!tcpserver->listen(QHostAddress::Any, port) || !m_httpServer.bind(tcpserver))
     {
@@ -68,7 +68,7 @@ void Control::registerRoutes()
     /// / index GET handler
     auto index = [](const QHttpServerRequest &request)
     {
-        QString response{"<h1>IIoTGateway - by Ailton Fidelix</h1>"};
+        const QString response("<h1>IIoTGateway - by Ailton Fidelix</h1>");
         return QHttpServerResponse(response);
     };
 
@@ -110,7 +110,7 @@ void Control::registerRoutes()
             QJsonObject obj{};
             obj.insert("status", status);
             obj.insert("message", message);
-            return QJsonDocument{obj}.toJson();
+            return QJsonDocument(obj).toJson();
         };
 
         const bool success = ((username == credentials.first) && (password == credentials.second)) ;
@@ -126,7 +126,7 @@ void Control::registerRoutes()
         headers.append("Access-Control-Allow-Origin", "*");
         headers.append("Content-Type", "application/json");
 
-        QHttpServerResponse response{data};
+        QHttpServerResponse response(data);
         response.setHeaders(headers);
 
         return response;
@@ -140,7 +140,7 @@ void Control::registerRoutes()
         headers.append("Access-Control-Allow-Methods", "GET");
         headers.append("Access-Control-Allow-Headers", "Content-Type");
 
-        QHttpServerResponse response{QHttpServerResponse::StatusCode::Ok};
+        QHttpServerResponse response(QHttpServerResponse::StatusCode::Ok);
         response.setHeaders(headers);
 
         return response;
@@ -151,20 +151,20 @@ void Control::registerRoutes()
     {
         if (m_gateway == nullptr)
         {
-            QHttpServerResponse response{QHttpServerResponse::StatusCode::InternalServerError};
+            QHttpServerResponse response(QHttpServerResponse::StatusCode::InternalServerError);
             return response;
         }
 
         QJsonObject obj{};
         obj.insert("status", m_gateway->isRunning() ? "running" : "stopped");
 
-        const auto data = QJsonDocument{obj}.toJson(QJsonDocument::Compact);
+        const auto data = QJsonDocument(obj).toJson(QJsonDocument::Compact);
 
         QHttpHeaders headers{};
         headers.append("Access-Control-Allow-Origin", "*");
         headers.append("Content-Type", "application/json");
 
-        QHttpServerResponse response{data};
+        QHttpServerResponse response(data);
         response.setHeaders(headers);
 
         return response;
@@ -178,7 +178,7 @@ void Control::registerRoutes()
         headers.append("Access-Control-Allow-Methods", "POST");
         headers.append("Access-Control-Allow-Headers", "Content-Type");
 
-        QHttpServerResponse response{QHttpServerResponse::StatusCode::Ok};
+        QHttpServerResponse response(QHttpServerResponse::StatusCode::Ok);
         response.setHeaders(headers);
 
         return response;
@@ -189,18 +189,18 @@ void Control::registerRoutes()
     {
         if (m_gateway == nullptr)
         {
-            QHttpServerResponse response{QHttpServerResponse::StatusCode::InternalServerError};
+            QHttpServerResponse response(QHttpServerResponse::StatusCode::InternalServerError);
             return response;
         }
 
         const auto body = request.body();
 
-        QJsonParseError parser;
+        QJsonParseError parser{};
         const auto json = QJsonDocument::fromJson(body, &parser);
 
         if (parser.error != QJsonParseError::NoError)
         {
-            QHttpServerResponse response{QHttpServerResponse::StatusCode::InternalServerError};
+            QHttpServerResponse response(QHttpServerResponse::StatusCode::InternalServerError);
             return response;
         }
 
@@ -224,7 +224,7 @@ void Control::registerRoutes()
         headers.append("Access-Control-Allow-Origin", "*");
         headers.append("Content-Type", "application/json");
 
-        QHttpServerResponse response{QHttpServerResponse::StatusCode::Ok};
+        QHttpServerResponse response(QHttpServerResponse::StatusCode::Ok);
         response.setHeaders(headers);
 
         return response;
@@ -238,7 +238,7 @@ void Control::registerRoutes()
         headers.append("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         headers.append("Access-Control-Allow-Headers", "Content-Type");
 
-        QHttpServerResponse response{QHttpServerResponse::StatusCode::Ok};
+        QHttpServerResponse response(QHttpServerResponse::StatusCode::Ok);
         response.setHeaders(headers);
 
         return response;
@@ -249,7 +249,7 @@ void Control::registerRoutes()
     {
         if (m_storage == nullptr)
         {
-            QHttpServerResponse response{QHttpServerResponse::StatusCode::InternalServerError};
+            QHttpServerResponse response(QHttpServerResponse::StatusCode::InternalServerError);
             return response;
         }
 
@@ -268,13 +268,13 @@ void Control::registerRoutes()
             obj.insert(protocol, settings);
         }
 
-        const auto data = QJsonDocument{obj}.toJson(QJsonDocument::Compact);
+        const auto data = QJsonDocument(obj).toJson(QJsonDocument::Compact);
 
         QHttpHeaders headers{};
         headers.append("Access-Control-Allow-Origin", "*");
         headers.append("Content-Type", "application/json");
 
-        QHttpServerResponse response{data};
+        QHttpServerResponse response(data);
         response.setHeaders(headers);
 
         return response;
@@ -292,29 +292,29 @@ void Control::registerRoutes()
 
         if ((parser.error != QJsonParseError::NoError) || (m_storage == nullptr))
         {
-            QHttpServerResponse response{QHttpServerResponse::StatusCode::InternalServerError};
+            QHttpServerResponse response(QHttpServerResponse::StatusCode::InternalServerError);
             return response;
         }
 
-        const auto reqObj = json.object();
-        const auto keys = reqObj.keys();
+        const QJsonObject reqObj = json.object();
+        const QStringList keys = reqObj.keys();
 
         bool ok = true;
 
         for (const auto &key : keys)
         {
-            const auto value = reqObj.value(key);
+            const QJsonValue value = reqObj.value(key);
 
             if (!value.isObject())
                 continue;
 
-            auto settings = value.toObject();
+            const QJsonObject settings = value.toObject();
             ok &= m_storage->setProtocolSettings(key, settings);
         }
 
         if (!ok)
         {
-            QHttpServerResponse response{QHttpServerResponse::StatusCode::InternalServerError};
+            QHttpServerResponse response(QHttpServerResponse::StatusCode::InternalServerError);
             return response;
         }
 
@@ -322,13 +322,13 @@ void Control::registerRoutes()
         resObj.insert("status", "ok");
         resObj.insert("message", "Settings successfully saved!");
 
-        const auto data = QJsonDocument{resObj}.toJson(QJsonDocument::Compact);
+        const auto data = QJsonDocument(resObj).toJson(QJsonDocument::Compact);
 
         QHttpHeaders headers{};
         headers.append("Access-Control-Allow-Origin", "*");
         headers.append("Content-Type", "application/json");
 
-        QHttpServerResponse response{data};
+        QHttpServerResponse response(data);
         response.setHeaders(headers);
 
         return response;

@@ -9,7 +9,7 @@ COMM_MODBUS_BEGIN_NAMESPACE
 int CommModbusRTU::m_typeId = comm::CommFactory::registerInterface<CommModbusRTU*>("MODBUS_RTU");
 
 CommModbusRTU::CommModbusRTU(QJsonObject settings)
-    : CommModbus{settings}
+    : CommModbus(settings)
 {
 }
 
@@ -17,8 +17,8 @@ void CommModbusRTU::connectComm()
 {
     if (!m_modbusClient)
     {
-        auto adapter = new CommModbusClientAdapter{};
-        auto client = new QModbusRtuSerialClient{};
+        auto adapter = new CommModbusClientAdapter();
+        auto client = new QModbusRtuSerialClient();
         adapter->setModbusClient(client);
 
         m_modbusClient = static_cast<CommModbusClientInterface*>(adapter);

@@ -1,5 +1,6 @@
 #include "gatewaycontroller.h"
 
+#include <QCryptographicHash>
 #include <QDebug>
 #include <QNetworkRequest>
 #include <QMetaEnum>
@@ -32,9 +33,14 @@ GatewayController::GatewayController(QObject *parent)
 void
 GatewayController::login(const QString &username, const QString &password)
 {
+    QCryptographicHash hash(QCryptographicHash::Sha1);
+    hash.addData(password.toUtf8());
+
+    const auto hashPass = QString(hash.result().toHex());
+
     QJsonObject obj;
     obj.insert("username", username);
-    obj.insert("password", password);
+    obj.insert("password", hashPass);
 
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/login").arg(m_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
@@ -199,6 +205,7 @@ GatewayController::sendCommand(const QString &command)
         auto reply = qobject_cast<QNetworkReply*>(sender());
         reply->disconnect();
         reply->deleteLater();
+#warning // TODO: handle response message
     });
 }
 

@@ -9,7 +9,7 @@ COMM_MODBUS_BEGIN_NAMESPACE
 int CommModbusTCP::m_typeId = comm::CommFactory::registerInterface<CommModbusTCP*>("MODBUS_TCP");
 
 CommModbusTCP::CommModbusTCP(QJsonObject settings)
-    : CommModbus{settings}
+    : CommModbus(settings)
 {
 }
 
@@ -17,8 +17,8 @@ void CommModbusTCP::connectComm()
 {
     if (!m_modbusClient)
     {
-        auto adapter = new CommModbusClientAdapter{};
-        auto client = new QModbusTcpClient{};
+        auto adapter = new CommModbusClientAdapter();
+        auto client = new QModbusTcpClient();
         adapter->setModbusClient(client);
 
         m_modbusClient = static_cast<CommModbusClientInterface*>(adapter);

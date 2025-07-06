@@ -1,18 +1,18 @@
-#include "commmodbussettingsparser.h"
+#include "commmodbusrequestparser.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
-CommModbusSettingsParser::CommModbusSettingsParser(const QByteArray &data, quint16 maxEntries) :
-    m_document{QJsonDocument::fromJson(data)},
-    m_maxEntries{maxEntries},
-    m_type{Unknown}
+CommModbusRequestParser::CommModbusRequestParser(const QByteArray &data, quint16 maxEntries) :
+    m_document(QJsonDocument::fromJson(data)),
+    m_maxEntries(maxEntries),
+    m_type(RequestType::Unknown)
 {
 }
 
-Request CommModbusSettingsParser::request()
+Request CommModbusRequestParser::request()
 {
     auto setValues = [](auto &current, const QJsonArray &values, QModbusDataUnit &unit) -> void
     {
@@ -34,11 +34,11 @@ Request CommModbusSettingsParser::request()
     for (const auto &device : devices)
     {
         const QJsonObject deviceObj = device.toObject();
-        const quint8 address = deviceObj.value("address").toInt(1);
+        const quint8 address = static_cast<quint8>(deviceObj.value("address").toInt(0));
 
-        auto registertype = getType(deviceObj.value("type").toString());
-        quint16 startRegister = deviceObj.value("startRegister").toInt(0);
-        quint16 numberOfEntries = deviceObj.value("numberOfEntries").toInt(1);
+        const auto registertype = getType(deviceObj.value("type").toString());
+        const quint16 startRegister = deviceObj.value("startRegister").toInt(0);
+        const quint16 numberOfEntries = deviceObj.value("numberOfEntries").toInt(0);
 
         bool hasValues = deviceObj.contains("values");
 
@@ -49,18 +49,18 @@ Request CommModbusSettingsParser::request()
         {
             values = deviceObj.value("values").toArray();
             current = values.begin();
-            m_type = Write;
+            m_type = RequestType::Write;
         }
         else
         {
-            m_type = Read;
+            m_type = RequestType::Read;
         }
 
         for (int i = 0, r = startRegister; i < numberOfEntries; i += m_maxEntries, r += m_maxEntries)
         {
             const quint16 entries = qMin(m_maxEntries, quint16(numberOfEntries - i));
 
-            auto unit = QModbusDataUnit{registertype, r, entries};
+            auto unit = QModbusDataUnit(registertype, r, entries);
 
             if (hasValues)
             {
@@ -74,12 +74,12 @@ Request CommModbusSettingsParser::request()
     return request;
 }
 
-RequestType CommModbusSettingsParser::type()
+RequestType CommModbusRequestParser::type()
 {
     return m_type;
 }
 
-Addresses CommModbusSettingsParser::sortedAddress(const Request &request)
+Addresses CommModbusRequestParser::sortedAddress(const Request &request)
 {
     auto keys = request.keys();
 
@@ -88,7 +88,7 @@ Addresses CommModbusSettingsParser::sortedAddress(const Request &request)
     return keys;
 }
 
-void CommModbusSettingsParser::sortRequestUnits(Units &units)
+void CommModbusRequestParser::sortRequestUnits(Units &units)
 {
     auto sort = [](const QModbusDataUnit &a, const QModbusDataUnit &b) -> bool
     {
@@ -98,7 +98,7 @@ void CommModbusSettingsParser::sortRequestUnits(Units &units)
     std::sort(units.begin(), units.end(), sort);
 }
 
-QModbusDataUnit::RegisterType CommModbusSettingsParser::getType(const QString &type) const
+QModbusDataUnit::RegisterType CommModbusRequestParser::getType(const QString &type) const
 {
     if (type.toLower() == "coils")
     {

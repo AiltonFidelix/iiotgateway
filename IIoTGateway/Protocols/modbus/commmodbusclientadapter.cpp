@@ -3,7 +3,7 @@
 COMM_MODBUS_BEGIN_NAMESPACE
 
 CommModbusClientAdapter::CommModbusClientAdapter()
-    : m_modbusClient{nullptr}
+    : m_modbusClient(nullptr)
 {
 }
 

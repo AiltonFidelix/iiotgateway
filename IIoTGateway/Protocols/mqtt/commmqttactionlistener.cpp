@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <mqtt/token.h>
 
+COMM_MQTT_BEGIN_NAMESPACE
+
 void
 CommMQTTActionListener::on_failure(const mqtt::token &asyncActionToken)
 {
@@ -36,3 +38,5 @@ CommMQTTActionListener::on_success(const mqtt::token &asyncActionToken)
     auto type = asyncActionToken.get_type();
 #warning // TODO: implement signals
 }
+
+COMM_MQTT_END_NAMESPACE
