@@ -1,4 +1,4 @@
-#include "testmqttsettingsparser.h"
+#include "testcommmqttsettingsparser.h"
 #include "testutils.h"
 
 #include <QJsonDocument>

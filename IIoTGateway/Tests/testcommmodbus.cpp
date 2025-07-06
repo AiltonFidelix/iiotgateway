@@ -5,11 +5,13 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
+using commmodbus::CommModbus;
+
 void
 TestCommModbus::SetUp()
 {
-    m_mockModbusClient = new MockModbusClient{};
-    m_commModbus = new CommModbusRTU{};
+    m_mockModbusClient = new MockModbusClient();
+    m_commModbus = new CommModbusRTU();
 
     m_commModbus->setModbusClient(m_mockModbusClient);
 }
@@ -65,7 +67,7 @@ TEST_F(TestCommModbus, TestReadRequest)
         emit reply->finished();
     };
 
-    auto unit = QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 0, maxRegisters);
+    QModbusDataUnit unit(QModbusDataUnit::HoldingRegisters, 0, maxRegisters);
     unit.setValues(expectedValues);
 
     reply->setResult(unit);
@@ -103,9 +105,9 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     for (const auto reg : registers)
     {
-        auto obj = reg.toObject();
-        auto regAddress = obj.value("register").toInt();
-        auto regValue = obj.value("value").toInt();
+        const QJsonObject obj = reg.toObject();
+        const int regAddress = obj.value("register").toInt();
+        const int regValue = obj.value("value").toInt();
 
         ASSERT_EQ(expectedValues.at(regAddress), regValue);
     }

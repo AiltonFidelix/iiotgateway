@@ -4,6 +4,8 @@
 #include <gtest/gtest.h>
 #include "mqtt/commmqttsettingsparser.h"
 
+using commmqtt::MQTTSettingsParser;
+
 class TestMQTTSettingsParser : public testing::Test
 {
 protected:

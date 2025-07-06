@@ -7,7 +7,7 @@
 #include "modbus/commmodbusrtu.h"
 #include "mockmodbusclient.h"
 
-using namespace commmodbus;
+using commmodbus::CommModbusRTU;
 
 class TestCommModbus: public testing::Test
 {

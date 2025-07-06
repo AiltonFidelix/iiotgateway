@@ -3,13 +3,17 @@ set(EXECUTABLE_NAME TestsRunner)
 set(HEADERS
     mockmodbusclient.h
     testcommmodbus.h
-    testmodbusjsonparser.h
+    testcommmodbusrequestparser.h
+    testcommmodbussettingsparser.h
+    testcommmqttsettingsparser.h
     testutils.h
 )
 
 set(SOURCES
     testcommmodbus.cpp
-    testmodbusjsonparser.cpp
+    testcommmodbusrequestparser.cpp
+    testcommmodbussettingsparser.cpp
+    testcommmqttsettingsparser.cpp
     testutils.cpp
     main.cpp
 )
@@ -31,9 +35,7 @@ set(PROJECT_SOURCES ${HEADERS} ${SOURCES})
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${COMPONENTS})
 
-add_executable(${EXECUTABLE_NAME} ${PROJECT_SOURCES} ${RESOURCES}
-    testmqttsettingsparser.h testmqttsettingsparser.cpp
-    testmodbussettingsparser.h testmodbussettingsparser.cpp)
+add_executable(${EXECUTABLE_NAME} ${PROJECT_SOURCES} ${RESOURCES})
 
 target_link_libraries(${EXECUTABLE_NAME} Qt${QT_VERSION_MAJOR}::Core)
 

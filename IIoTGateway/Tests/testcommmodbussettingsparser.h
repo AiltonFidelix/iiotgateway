@@ -1,54 +1,13 @@
-#ifndef TESTMODBUSJSONPARSER_H
-#define TESTMODBUSJSONPARSER_H
+#ifndef TESTMODBUSSETTINGSPARSER_H
+#define TESTMODBUSSETTINGSPARSER_H
 
 #include <gtest/gtest.h>
-#include "modbus/commmodbussettingsparser.h"
 
-using namespace commmodbus;
-
-class TestModbusJsonParserReadOne : public testing::Test
+class TestModbusSettingsParser : public testing::Test
 {
 protected:
-    CommModbusSettingsParser *m_parser;
-
     void SetUp() override;
     void TearDown() override;
 };
 
-class TestModbusJsonParserReadMultiple : public testing::Test
-{
-protected:
-    CommModbusSettingsParser *m_parser;
-
-    void SetUp() override;
-    void TearDown() override;
-};
-
-class TestModbusJsonParserWriteOne : public testing::Test
-{
-protected:
-    CommModbusSettingsParser *m_parser;
-
-    void SetUp() override;
-    void TearDown() override;
-};
-
-class TestModbusJsonParserWriteMultiple : public testing::Test
-{
-protected:
-    CommModbusSettingsParser *m_parser;
-
-    void SetUp() override;
-    void TearDown() override;
-};
-
-class TestModbusJsonParserEmpty : public testing::Test
-{
-protected:
-    CommModbusSettingsParser *m_parser;
-
-    void SetUp() override;
-    void TearDown() override;
-};
-
-#endif // TESTMODBUSJSONPARSER_H
+#endif // TESTMODBUSSETTINGSPARSER_H
