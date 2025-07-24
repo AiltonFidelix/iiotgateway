@@ -16,12 +16,14 @@ Window {
         id: loginScreen
         anchors.fill: parent
         visible: true
+        // visible: false
     }
 
     Settings {
         id: settingsScreen
         anchors.fill: parent
         visible: false
+        // visible: true
     }
 
     // Slots Connections

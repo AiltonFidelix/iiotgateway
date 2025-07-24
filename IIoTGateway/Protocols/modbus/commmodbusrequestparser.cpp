@@ -34,11 +34,11 @@ Request CommModbusRequestParser::request()
     for (const auto &device : devices)
     {
         const QJsonObject deviceObj = device.toObject();
-        const quint8 address = static_cast<quint8>(deviceObj.value("address").toInt(0));
+        const auto address = static_cast<quint8>(deviceObj.value("address").toInt(0));
 
         const auto registertype = getType(deviceObj.value("type").toString());
-        const quint16 startRegister = deviceObj.value("startRegister").toInt(0);
-        const quint16 numberOfEntries = deviceObj.value("numberOfEntries").toInt(0);
+        const auto startRegister = static_cast<quint16>(deviceObj.value("startRegister").toInt(0));
+        const auto numberOfEntries = static_cast<quint16>(deviceObj.value("numberOfEntries").toInt(0));
 
         bool hasValues = deviceObj.contains("values");
 
@@ -60,7 +60,7 @@ Request CommModbusRequestParser::request()
         {
             const quint16 entries = qMin(m_maxEntries, quint16(numberOfEntries - i));
 
-            auto unit = QModbusDataUnit(registertype, r, entries);
+            QModbusDataUnit unit(registertype, r, entries);
 
             if (hasValues)
             {
@@ -74,7 +74,7 @@ Request CommModbusRequestParser::request()
     return request;
 }
 
-RequestType CommModbusRequestParser::type()
+RequestType CommModbusRequestParser::type() const
 {
     return m_type;
 }

@@ -38,7 +38,7 @@ public:
      * @brief The type is defined after request() be called
      * @see request()
      */
-    RequestType type();
+    RequestType type() const;
 
     static Addresses sortedAddress(const Request &request);
     static void sortRequestUnits(Units &units);

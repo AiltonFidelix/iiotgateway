@@ -58,7 +58,7 @@ TEST_F(TestCommModbus, TestReadRequest)
 {
     const quint8 expectedAddress = 240;
     const quint8 maxRegisters = 10;
-    const QList<quint16> expectedValues{ 1, 50, 58, 100, 6528, 2048, 0, 65535, 35, 88 };
+    const QList<uint16_t> expectedValues{ 1, 50, 58, 100, 6528, 2048, 0, 65535, 35, 88 };
 
     auto reply = new QModbusReply(QModbusReply::Common, expectedAddress);
 

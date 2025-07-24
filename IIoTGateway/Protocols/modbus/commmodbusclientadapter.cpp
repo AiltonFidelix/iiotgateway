@@ -15,7 +15,7 @@ CommModbusClientAdapter::~CommModbusClientAdapter()
     }
 }
 
-bool CommModbusClientAdapter::connectDevice()
+bool CommModbusClientAdapter::connectDevice() const
 {
     return m_modbusClient->connectDevice();
 }
@@ -50,7 +50,7 @@ QModbusReply *CommModbusClientAdapter::sendWriteRequest(const QModbusDataUnit &w
     return m_modbusClient->sendWriteRequest(write, serverAddress);
 }
 
-QModbusDevice::State CommModbusClientAdapter::state()
+QModbusDevice::State CommModbusClientAdapter::state() const
 {
     return m_modbusClient->state();
 }

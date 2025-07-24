@@ -16,14 +16,14 @@ public:
     CommModbusClientAdapter();
     ~CommModbusClientAdapter();
 
-    bool connectDevice() override;
+    bool connectDevice() const override;
     void disconnectDevice() override;
     void setConnectionParameter(int parameter, const QVariant &value) override;
     void setTimeout(int newTimeout) override;
     void setNumberOfRetries(int number) override;
     QModbusReply *sendReadRequest(const QModbusDataUnit &read, int serverAddress) override;
     QModbusReply *sendWriteRequest(const QModbusDataUnit &write, int serverAddress) override;
-    QModbusDevice::State state() override;
+    QModbusDevice::State state() const override;
     QString errorString() const override;
 
     QModbusClient *modbusClient() const;

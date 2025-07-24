@@ -209,7 +209,7 @@ Registers CommModbus::readReady(QModbusReply *reply)
 
 bool CommModbus::ispolling()
 {
-    return !(m_polling == nullptr);
+    return (m_polling != nullptr);
 }
 
 void CommModbus::initPolling()
