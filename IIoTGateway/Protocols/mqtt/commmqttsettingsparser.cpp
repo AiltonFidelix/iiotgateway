@@ -4,8 +4,13 @@
 
 COMM_MQTT_BEGIN_NAMESPACE
 
-MQTTSettingsParser::MQTTSettingsParser(QJsonObject settings) :
-    m_settings(settings)
+MQTTSettingsParser::MQTTSettingsParser(const QJsonObject &settings)
+    : m_settings(settings)
+{
+}
+
+MQTTSettingsParser::MQTTSettingsParser(const QJsonDocument &settings)
+    : MQTTSettingsParser(settings.object())
 {
 }
 
@@ -29,40 +34,40 @@ bool MQTTSettingsParser::subscribe() const
     return m_settings.value("subscribe").toBool(false);
 }
 
-QString MQTTSettingsParser::protocol() const
+std::string MQTTSettingsParser::protocol() const
 {
     const QString protocol = m_settings.value("protocol").toString();
-    return protocol.split(':').first();
+    return protocol.split(':').first().toStdString();
 }
 
-QString MQTTSettingsParser::host() const
+std::string MQTTSettingsParser::host() const
 {
-    return m_settings.value("host").toString();
+    return m_settings.value("host").toString().toStdString();
 }
 
-QString MQTTSettingsParser::username() const
+std::string MQTTSettingsParser::username() const
 {
-    return m_settings.value("username").toString();
+    return m_settings.value("username").toString().toStdString();
 }
 
-QString MQTTSettingsParser::password() const
+std::string MQTTSettingsParser::password() const
 {
-    return m_settings.value("password").toString();
+    return m_settings.value("password").toString().toStdString();
 }
 
-QString MQTTSettingsParser::clientId() const
+std::string MQTTSettingsParser::clientId() const
 {
-    return m_settings.value("clientId").toString();
+    return m_settings.value("clientId").toString().toStdString();
 }
 
-QString MQTTSettingsParser::publishTopic() const
+std::string MQTTSettingsParser::publishTopic() const
 {
-    return m_settings.value("publishTopic").toString();
+    return m_settings.value("publishTopic").toString().toStdString();
 }
 
-QString MQTTSettingsParser::subscribeTopic() const
+std::string MQTTSettingsParser::subscribeTopic() const
 {
-    return m_settings.value("subscribeTopic").toString();
+    return m_settings.value("subscribeTopic").toString().toStdString();
 }
 
 int MQTTSettingsParser::connectionTimeout() const

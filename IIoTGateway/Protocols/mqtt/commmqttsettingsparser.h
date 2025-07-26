@@ -1,6 +1,7 @@
 #ifndef COMMMQTTSETTINGSPARSER_H
 #define COMMMQTTSETTINGSPARSER_H
 
+#include <QJsonDocument>
 #include <QJsonObject>
 
 #include "commmqtt_global.h"
@@ -12,7 +13,8 @@ class MQTTSettingsParser
     QJsonObject m_settings;
 
 public:
-    explicit MQTTSettingsParser(QJsonObject settings = QJsonObject());
+    explicit MQTTSettingsParser(const QJsonObject &settings = QJsonObject());
+    MQTTSettingsParser(const QJsonDocument &settings);
     ~MQTTSettingsParser() = default;
 
     bool autoReconnect() const;
@@ -20,13 +22,13 @@ public:
     bool publish() const;
     bool subscribe() const;
 
-    QString protocol() const;
-    QString host() const;
-    QString username() const;
-    QString password() const;
-    QString clientId() const;
-    QString publishTopic() const;
-    QString subscribeTopic() const;
+    std::string protocol() const;
+    std::string host() const;
+    std::string username() const;
+    std::string password() const;
+    std::string clientId() const;
+    std::string publishTopic() const;
+    std::string subscribeTopic() const;
 
     int connectionTimeout() const;
     int keepAlive() const;

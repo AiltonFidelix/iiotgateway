@@ -24,21 +24,25 @@ CommMQTT::CommMQTT(QJsonObject settings) :
     m_subTopic{},
     m_settingsParser{settings}
 {
-    const auto protocol = m_settingsParser.protocol();
-    const auto host = m_settingsParser.host();
-    const auto port = m_settingsParser.port();
+    const std::string protocol = m_settingsParser.protocol();
+    const std::string  host = m_settingsParser.host();
+    const int port = m_settingsParser.port();
 
-    const auto server_address = QString("%1://%2%3%4").arg(protocol, host, (port == -1) ? "" : ":", QString::number(port)).toStdString();
-    const auto client_id = m_settingsParser.clientId().toStdString();
+    const std::string server_address = QString("%1://%2%3%4").arg(QString::fromStdString(protocol),
+                                                                  QString::fromStdString(host),
+                                                                  (port == -1) ? QString() : QString(":"),
+                                                                  QString::number(port)).toStdString();
+
+    const std::string client_id = m_settingsParser.clientId();
 
     m_publish = m_settingsParser.publish();
     m_subscribe = m_settingsParser.subscribe();
-    m_pubTopic = m_settingsParser.publishTopic().toStdString();
-    m_subTopic = m_settingsParser.subscribeTopic().toStdString();
+    m_pubTopic = m_settingsParser.publishTopic();
+    m_subTopic = m_settingsParser.subscribeTopic();
     m_pubQos = m_settingsParser.publishQos();
     m_subQos = m_settingsParser.subscribeQos();
 
-    m_client = new mqtt::async_client{server_address, client_id};
+    m_client = new mqtt::async_client(server_address, client_id);
 
     if (m_client == nullptr)
         return;
@@ -74,13 +78,13 @@ CommMQTT::connectComm()
 
     mqtt::connect_options connOpts{};
 
-    const auto username = m_settingsParser.username();
-    const auto password = m_settingsParser.password();
+    const std::string username = m_settingsParser.username();
+    const std::string password = m_settingsParser.password();
 
-    if (!username.isEmpty() && !password.isEmpty())
+    if (!username.empty() && !password.empty())
     {
-        connOpts.set_user_name(username.toStdString());
-        connOpts.set_password(password.toStdString());
+        connOpts.set_user_name(username);
+        connOpts.set_password(password);
     }
 
     connOpts.set_mqtt_version(m_settingsParser.version());
