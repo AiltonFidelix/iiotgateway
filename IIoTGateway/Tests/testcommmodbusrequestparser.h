@@ -9,7 +9,7 @@ using commmodbus::Request;
 class TestModbusRequestParser : public testing::TestWithParam<std::tuple<QByteArray, Request*>>
 {
 public:
-    static std::vector<std::tuple<QByteArray, Request*>> LoadTestCases() ;
+    static std::vector<std::tuple<QByteArray, Request*>> LoadTestCases();
 };
 
 #endif // TESTCOMMMODBUSSETTINGSPARSER_H
