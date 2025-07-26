@@ -6,13 +6,10 @@
 
 using commmqtt::MQTTSettingsParser;
 
-class TestMQTTSettingsParser : public testing::Test
+class TestMQTTSettingsParser : public testing::TestWithParam<std::tuple<QByteArray, MQTTSettingsParser*>>
 {
-protected:
-    MQTTSettingsParser *m_parser;
-
-    void SetUp() override;
-    void TearDown() override;
+public:
+    static std::vector<std::tuple<QByteArray, MQTTSettingsParser*>> LoadTestCases();
 };
 
 #endif // TESTMQTTSETTINGSPARSER_H

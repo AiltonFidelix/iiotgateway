@@ -1,111 +1,85 @@
 #include "testcommmqttsettingsparser.h"
 #include "testutils.h"
 
-#include <QJsonDocument>
 #include <MQTTAsync.h>
 
-void
-TestMQTTSettingsParser::SetUp()
+TEST_P(TestMQTTSettingsParser, TestSettingsParser)
 {
-    const auto bytearray = TestUtils::readJsonFile(":/settings/mqtt.json");
-    const auto object = QJsonDocument::fromJson(bytearray).object();
+    const auto param = GetParam();
 
-    m_parser = new MQTTSettingsParser{object};
+    const QByteArray filePath = std::get<0>(param);
+    MQTTSettingsParser *expectedParser = std::get<1>(param);
+
+    ASSERT_TRUE(expectedParser != nullptr);
+
+    const QByteArray data = TestUtils::readJsonFile(filePath);
+    const QJsonObject object = QJsonDocument::fromJson(data).object();
+
+    MQTTSettingsParser actualParser(object);
+
+    ASSERT_EQ(expectedParser->autoReconnect(), actualParser.autoReconnect());
+    ASSERT_EQ(expectedParser->cleanStart(), actualParser.cleanStart());
+    ASSERT_EQ(expectedParser->publish(), actualParser.publish());
+    ASSERT_EQ(expectedParser->subscribe(), actualParser.subscribe());
+
+    ASSERT_EQ(expectedParser->protocol(), actualParser.protocol());
+    ASSERT_EQ(expectedParser->host(), actualParser.host());
+    ASSERT_EQ(expectedParser->username(), actualParser.username());
+    ASSERT_EQ(expectedParser->password(), actualParser.password());
+    ASSERT_EQ(expectedParser->clientId(), actualParser.clientId());
+    ASSERT_EQ(expectedParser->publishTopic(), actualParser.publishTopic());
+    ASSERT_EQ(expectedParser->subscribeTopic(), actualParser.subscribeTopic());
+
+    ASSERT_EQ(expectedParser->connectionTimeout(), actualParser.connectionTimeout());
+    ASSERT_EQ(expectedParser->keepAlive(), actualParser.keepAlive());
+    ASSERT_EQ(expectedParser->port(), actualParser.port());
+    ASSERT_EQ(expectedParser->version(), actualParser.version());
+    ASSERT_EQ(expectedParser->publishQos(), actualParser.publishQos());
+    ASSERT_EQ(expectedParser->subscribeQos(), actualParser.subscribeQos());
+
+    delete expectedParser;
 }
 
-void
-TestMQTTSettingsParser::TearDown()
+std::vector<std::tuple<QByteArray, MQTTSettingsParser*>> TestMQTTSettingsParser::LoadTestCases()
 {
-    if (m_parser)
+    std::vector<std::tuple<QByteArray, MQTTSettingsParser*>> cases{};
+
     {
-        delete m_parser;
+        // Test without settings
+        auto parser = new MQTTSettingsParser();
+        cases.push_back(std::make_tuple("", parser));
     }
+
+    {
+        // Test with settings
+        QJsonObject settings{};
+
+        settings.insert("autoReconnect", true);
+        settings.insert("cleanStart", true);
+        settings.insert("publish", true);
+        settings.insert("subscribe", true);
+
+        settings.insert("protocol", "mqtt://");
+        settings.insert("host", "localhost");
+        settings.insert("username", "testeruser");
+        settings.insert("password", "testerpass");
+        settings.insert("clientId", "iiotgateway");
+        settings.insert("publishTopic", "iiotgateway/edge");
+        settings.insert("subscribeTopic", "iiotgateway/cloud");
+
+        settings.insert("connectionTimeout", 10);
+        settings.insert("keepAlive", 60);
+        settings.insert("port", 1883);
+        settings.insert("version", "3.1");
+        settings.insert("publishQos", 0);
+        settings.insert("subscribeQos", 0);
+
+        auto parser = new MQTTSettingsParser(settings);
+
+        cases.push_back(std::make_tuple(":/settings/mqtt.json", parser));
+    }
+
+    return cases;
 }
 
-TEST_F(TestMQTTSettingsParser, TestAutoReconnect)
-{
-    const auto autoReconnect = m_parser->autoReconnect();
-    ASSERT_TRUE(autoReconnect);
-}
-
-TEST_F(TestMQTTSettingsParser, TestCleanStart)
-{
-    const auto cleanStart = m_parser->cleanStart();
-    ASSERT_TRUE(cleanStart);
-}
-
-TEST_F(TestMQTTSettingsParser, TestClientId)
-{
-    const auto clientId = m_parser->clientId();
-    ASSERT_EQ("iiotgateway", clientId);
-}
-
-TEST_F(TestMQTTSettingsParser, TestConnectionTimeout)
-{
-    const auto connectionTimeout = m_parser->connectionTimeout();
-    ASSERT_EQ(10, connectionTimeout);
-}
-
-TEST_F(TestMQTTSettingsParser, TestHost)
-{
-    const auto host = m_parser->host();
-    ASSERT_EQ("localhost", host);
-}
-
-TEST_F(TestMQTTSettingsParser, TestKeepAlive)
-{
-    const auto keepalive = m_parser->keepAlive();
-    ASSERT_EQ(60, keepalive);
-}
-
-TEST_F(TestMQTTSettingsParser, TestPassword)
-{
-    const auto password = m_parser->password();
-    ASSERT_EQ("testerpass", password);
-}
-
-TEST_F(TestMQTTSettingsParser, TestPort)
-{
-    const auto port = m_parser->port();
-    ASSERT_EQ(1883, port);
-}
-
-TEST_F(TestMQTTSettingsParser, TestProtocol)
-{
-    const auto protocol = m_parser->protocol();
-    ASSERT_EQ("mqtt", protocol);
-}
-
-TEST_F(TestMQTTSettingsParser, TestUsername)
-{
-    const auto username = m_parser->username();
-    ASSERT_EQ("testeruser", username);
-}
-
-TEST_F(TestMQTTSettingsParser, TestVersion)
-{
-    const auto version = m_parser->version();
-    ASSERT_EQ(MQTTVERSION_3_1, version);
-}
-
-TEST_F(TestMQTTSettingsParser, TestPublish)
-{
-    const auto publish = m_parser->publish();
-    const auto topic = m_parser->publishTopic();
-    const auto qos = m_parser->publishQos();
-
-    ASSERT_TRUE(publish);
-    ASSERT_EQ("iiotgateway/edge", topic);
-    ASSERT_EQ(0, qos);
-}
-
-TEST_F(TestMQTTSettingsParser, TestSubscribe)
-{
-    const auto subscribe = m_parser->subscribe();
-    const auto topic = m_parser->subscribeTopic();
-    const auto qos = m_parser->subscribeQos();
-
-    ASSERT_TRUE(subscribe);
-    ASSERT_EQ("iiotgateway/cloud", topic);
-    ASSERT_EQ(0, qos);
-}
+INSTANTIATE_TEST_SUITE_P(TestSettingsParser, TestMQTTSettingsParser, ::testing::ValuesIn(TestMQTTSettingsParser::LoadTestCases()));
