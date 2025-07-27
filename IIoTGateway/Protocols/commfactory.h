@@ -21,7 +21,7 @@ public:
 
     static QSet<QByteArray> *commInterfaces();
 
-    static CommInterface *getCommInterface(const QByteArray &commInterface, QJsonObject settings = QJsonObject());
+    static CommInterface *getCommInterface(const QByteArray &commInterface, const QJsonObject &settings = QJsonObject());
 
     template<typename T> static int registerInterface(QByteArray commInterface)
     {

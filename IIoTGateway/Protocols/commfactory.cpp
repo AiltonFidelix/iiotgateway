@@ -9,7 +9,7 @@ QSet<QByteArray> *CommFactory::commInterfaces()
     return m_commInterfaces;
 }
 
-CommInterface *CommFactory::getCommInterface(const QByteArray &commInterface, QJsonObject settings)
+CommInterface *CommFactory::getCommInterface(const QByteArray &commInterface, const QJsonObject &settings)
 {
     const QMetaType type = QMetaType::fromName(commInterface.toUpper());
 

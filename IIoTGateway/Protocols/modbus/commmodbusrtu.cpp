@@ -8,7 +8,7 @@ COMM_MODBUS_BEGIN_NAMESPACE
 
 int CommModbusRTU::m_typeId = comm::CommFactory::registerInterface<CommModbusRTU*>("MODBUS_RTU");
 
-CommModbusRTU::CommModbusRTU(QJsonObject settings)
+CommModbusRTU::CommModbusRTU(const QJsonObject &settings)
     : CommModbus(settings)
 {
 }

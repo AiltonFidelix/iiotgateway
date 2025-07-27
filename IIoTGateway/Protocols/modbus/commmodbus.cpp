@@ -8,7 +8,7 @@
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
-CommModbus::CommModbus(QJsonObject settings)
+CommModbus::CommModbus(const QJsonObject &settings)
     : m_modbusClient(nullptr),
     m_polling(nullptr)
 {

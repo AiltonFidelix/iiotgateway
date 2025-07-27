@@ -74,7 +74,7 @@ TEST_F(TestCommModbus, TestReadRequest)
 {
     const quint8 expectedAddress = 240;
     const quint8 maxRegisters = 10;
-    const QList<uint16_t> expectedValues{ 1, 50, 58, 100, 6528, 2048, 0, 65535, 35, 88 };
+    const QList<quint16> expectedValues{ 1, 50, 58, 100, 6528, 2048, 0, 65535, 35, 88 };
 
     auto reply = new QModbusReply(QModbusReply::Common, expectedAddress);
 
@@ -83,10 +83,7 @@ TEST_F(TestCommModbus, TestReadRequest)
         emit reply->finished();
     };
 
-    QModbusDataUnit unit(QModbusDataUnit::HoldingRegisters, 0, maxRegisters);
-    unit.setValues(expectedValues);
-
-    reply->setResult(unit);
+    reply->setResult(QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 0, expectedValues));
 
     EXPECT_CALL(*m_mockModbusClient, sendReadRequest(testing::_, testing::_)).WillOnce(testing::Return(reply));
 
@@ -119,7 +116,7 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     ASSERT_EQ(maxRegisters, registers.count());
 
-    for (const auto reg : registers)
+    for (const auto &reg : registers)
     {
         const QJsonObject obj = reg.toObject();
         const int regAddress = obj.value("register").toInt();
