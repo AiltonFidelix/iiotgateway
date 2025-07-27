@@ -9,26 +9,6 @@ MQTTSettingsParser::MQTTSettingsParser(const QJsonObject &settings)
 {
 }
 
-bool MQTTSettingsParser::autoReconnect() const
-{
-    return m_settings.value("autoReconnect").toBool(false);
-}
-
-bool MQTTSettingsParser::cleanStart() const
-{
-    return m_settings.value("cleanStart").toBool(false);
-}
-
-bool MQTTSettingsParser::publish() const
-{
-    return m_settings.value("publish").toBool(false);
-}
-
-bool MQTTSettingsParser::subscribe() const
-{
-    return m_settings.value("subscribe").toBool(false);
-}
-
 std::string MQTTSettingsParser::protocol() const
 {
     const QString protocol = m_settings.value("protocol").toString();
@@ -109,6 +89,26 @@ int MQTTSettingsParser::publishQos() const
 int MQTTSettingsParser::subscribeQos() const
 {
     return m_settings.value("subscribeQos").toInt(0);
+}
+
+bool MQTTSettingsParser::autoReconnect() const
+{
+    return m_settings.value("autoReconnect").toBool(false);
+}
+
+bool MQTTSettingsParser::cleanStart() const
+{
+    return m_settings.value("cleanStart").toBool(false);
+}
+
+bool MQTTSettingsParser::publish() const
+{
+    return m_settings.value("publish").toBool(false);
+}
+
+bool MQTTSettingsParser::subscribe() const
+{
+    return m_settings.value("subscribe").toBool(false);
 }
 
 COMM_MQTT_END_NAMESPACE

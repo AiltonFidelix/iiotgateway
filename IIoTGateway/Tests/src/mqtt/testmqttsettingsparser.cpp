@@ -29,11 +29,6 @@ TEST_P(TestMQTTSettingsParser, TestSettingsParser)
 
     MQTTSettingsParser actualParser(object);
 
-    ASSERT_EQ(expectedParser->autoReconnect(), actualParser.autoReconnect());
-    ASSERT_EQ(expectedParser->cleanStart(), actualParser.cleanStart());
-    ASSERT_EQ(expectedParser->publish(), actualParser.publish());
-    ASSERT_EQ(expectedParser->subscribe(), actualParser.subscribe());
-
     ASSERT_EQ(expectedParser->protocol(), actualParser.protocol());
     ASSERT_EQ(expectedParser->host(), actualParser.host());
     ASSERT_EQ(expectedParser->username(), actualParser.username());
@@ -48,6 +43,11 @@ TEST_P(TestMQTTSettingsParser, TestSettingsParser)
     ASSERT_EQ(expectedParser->version(), actualParser.version());
     ASSERT_EQ(expectedParser->publishQos(), actualParser.publishQos());
     ASSERT_EQ(expectedParser->subscribeQos(), actualParser.subscribeQos());
+
+    ASSERT_EQ(expectedParser->autoReconnect(), actualParser.autoReconnect());
+    ASSERT_EQ(expectedParser->cleanStart(), actualParser.cleanStart());
+    ASSERT_EQ(expectedParser->publish(), actualParser.publish());
+    ASSERT_EQ(expectedParser->subscribe(), actualParser.subscribe());
 
     delete expectedParser;
 }
@@ -66,11 +66,6 @@ std::vector<TestCases> TestMQTTSettingsParser::LoadTestCases()
         // Test with settings
         QJsonObject settings{};
 
-        settings.insert("autoReconnect", true);
-        settings.insert("cleanStart", true);
-        settings.insert("publish", true);
-        settings.insert("subscribe", true);
-
         settings.insert("protocol", "mqtt://");
         settings.insert("host", "localhost");
         settings.insert("username", "testeruser");
@@ -85,6 +80,11 @@ std::vector<TestCases> TestMQTTSettingsParser::LoadTestCases()
         settings.insert("version", "3.1");
         settings.insert("publishQos", 0);
         settings.insert("subscribeQos", 0);
+
+        settings.insert("autoReconnect", true);
+        settings.insert("cleanStart", true);
+        settings.insert("publish", true);
+        settings.insert("subscribe", true);
 
         auto parser = new MQTTSettingsParser(settings);
 

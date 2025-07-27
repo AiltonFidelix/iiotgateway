@@ -15,11 +15,6 @@ public:
     explicit MQTTSettingsParser(const QJsonObject &settings = QJsonObject());
     ~MQTTSettingsParser() = default;
 
-    bool autoReconnect() const;
-    bool cleanStart() const;
-    bool publish() const;
-    bool subscribe() const;
-
     std::string protocol() const;
     std::string host() const;
     std::string username() const;
@@ -34,6 +29,11 @@ public:
     int version() const;
     int publishQos() const;
     int subscribeQos() const;
+
+    bool autoReconnect() const;
+    bool cleanStart() const;
+    bool publish() const;
+    bool subscribe() const;
 };
 
 COMM_MQTT_END_NAMESPACE
