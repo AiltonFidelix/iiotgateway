@@ -1,7 +1,6 @@
-#ifndef COMMMQTTSETTINGSPARSER_H
-#define COMMMQTTSETTINGSPARSER_H
+#ifndef MQTTSETTINGSPARSER_H
+#define MQTTSETTINGSPARSER_H
 
-#include <QJsonDocument>
 #include <QJsonObject>
 
 #include "commmqtt_global.h"
@@ -14,7 +13,6 @@ class MQTTSettingsParser
 
 public:
     explicit MQTTSettingsParser(const QJsonObject &settings = QJsonObject());
-    MQTTSettingsParser(const QJsonDocument &settings);
     ~MQTTSettingsParser() = default;
 
     bool autoReconnect() const;
@@ -40,4 +38,4 @@ public:
 
 COMM_MQTT_END_NAMESPACE
 
-#endif // COMMMQTTSETTINGSPARSER_H
+#endif // MQTTSETTINGSPARSER_H

@@ -10,7 +10,7 @@
 #include "comminterface.h"
 #include "commmqttcallback.h"
 #include "commmqttactionlistener.h"
-#include "commmqttsettingsparser.h"
+#include "mqttsettingsparser.h"
 
 COMM_MQTT_BEGIN_NAMESPACE
 
@@ -36,7 +36,7 @@ class CommMQTT : public CommInterface
     MQTTSettingsParser m_settingsParser;
 
 public:
-    Q_INVOKABLE CommMQTT(QJsonObject settings = QJsonObject{});
+    Q_INVOKABLE explicit CommMQTT(QJsonObject settings = QJsonObject());
     ~CommMQTT();
 
     bool isconnected() override;

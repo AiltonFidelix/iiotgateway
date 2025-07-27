@@ -4,14 +4,14 @@
 
 QByteArray TestUtils::readJsonFile(const QString &filename)
 {
-    QFile file{filename};
+    QFile file(filename);
 
     if (!file.open(QIODevice::ReadOnly))
     {
-        return QByteArray{};
+        return QByteArray();
     }
 
-    const QByteArray data{file.readAll()};
+    const QByteArray data(file.readAll());
 
     file.close();
 

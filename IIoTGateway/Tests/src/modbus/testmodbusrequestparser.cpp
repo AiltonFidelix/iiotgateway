@@ -1,9 +1,21 @@
-#include "testcommmodbusrequestparser.h"
+#include <gtest/gtest.h>
+
 #include "testutils.h"
 
+#include "modbus/commmodbusrequestparser.h"
+
 using commmodbus::CommModbusRequestParser;
+using commmodbus::Request;
 using commmodbus::RequestType;
 using commmodbus::Units;
+
+using TestCases = std::tuple<QByteArray, Request*>;
+
+class TestModbusRequestParser : public testing::TestWithParam<TestCases>
+{
+public:
+    static std::vector<TestCases> LoadTestCases();
+};
 
 TEST_P(TestModbusRequestParser, TestRequestParser)
 {
@@ -26,8 +38,8 @@ TEST_P(TestModbusRequestParser, TestRequestParser)
 
     const auto param = GetParam();
 
-    const QByteArray filePath = std::get<0>(param);
-    Request *expectedRequest = std::get<1>(param);
+    const auto filePath = std::get<QByteArray>(param);
+    auto expectedRequest = std::get<Request*>(param);
 
     ASSERT_TRUE(expectedRequest != nullptr);
 
@@ -58,14 +70,14 @@ TEST_P(TestModbusRequestParser, TestRequestParser)
     delete expectedRequest;
 }
 
-std::vector<std::tuple<QByteArray, Request*>> TestModbusRequestParser::LoadTestCases()
+std::vector<TestCases> TestModbusRequestParser::LoadTestCases()
 {
-    std::vector<std::tuple<QByteArray, Request*>> cases{};
+    std::vector<TestCases> testCases{};
 
     {
         // Test empty
         auto request = new Request();
-        cases.push_back(std::make_tuple("", request));
+        testCases.push_back(std::make_tuple("", request));
     }
 
     {
@@ -74,7 +86,7 @@ std::vector<std::tuple<QByteArray, Request*>> TestModbusRequestParser::LoadTestC
 
         request->insert(240, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 0, 10)}));
 
-        cases.push_back(std::make_tuple(":/requests/readone.json", request));
+        testCases.push_back(std::make_tuple(":/cases/requests/readone.json", request));
     }
 
     {
@@ -89,7 +101,7 @@ std::vector<std::tuple<QByteArray, Request*>> TestModbusRequestParser::LoadTestC
                                   QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 20, 10),
                                   QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 30, 10)}));
 
-        cases.push_back(std::make_tuple(":/requests/readmultiple.json", request));
+        testCases.push_back(std::make_tuple(":/cases/requests/readmultiple.json", request));
     }
 
     {
@@ -98,7 +110,7 @@ std::vector<std::tuple<QByteArray, Request*>> TestModbusRequestParser::LoadTestC
 
         request->insert(55, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 3, { 88, 2, 65533, 4, 5, 0, 7, 8, 255, 10 })}));
 
-        cases.push_back(std::make_tuple(":/requests/writeone.json", request));
+        testCases.push_back(std::make_tuple(":/cases/requests/writeone.json", request));
     }
 
     {
@@ -110,10 +122,10 @@ std::vector<std::tuple<QByteArray, Request*>> TestModbusRequestParser::LoadTestC
         request->insert(60, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 0, { 88, 2, 65533, 4, 55, 0, 7, 8, 255, 1080 }),
                                    QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 10, { 68, 72, 780, 2556, 101, 99, 0, 23 })}));
 
-        cases.push_back(std::make_tuple(":/requests/writemultiple.json", request));
+        testCases.push_back(std::make_tuple(":/cases/requests/writemultiple.json", request));
     }
 
-    return cases;
+    return testCases;
 }
 
 INSTANTIATE_TEST_SUITE_P(TestRequestParser, TestModbusRequestParser, ::testing::ValuesIn(TestModbusRequestParser::LoadTestCases()));

@@ -1,4 +1,4 @@
-#include "commmqttsettingsparser.h"
+#include "mqttsettingsparser.h"
 
 #include <MQTTAsync.h>
 
@@ -6,11 +6,6 @@ COMM_MQTT_BEGIN_NAMESPACE
 
 MQTTSettingsParser::MQTTSettingsParser(const QJsonObject &settings)
     : m_settings(settings)
-{
-}
-
-MQTTSettingsParser::MQTTSettingsParser(const QJsonDocument &settings)
-    : MQTTSettingsParser(settings.object())
 {
 }
 

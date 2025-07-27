@@ -16,7 +16,7 @@ class CommModbusRTU : public CommModbus
     static int m_typeId;
 
 public:
-    explicit Q_INVOKABLE CommModbusRTU(QJsonObject settings = QJsonObject());
+    Q_INVOKABLE explicit CommModbusRTU(QJsonObject settings = QJsonObject());
     ~CommModbusRTU() = default;
 
 public slots:

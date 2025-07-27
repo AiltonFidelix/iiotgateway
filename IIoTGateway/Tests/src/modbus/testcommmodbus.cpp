@@ -1,11 +1,27 @@
-#include "testcommmodbus.h"
-#include "testutils.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <QModbusReply>
 #include <QJsonArray>
 #include <QJsonObject>
 
+#include "testutils.h"
+
+#include "modbus/commmodbusrtu.h"
+#include "mockmodbusclient.h"
+
 using commmodbus::CommModbus;
+using commmodbus::CommModbusRTU;
+
+class TestCommModbus: public testing::Test
+{
+protected:
+    MockModbusClient *m_mockModbusClient;
+    CommModbusRTU *m_commModbus;
+
+    void SetUp() override;
+    void TearDown() override;
+};
 
 void
 TestCommModbus::SetUp()
@@ -74,7 +90,7 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     EXPECT_CALL(*m_mockModbusClient, sendReadRequest(testing::_, testing::_)).WillOnce(testing::Return(reply));
 
-    const QByteArray request = TestUtils::readJsonFile(":/requests/readone.json");
+    const QByteArray request = TestUtils::readJsonFile(":/cases/requests/readone.json");
 
     QTimer::singleShot(1, emitFinished);
 

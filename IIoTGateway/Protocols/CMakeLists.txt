@@ -16,7 +16,7 @@ set(HEADERS
     mqtt/commmqtt.h
     mqtt/commmqttcallback.h
     mqtt/commmqttactionlistener.h
-    mqtt/commmqttsettingsparser.h
+    mqtt/mqttsettingsparser.h
 )
 
 set(SOURCES
@@ -31,7 +31,7 @@ set(SOURCES
     mqtt/commmqtt.cpp
     mqtt/commmqttcallback.cpp
     mqtt/commmqttactionlistener.cpp
-    mqtt/commmqttsettingsparser.cpp
+    mqtt/mqttsettingsparser.cpp
 )
 
 set(QT_COMPONENTS
@@ -45,7 +45,8 @@ set(LIBRARIES paho-mqttpp3)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPONENTS})
 
-add_library(${LIBRARY_NAME} SHARED ${HEADERS} ${SOURCES})
+add_library(${LIBRARY_NAME} SHARED ${HEADERS} ${SOURCES}
+    modbus/modbussettingsparser.h modbus/modbussettingsparser.cpp)
 
 foreach(component IN LISTS QT_COMPONENTS)
     target_link_libraries(${LIBRARY_NAME} Qt${QT_VERSION_MAJOR}::${component})

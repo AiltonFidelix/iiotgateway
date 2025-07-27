@@ -1,21 +1,17 @@
 set(EXECUTABLE_NAME TestsRunner)
 
 set(HEADERS
-    mockmodbusclient.h
-    testcommmodbus.h
-    testcommmodbusrequestparser.h
-    testcommmodbussettingsparser.h
-    testcommmqttsettingsparser.h
-    testutils.h
+    src/utils/testutils.h
+    src/modbus/mockmodbusclient.h
 )
 
 set(SOURCES
-    testcommmodbus.cpp
-    testcommmodbusrequestparser.cpp
-    testcommmodbussettingsparser.cpp
-    testcommmqttsettingsparser.cpp
-    testutils.cpp
-    main.cpp
+    src/utils/testutils.cpp
+    src/mqtt/testmqttsettingsparser.cpp
+    src/modbus/testcommmodbus.cpp
+    src/modbus/testmodbusrequestparser.cpp
+    src/modbus/testmodbussettingsparser.cpp
+    src/main.cpp
 )
 
 set(RESOURCES tests.qrc)
@@ -29,6 +25,8 @@ set(LIBRARIES
     gmock_main
     paho-mqttpp3
 )
+
+include_directories("src/utils")
 
 set(PROJECT_SOURCES ${HEADERS} ${SOURCES})
 
