@@ -29,6 +29,19 @@ TEST_P(TestModbusSettingsParser, TestSettingsParser)
 
     ModbusSettingsParser actualParser(object);
 
+    ASSERT_EQ(expectedParser->host(), actualParser.host());
+    ASSERT_EQ(expectedParser->port(), actualParser.port());
+    ASSERT_EQ(expectedParser->baudrate(), actualParser.baudrate());
+    ASSERT_EQ(expectedParser->parity(), actualParser.parity());
+
+    ASSERT_EQ(expectedParser->databits(), actualParser.databits());
+    ASSERT_EQ(expectedParser->stopbits(), actualParser.stopbits());
+    ASSERT_EQ(expectedParser->retries(), actualParser.retries());
+    ASSERT_EQ(expectedParser->timeout(), actualParser.timeout());
+    ASSERT_EQ(expectedParser->pollingTimeout(), actualParser.pollingTimeout());
+
+    ASSERT_EQ(expectedParser->pollingEnabled(), actualParser.pollingEnabled());
+
     delete expectedParser;
 }
 
@@ -46,15 +59,15 @@ std::vector<TestCases> TestModbusSettingsParser::LoadTestCases()
         // Test modbus RTU settings
         QJsonObject settings{};
 
-        settings.insert("baudrate", "115200");
-        settings.insert("dataBits", 8);
-        settings.insert("parity", "None");
-        settings.insert("pollingEnabled", false);
-        settings.insert("pollingTimeout", 1000);
         settings.insert("port", "default");
-        settings.insert("retries", 5);
+        settings.insert("baudrate", "115200");
+        settings.insert("parity", "None");
+        settings.insert("dataBits", 8);
         settings.insert("stopBits", 1);
-        settings.insert("timeout", 1000);
+        settings.insert("retries", 10);
+        settings.insert("timeout", 2000);
+        settings.insert("pollingInterval", 5000);
+        settings.insert("pollingEnabled", true);
 
         auto parser = new ModbusSettingsParser(settings);
 
@@ -64,6 +77,13 @@ std::vector<TestCases> TestModbusSettingsParser::LoadTestCases()
     {
         // Test modbus TCP settings
         QJsonObject settings{};
+
+        settings.insert("host", "192.68.50.94");
+        settings.insert("port", 502);
+        settings.insert("retries", 5);
+        settings.insert("timeout", 500);
+        settings.insert("pollingInterval", 1000);
+        settings.insert("pollingEnabled", false);
 
         auto parser = new ModbusSettingsParser(settings);
 
