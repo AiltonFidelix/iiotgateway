@@ -8,6 +8,13 @@
 class GatewayController : public QObject
 {
     Q_OBJECT
+
+    QNetworkAccessManager m_manager;
+    QString m_serverUrl;
+
+    void sendCommand(const QString &command);
+    QString errorHandler(QNetworkReply::NetworkError e);
+
 public:
     explicit GatewayController(QObject *parent = nullptr);
 
@@ -25,14 +32,6 @@ public slots:
     void start();
     void stop();
     void restart();
-
-private:
-    void sendCommand(const QString &command);
-    QString errorHandler(QNetworkReply::NetworkError e);
-
-private:
-    QNetworkAccessManager m_manager;
-    QString m_serverUrl;
 };
 
 #endif // GATEWAYCONTROLLER_H

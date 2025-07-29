@@ -7,6 +7,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+constexpr const char* DEFAULT_SERVER_URL = "http://localhost:8084";
+
 #ifdef Q_OS_WASM
 #include <emscripten/emscripten.h>
 #include <emscripten/val.h>
@@ -18,27 +20,26 @@ EM_JS(emscripten::EM_VAL, getServerUrl, (), {
 #endif
 
 GatewayController::GatewayController(QObject *parent)
-    : QObject{parent}
+    : QObject(parent),
+    m_manager(),
+    m_serverUrl(DEFAULT_SERVER_URL)
 {
 #ifdef Q_OS_WASM
     auto url = emscripten::val::take_ownership(getServerUrl());
     m_serverUrl = QString("%1:8084").arg(QString::fromStdString(url.as<std::string>()));
-#else
-    m_serverUrl = "http://localhost:8084";
 #endif
 
     m_manager.setTransferTimeout(5000);
 }
 
-void
-GatewayController::login(const QString &username, const QString &password)
+void GatewayController::login(const QString &username, const QString &password)
 {
     QCryptographicHash hash(QCryptographicHash::Sha1);
     hash.addData(password.toUtf8());
 
-    const auto hashPass = QString(hash.result().toHex());
+    const QString hashPass(hash.result().toHex());
 
-    QJsonObject obj;
+    QJsonObject obj{};
     obj.insert("username", username);
     obj.insert("password", hashPass);
 
@@ -57,11 +58,11 @@ GatewayController::login(const QString &username, const QString &password)
         auto reply = qobject_cast<QNetworkReply*>(sender());
         reply->disconnect();
 
-        auto data = reply->readAll();
+        const QByteArray data = reply->readAll();
 
         reply->deleteLater();
 
-        QJsonParseError parser;
+        QJsonParseError parser{};
         auto doc = QJsonDocument::fromJson(data, &parser);
 
         if (parser.error != QJsonParseError::NoError)
@@ -71,8 +72,8 @@ GatewayController::login(const QString &username, const QString &password)
             return;
         }
 
-        auto obj = doc.object();
-        auto status = obj.value("status").toString();
+        const QJsonObject obj = doc.object();
+        const QString status = obj.value("status").toString();
 
         if (status.toLower() == "error")
         {
@@ -86,8 +87,7 @@ GatewayController::login(const QString &username, const QString &password)
     });
 }
 
-void
-GatewayController::setSettings(const QByteArray &settings)
+void GatewayController::setSettings(const QByteArray &settings)
 {
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/settings").arg(m_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
@@ -143,8 +143,7 @@ GatewayController::requestSettings(const QStringList &protocols)
     });
 }
 
-void
-GatewayController::requestStatus()
+void GatewayController::requestStatus()
 {
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/status").arg(m_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
@@ -163,34 +162,30 @@ GatewayController::requestStatus()
     });
 }
 
-void
-GatewayController::start()
+void GatewayController::start()
 {
     const QString cmd = "start";
     sendCommand(cmd);
 }
 
-void
-GatewayController::stop()
+void GatewayController::stop()
 {
     const QString cmd = "stop";
     sendCommand(cmd);
 }
 
-void
-GatewayController::restart()
+void GatewayController::restart()
 {
     const QString cmd = "restart";
     sendCommand(cmd);
 }
 
-void
-GatewayController::sendCommand(const QString &command)
+void GatewayController::sendCommand(const QString &command)
 {
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/command").arg(m_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
 
-    QJsonObject obj;
+    QJsonObject obj{};
     obj.insert("command", command);
 
     auto reply = m_manager.post(request, QJsonDocument(obj).toJson(QJsonDocument::Compact));
@@ -209,8 +204,7 @@ GatewayController::sendCommand(const QString &command)
     });
 }
 
-QString
-GatewayController::errorHandler(QNetworkReply::NetworkError e)
+QString GatewayController::errorHandler(QNetworkReply::NetworkError e)
 {
     auto reply = qobject_cast<QNetworkReply*>(sender());
     reply->disconnect();
