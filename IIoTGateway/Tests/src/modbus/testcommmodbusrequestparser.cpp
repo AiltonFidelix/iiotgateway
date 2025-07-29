@@ -4,20 +4,20 @@
 
 #include "modbus/commmodbusrequestparser.h"
 
-using commmodbus::CommModbusRequestParser;
-using commmodbus::Request;
-using commmodbus::RequestType;
-using commmodbus::Units;
+using comm::commmodbus::CommModbusRequestParser;
+using comm::commmodbus::Request;
+using comm::commmodbus::RequestType;
+using comm::commmodbus::Units;
 
 using TestCases = std::tuple<QByteArray, Request*>;
 
-class TestModbusRequestParser : public testing::TestWithParam<TestCases>
+class TestCommModbusRequestParser : public testing::TestWithParam<TestCases>
 {
 public:
     static std::vector<TestCases> LoadTestCases();
 };
 
-TEST_P(TestModbusRequestParser, TestRequestParser)
+TEST_P(TestCommModbusRequestParser, TestRequestParser)
 {
     auto testUnit = [] (const QModbusDataUnit &expected, const QModbusDataUnit &actual) -> bool
     {
@@ -70,7 +70,7 @@ TEST_P(TestModbusRequestParser, TestRequestParser)
     delete expectedRequest;
 }
 
-std::vector<TestCases> TestModbusRequestParser::LoadTestCases()
+std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases()
 {
     std::vector<TestCases> testCases{};
 
@@ -128,4 +128,4 @@ std::vector<TestCases> TestModbusRequestParser::LoadTestCases()
     return testCases;
 }
 
-INSTANTIATE_TEST_SUITE_P(TestRequestParser, TestModbusRequestParser, ::testing::ValuesIn(TestModbusRequestParser::LoadTestCases()));
+INSTANTIATE_TEST_SUITE_P(TestRequestParser, TestCommModbusRequestParser, ::testing::ValuesIn(TestCommModbusRequestParser::LoadTestCases()));

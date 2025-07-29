@@ -10,8 +10,8 @@
 #include "modbus/commmodbusrtu.h"
 #include "mockmodbusclient.h"
 
-using commmodbus::CommModbus;
-using commmodbus::CommModbusRTU;
+using comm::commmodbus::CommModbus;
+using comm::commmodbus::CommModbusRTU;
 
 class TestCommModbus: public testing::Test
 {
@@ -23,8 +23,7 @@ protected:
     void TearDown() override;
 };
 
-void
-TestCommModbus::SetUp()
+void TestCommModbus::SetUp()
 {
     m_mockModbusClient = new MockModbusClient();
     m_commModbus = new CommModbusRTU();

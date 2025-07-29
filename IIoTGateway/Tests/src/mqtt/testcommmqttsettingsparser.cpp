@@ -3,31 +3,31 @@
 
 #include "testutils.h"
 
-#include "mqtt/mqttsettingsparser.h"
+#include "mqtt/commmqttsettingsparser.h"
 
-using commmqtt::MQTTSettingsParser;
+using comm::commmqtt::CommMQTTSettingsParser;
 
-using TestCases = std::tuple<QByteArray, MQTTSettingsParser*>;
+using TestCases = std::tuple<QByteArray, CommMQTTSettingsParser*>;
 
-class TestMQTTSettingsParser : public testing::TestWithParam<TestCases>
+class TestCommMQTTSettingsParser : public testing::TestWithParam<TestCases>
 {
 public:
     static std::vector<TestCases> LoadTestCases();
 };
 
-TEST_P(TestMQTTSettingsParser, TestSettingsParser)
+TEST_P(TestCommMQTTSettingsParser, TestSettingsParser)
 {
     const auto param = GetParam();
 
     const auto filePath = std::get<QByteArray>(param);
-    auto expectedParser = std::get<MQTTSettingsParser*>(param);
+    auto expectedParser = std::get<CommMQTTSettingsParser*>(param);
 
     ASSERT_TRUE(expectedParser != nullptr);
 
     const QByteArray data = TestUtils::readJsonFile(filePath);
-    const QJsonObject object = QJsonDocument::fromJson(data).object();
+    const QJsonObject settings = QJsonDocument::fromJson(data).object();
 
-    MQTTSettingsParser actualParser(object);
+    CommMQTTSettingsParser actualParser(settings);
 
     ASSERT_EQ(expectedParser->protocol(), actualParser.protocol());
     ASSERT_EQ(expectedParser->host(), actualParser.host());
@@ -52,13 +52,13 @@ TEST_P(TestMQTTSettingsParser, TestSettingsParser)
     delete expectedParser;
 }
 
-std::vector<TestCases> TestMQTTSettingsParser::LoadTestCases()
+std::vector<TestCases> TestCommMQTTSettingsParser::LoadTestCases()
 {
     std::vector<TestCases> testCases{};
 
     {
         // Test without settings
-        auto parser = new MQTTSettingsParser();
+        auto parser = new CommMQTTSettingsParser();
         testCases.push_back(std::make_tuple("", parser));
     }
 
@@ -86,7 +86,7 @@ std::vector<TestCases> TestMQTTSettingsParser::LoadTestCases()
         settings.insert("publish", true);
         settings.insert("subscribe", true);
 
-        auto parser = new MQTTSettingsParser(settings);
+        auto parser = new CommMQTTSettingsParser(settings);
 
         testCases.push_back(std::make_tuple(":/cases/settings/mqtt.json", parser));
     }
@@ -94,4 +94,4 @@ std::vector<TestCases> TestMQTTSettingsParser::LoadTestCases()
     return testCases;
 }
 
-INSTANTIATE_TEST_SUITE_P(TestSettingsParser, TestMQTTSettingsParser, ::testing::ValuesIn(TestMQTTSettingsParser::LoadTestCases()));
+INSTANTIATE_TEST_SUITE_P(TestSettingsParser, TestCommMQTTSettingsParser, ::testing::ValuesIn(TestCommMQTTSettingsParser::LoadTestCases()));

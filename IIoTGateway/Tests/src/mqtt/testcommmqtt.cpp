@@ -19,8 +19,7 @@ protected:
     void TearDown() override;
 };
 
-void
-TestCommMQTT::SetUp()
+void TestCommMQTT::SetUp()
 {
     m_mockMQTTClient = new MockMQTTClient();
     m_commMQTT = new CommMQTT();

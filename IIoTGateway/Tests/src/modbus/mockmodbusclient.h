@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include "modbus/commmodbusclientinterface.h"
 
-using commmodbus::CommModbusClientInterface;
+using comm::commmodbus::CommModbusClientInterface;
 
 class MockModbusClient : public CommModbusClientInterface
 {

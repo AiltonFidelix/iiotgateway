@@ -4,19 +4,7 @@
 #include <gmock/gmock.h>
 #include <mqtt/iasync_client.h>
 
-using mqtt::binary_ref;
-using mqtt::callback;
-using mqtt::connect_options;
-using mqtt::const_message_ptr;
-using mqtt::const_string_collection_ptr;
-using mqtt::delivery_token_ptr;
-using mqtt::disconnect_options;
-using mqtt::token_ptr;
-using mqtt::iaction_listener;
-using mqtt::string_ref;
-using mqtt::properties;
-using mqtt::subscribe_options;
-using mqtt::token;
+using namespace mqtt;
 
 using qos_collection = std::vector<int>;
 
@@ -24,7 +12,6 @@ class TestableMQTTClientInterface : public mqtt::iasync_client {
 protected:
     void remove_token(token* tok) override = 0;
 };
-
 
 class MockMQTTClient : public TestableMQTTClientInterface
 {
@@ -56,7 +43,7 @@ public:
 
     // Subscribe
     MOCK_METHOD(token_ptr, subscribe, (const std::string&, int, const subscribe_options&, const properties&), (override));
-    MOCK_METHOD(token_ptr, subscribe, (const std::string&, int, void* userContext, iaction_listener&, const subscribe_options&, const properties&), (override));
+    MOCK_METHOD(token_ptr, subscribe, (const std::string&, int, void*, iaction_listener&, const subscribe_options&, const properties&), (override));
     MOCK_METHOD(token_ptr, subscribe, (const_string_collection_ptr, const qos_collection&, const std::vector<subscribe_options>&, const properties&), (override));
     MOCK_METHOD(token_ptr, subscribe, (const_string_collection_ptr, const qos_collection&, void*, iaction_listener&, const std::vector<subscribe_options>&, const properties&), (override));
 

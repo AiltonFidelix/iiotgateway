@@ -3,31 +3,31 @@
 
 #include "testutils.h"
 
-#include "modbus/modbussettingsparser.h"
+#include "modbus/commmodbussettingsparser.h"
 
-using commmodbus::ModbusSettingsParser;
+using comm::commmodbus::CommModbusSettingsParser;
 
-using TestCases = std::tuple<QByteArray, ModbusSettingsParser*>;
+using TestCases = std::tuple<QByteArray, CommModbusSettingsParser*>;
 
-class TestModbusSettingsParser : public testing::TestWithParam<TestCases>
+class TestCommModbusSettingsParser : public testing::TestWithParam<TestCases>
 {
 public:
     static std::vector<TestCases> LoadTestCases();
 };
 
-TEST_P(TestModbusSettingsParser, TestSettingsParser)
+TEST_P(TestCommModbusSettingsParser, TestSettingsParser)
 {
     const auto param = GetParam();
 
     const auto filePath = std::get<QByteArray>(param);
-    auto expectedParser = std::get<ModbusSettingsParser*>(param);
+    auto expectedParser = std::get<CommModbusSettingsParser*>(param);
 
     ASSERT_TRUE(expectedParser != nullptr);
 
     const QByteArray data = TestUtils::readJsonFile(filePath);
-    const QJsonObject object = QJsonDocument::fromJson(data).object();
+    const QJsonObject settings = QJsonDocument::fromJson(data).object();
 
-    ModbusSettingsParser actualParser(object);
+    CommModbusSettingsParser actualParser(settings);
 
     ASSERT_EQ(expectedParser->host(), actualParser.host());
     ASSERT_EQ(expectedParser->port(), actualParser.port());
@@ -38,20 +38,20 @@ TEST_P(TestModbusSettingsParser, TestSettingsParser)
     ASSERT_EQ(expectedParser->stopbits(), actualParser.stopbits());
     ASSERT_EQ(expectedParser->retries(), actualParser.retries());
     ASSERT_EQ(expectedParser->timeout(), actualParser.timeout());
-    ASSERT_EQ(expectedParser->pollingTimeout(), actualParser.pollingTimeout());
+    ASSERT_EQ(expectedParser->pollingInterval(), actualParser.pollingInterval());
 
     ASSERT_EQ(expectedParser->pollingEnabled(), actualParser.pollingEnabled());
 
     delete expectedParser;
 }
 
-std::vector<TestCases> TestModbusSettingsParser::LoadTestCases()
+std::vector<TestCases> TestCommModbusSettingsParser::LoadTestCases()
 {
     std::vector<TestCases> testCases{};
 
     {
         // Test without settings
-        auto parser = new ModbusSettingsParser();
+        auto parser = new CommModbusSettingsParser();
         testCases.push_back(std::make_tuple("", parser));
     }
 
@@ -69,7 +69,7 @@ std::vector<TestCases> TestModbusSettingsParser::LoadTestCases()
         settings.insert("pollingInterval", 5000);
         settings.insert("pollingEnabled", true);
 
-        auto parser = new ModbusSettingsParser(settings);
+        auto parser = new CommModbusSettingsParser(settings);
 
         testCases.push_back(std::make_tuple(":/cases/settings/modbusrtu.json", parser));
     }
@@ -85,7 +85,7 @@ std::vector<TestCases> TestModbusSettingsParser::LoadTestCases()
         settings.insert("pollingInterval", 1000);
         settings.insert("pollingEnabled", false);
 
-        auto parser = new ModbusSettingsParser(settings);
+        auto parser = new CommModbusSettingsParser(settings);
 
         testCases.push_back(std::make_tuple(":/cases/settings/modbustcp.json", parser));
     }
@@ -93,5 +93,5 @@ std::vector<TestCases> TestModbusSettingsParser::LoadTestCases()
     return testCases;
 }
 
-INSTANTIATE_TEST_SUITE_P(TestSettingsParser, TestModbusSettingsParser, ::testing::ValuesIn(TestModbusSettingsParser::LoadTestCases()));
+INSTANTIATE_TEST_SUITE_P(TestSettingsParser, TestCommModbusSettingsParser, ::testing::ValuesIn(TestCommModbusSettingsParser::LoadTestCases()));
 
