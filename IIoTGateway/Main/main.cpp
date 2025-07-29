@@ -5,12 +5,11 @@
 #include "dbstorage.h"
 #include "gateway.h"
 
-// static Gateway *gateway = nullptr;
 static Control *control = nullptr;
 
 Q_NORETURN void quit(int sig)
 {
-    const QHash<int, QByteArray> sigNames = {
+    const QHash<int, QByteArray> sigNames{
         {SIGINT, "SIGINT"},
         {SIGTERM, "SIGTERM"},
         {SIGKILL, "SIGKILL"},
@@ -38,7 +37,7 @@ Q_NORETURN void quit(int sig)
 
 void setup_unix_signal_handlers()
 {
-    const QSet<int> sigs {SIGINT, SIGABRT, SIGTERM, SIGKILL, SIGQUIT, SIGHUP, SIGINT};
+    const QSet<int> sigs{SIGINT, SIGABRT, SIGTERM, SIGKILL, SIGQUIT, SIGHUP, SIGINT};
 
     for (int sig : sigs)
     {

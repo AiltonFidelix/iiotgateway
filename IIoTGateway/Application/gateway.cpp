@@ -4,7 +4,7 @@
 
 #include "../Protocols/commfactory.h"
 
-using namespace comm;
+using comm::CommFactory;
 
 Gateway::Gateway(StorageInterface *storage, QObject *parent)
     : QObject(parent),
@@ -13,7 +13,7 @@ Gateway::Gateway(StorageInterface *storage, QObject *parent)
     m_threadCloud(nullptr),
     m_storage(storage)
 {
-    qInfo() << "Creating gateway object...";
+    qInfo() << Q_FUNC_INFO << "Creating gateway instance...";
 }
 
 Gateway::~Gateway()
@@ -29,11 +29,11 @@ bool Gateway::isRunning()
 
 bool Gateway::start()
 {
-    qDebug() << "Starting gateway...";
+    qDebug() << Q_FUNC_INFO << "Starting gateway...";
 
     if (m_storage == nullptr)
     {
-        qWarning() << "Failed to start: No settings storage!";
+        qWarning() << Q_FUNC_INFO << "Failed to start: No settings storage!";
         return false;
     }
 
@@ -45,7 +45,7 @@ bool Gateway::start()
 
     if (cloudProtocol.isEmpty() || edgeProtocol.isEmpty())
     {
-        qWarning() << "Failed to start: Missing Protocol configuration!";
+        qWarning() << Q_FUNC_INFO << "Failed to start: Missing Protocol configuration!";
         return false;
     }
 
@@ -119,17 +119,17 @@ void Gateway::stop()
     m_isRunning = false;
     m_storage->setActive(m_isRunning);
 
-    qDebug() << "Stoping gateway...";
+    qDebug() << Q_FUNC_INFO << "Stoping gateway...";
 }
 
 bool Gateway::restart()
 {
-    qDebug() << "Restarting gateway...";
+    qDebug() << Q_FUNC_INFO << "Restarting gateway...";
     stop();
     return start();
 }
 
 void Gateway::notifyError(const QByteArray &error)
 {
-    qWarning() << error;
+    qWarning() << Q_FUNC_INFO << error;
 }
