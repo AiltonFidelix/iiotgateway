@@ -9,6 +9,7 @@ set(HEADERS
     modbus/commmodbusclientadapter.h
     modbus/commmodbusclientinterface.h
     modbus/commmodbusrequestparser.h
+    odbus/commmodbussettingsparser.h
     modbus/commmodbus.h
     modbus/commmodbusrtu.h
     modbus/commmodbustcp.h
@@ -16,13 +17,14 @@ set(HEADERS
     mqtt/commmqtt.h
     mqtt/commmqttcallback.h
     mqtt/commmqttactionlistener.h
-    mqtt/mqttsettingsparser.h
+    mqtt/commmqttsettingsparser.h
 )
 
 set(SOURCES
     commfactory.cpp
     modbus/commmodbusclientadapter.cpp
     modbus/commmodbusrequestparser.cpp
+    modbus/commmodbussettingsparser.cpp
     modbus/commmodbus.cpp
     modbus/commmodbusrtu.cpp
     modbus/commmodbustcp.cpp
@@ -31,7 +33,7 @@ set(SOURCES
     mqtt/commmqtt.cpp
     mqtt/commmqttcallback.cpp
     mqtt/commmqttactionlistener.cpp
-    mqtt/mqttsettingsparser.cpp
+    mqtt/commmqttsettingsparser.cpp
 )
 
 set(QT_COMPONENTS
@@ -45,8 +47,7 @@ set(LIBRARIES paho-mqttpp3)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPONENTS})
 
-add_library(${LIBRARY_NAME} SHARED ${HEADERS} ${SOURCES}
-    modbus/modbussettingsparser.h modbus/modbussettingsparser.cpp)
+add_library(${LIBRARY_NAME} SHARED ${HEADERS} ${SOURCES})
 
 foreach(component IN LISTS QT_COMPONENTS)
     target_link_libraries(${LIBRARY_NAME} Qt${QT_VERSION_MAJOR}::${component})
