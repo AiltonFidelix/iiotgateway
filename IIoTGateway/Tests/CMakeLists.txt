@@ -3,14 +3,16 @@ set(EXECUTABLE_NAME TestsRunner)
 set(HEADERS
     src/utils/testutils.h
     src/modbus/mockmodbusclient.h
+    src/mqtt/mockmqttclient.h
 )
 
 set(SOURCES
     src/utils/testutils.cpp
-    src/mqtt/testmqttsettingsparser.cpp
     src/modbus/testcommmodbus.cpp
-    src/modbus/testmodbusrequestparser.cpp
-    src/modbus/testmodbussettingsparser.cpp
+    src/modbus/testcommmodbusrequestparser.cpp
+    src/modbus/testcommmodbussettingsparser.cpp
+    src/mqtt/testcommmqtt.cpp
+    src/mqtt/testcommmqttsettingsparser.cpp
     src/main.cpp
 )
 
@@ -23,6 +25,8 @@ set(LIBRARIES
     Protocols
     gtest_main
     gmock_main
+    paho-mqtt3a
+    paho-mqtt3as
     paho-mqttpp3
 )
 
