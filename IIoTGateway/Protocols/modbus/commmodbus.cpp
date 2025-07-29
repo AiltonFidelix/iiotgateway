@@ -10,9 +10,10 @@ COMM_MODBUS_BEGIN_NAMESPACE
 
 CommModbus::CommModbus(const QJsonObject &settings)
     : m_modbusClient(nullptr),
-    m_polling(nullptr)
+    m_polling(nullptr),
+    m_readRequest({}),
+    m_settingsParser(std::move(settings))
 {
-#warning // TODO: set settings into the parser
 }
 
 CommModbus::~CommModbus()
@@ -184,7 +185,7 @@ Registers CommModbus::readReady(QModbusReply *reply)
     {
         const auto unit = reply->result();
 
-        for (int i = 0, total = int(unit.valueCount()); i < total; ++i)
+        for (int i = 0, total = static_cast<int>(unit.valueCount()); i < total; ++i)
         {
             registers.insert(unit.startAddress() + i, unit.value(i));
         }
@@ -241,7 +242,7 @@ Request CommModbus::loadReadRequestSettings()
     {
         emit error("Failed opening read.json");
 
-        return Request{};
+        return Request();
     }
 
     CommModbusRequestParser parser(file.readAll());

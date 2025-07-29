@@ -11,6 +11,7 @@
 #include "commmodbus_global.h"
 #include "commmodbusclientinterface.h"
 #include "commmodbusrequestparser.h"
+#include "commmodbussettingsparser.h"
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
@@ -51,6 +52,7 @@ protected:
     CommModbusClientInterface *m_modbusClient;
     QTimer *m_polling;
     Request m_readRequest;
+    CommModbusSettingsParser m_settingsParser;
 };
 
 COMM_MODBUS_END_NAMESPACE
