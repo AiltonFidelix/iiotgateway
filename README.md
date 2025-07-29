@@ -64,3 +64,10 @@ MQTT_QOS=0
 DB_TYPE=QSQLITE
 DB_NAME=IIoTGateway.db
 ```
+
+Dashboard login:
+
+```
+username: admin
+password gtwAdmin
+```
