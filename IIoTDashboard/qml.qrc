@@ -6,5 +6,6 @@
         <file>ModbusRTU.qml</file>
         <file>MQTT.qml</file>
         <file>Footer.qml</file>
+        <file>ModbusRequest.qml</file>
     </qresource>
 </RCC>
