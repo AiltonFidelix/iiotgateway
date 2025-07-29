@@ -13,7 +13,7 @@ class CommMQTTCallback : public QObject, public virtual mqtt::callback
     Q_OBJECT
 public:
     void connected(const mqtt::string &message) override;
-    void connection_lost(const std::string& cause) override;
+    void connection_lost(const std::string &cause) override;
     void message_arrived(mqtt::const_message_ptr ptr) override;
     void delivery_complete(mqtt::delivery_token_ptr token) override;
 

@@ -12,10 +12,16 @@ class CommMQTTActionListener : public QObject, public virtual mqtt::iaction_list
 {
     Q_OBJECT
 public:
-    void on_failure(const mqtt::token &asyncActionToken);
     void on_success(const mqtt::token &asyncActionToken);
+    void on_failure(const mqtt::token &asyncActionToken);
 
 signals:
+    void connected();
+    void subscribed();
+    void published();
+    void unsubscribed();
+    void disconnected();
+
     void connectionFailed();
     void subscribeFailed();
     void publishFailed();

@@ -10,7 +10,7 @@
 #include "comminterface.h"
 #include "commmqttcallback.h"
 #include "commmqttactionlistener.h"
-#include "mqttsettingsparser.h"
+#include "commmqttsettingsparser.h"
 
 COMM_MQTT_BEGIN_NAMESPACE
 
@@ -27,19 +27,20 @@ class CommMQTT : public CommInterface
     bool m_publish;
     bool m_subscribe;
 
-    mqtt::async_client *m_client;
+    mqtt::iasync_client *m_client;
     std::string m_pubTopic;
     std::string m_subTopic;
 
     CommMQTTCallback m_callback;
     CommMQTTActionListener m_listener;
-    MQTTSettingsParser m_settingsParser;
+    CommMQTTSettingsParser m_settingsParser;
 
 public:
-    Q_INVOKABLE explicit CommMQTT(QJsonObject settings = QJsonObject());
+    Q_INVOKABLE explicit CommMQTT(const QJsonObject &settings = QJsonObject());
     ~CommMQTT();
 
     bool isconnected() override;
+    void setMQTTClient(mqtt::iasync_client *client);
 
 public slots:
     void connectComm() override;

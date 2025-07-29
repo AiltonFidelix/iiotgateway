@@ -4,37 +4,26 @@
 #include <QDebug>
 #include <QJsonDocument>
 
-constexpr int defaultQos = 0;
-constexpr int defaultConnectionTimeout = 10;
-constexpr int defaultKeepAliveInterval = 60;
-constexpr int maxRetries = 5;
+constexpr const int defaultQos = 0;
+constexpr const int defaultConnectionTimeout = 10;
+constexpr const int defaultKeepAliveInterval = 60;
+constexpr const int maxRetries = 5;
 
 COMM_MQTT_BEGIN_NAMESPACE
 
 int CommMQTT::m_typeId = comm::CommFactory::registerInterface<CommMQTT*>("MQTT");
 
-CommMQTT::CommMQTT(QJsonObject settings) :
-    m_pubQos{defaultQos},
-    m_subQos{defaultQos},
-    m_retries{0},
-    m_publish{false},
-    m_subscribe{false},
-    m_client{nullptr},
-    m_pubTopic{},
-    m_subTopic{},
-    m_settingsParser{settings}
+CommMQTT::CommMQTT(const QJsonObject &settings) :
+    m_pubQos(defaultQos),
+    m_subQos(defaultQos),
+    m_retries(0),
+    m_publish(false),
+    m_subscribe(false),
+    m_client(nullptr),
+    m_pubTopic(""),
+    m_subTopic(""),
+    m_settingsParser(std::move(settings))
 {
-    const std::string protocol = m_settingsParser.protocol();
-    const std::string  host = m_settingsParser.host();
-    const int port = m_settingsParser.port();
-
-    const std::string server_address = QString("%1://%2%3%4").arg(QString::fromStdString(protocol),
-                                                                  QString::fromStdString(host),
-                                                                  (port == -1) ? QString() : QString(":"),
-                                                                  QString::number(port)).toStdString();
-
-    const std::string client_id = m_settingsParser.clientId();
-
     m_publish = m_settingsParser.publish();
     m_subscribe = m_settingsParser.subscribe();
     m_pubTopic = m_settingsParser.publishTopic();
@@ -42,15 +31,8 @@ CommMQTT::CommMQTT(QJsonObject settings) :
     m_pubQos = m_settingsParser.publishQos();
     m_subQos = m_settingsParser.subscribeQos();
 
-    m_client = new mqtt::async_client(server_address, client_id);
-
-    if (m_client == nullptr)
-        return;
-
     connect(&m_callback, &CommMQTTCallback::cbConnected, this, &CommMQTT::onConnected);
     connect(&m_callback, &CommMQTTCallback::cbMessageArrived, this, &CommMQTT::onMessageArrived);
-
-    m_client->set_callback(m_callback);
 }
 
 CommMQTT::~CommMQTT()
@@ -61,15 +43,36 @@ CommMQTT::~CommMQTT()
     }
 }
 
-bool
-CommMQTT::isconnected()
+bool CommMQTT::isconnected()
 {
     return m_client->is_connected();
 }
 
-void
-CommMQTT::connectComm()
+void CommMQTT::setMQTTClient(mqtt::iasync_client *client)
 {
+    m_client = client;
+}
+
+void CommMQTT::connectComm()
+{
+    if (m_client == nullptr)
+    {
+        const std::string protocol = m_settingsParser.protocol();
+        const std::string  host = m_settingsParser.host();
+        const int port = m_settingsParser.port();
+
+        const std::string server_address = QString("%1://%2%3%4").arg(QString::fromStdString(protocol),
+                                                                      QString::fromStdString(host),
+                                                                      (port == -1) ? QString() : QString(":"),
+                                                                      QString::number(port)).toStdString();
+
+        const std::string client_id = m_settingsParser.clientId();
+
+        m_client = new mqtt::async_client(server_address, client_id);
+
+        m_client->set_callback(m_callback);
+    }
+
     if (m_retries++ >= maxRetries)
     {
         emit connectionFailed();
@@ -98,11 +101,15 @@ CommMQTT::connectComm()
 
     try
     {
-        qDebug() << "Connecting...";
+        qDebug() << Q_FUNC_INFO << "Connecting...";
         auto connTok = m_client->connect(connOpts, nullptr, m_listener);
-        qDebug() << "Waiting for the connection...";
-        connTok->wait();
-        qDebug() << "Successfully connected";
+        qDebug() << Q_FUNC_INFO << "Waiting for the connection...";
+
+        if (connTok)
+        {
+            connTok->wait();
+            qDebug() << Q_FUNC_INFO << "Successfully connected";
+        }
     }
     catch (const mqtt::exception& ex)
     {
@@ -110,13 +117,16 @@ CommMQTT::connectComm()
     }
 }
 
-void
-CommMQTT::disconnectComm()
+void CommMQTT::disconnectComm()
 {
     if (isconnected())
     {
         auto discTok = m_client->disconnect();
-        discTok->wait();
+
+        if (discTok)
+        {
+            discTok->wait();
+        }
     }
 
     emit disconnected();
@@ -127,13 +137,13 @@ CommMQTT::incoming(QByteArray data)
 {
     if (!isconnected())
     {
-        qWarning() << "MQTT publish failed: Not connected!";
+        qWarning() << Q_FUNC_INFO << "MQTT publish failed: Not connected!";
         return;
     }
 
     if (!m_publish)
     {
-        qWarning() << "MQTT publish failed: Publish is not configured!";
+        qWarning() << Q_FUNC_INFO << "MQTT publish failed: Publish is not configured!";
         return;
     }
 
@@ -143,7 +153,11 @@ CommMQTT::incoming(QByteArray data)
     {
         auto pubMsg = mqtt::make_message(m_pubTopic, message, m_pubQos, false);
         auto delTok = m_client->publish(pubMsg);
-        delTok->wait();
+
+        if (delTok)
+        {
+            delTok->wait();
+        }
     }
     catch (const mqtt::exception& ex)
     {
@@ -157,7 +171,7 @@ CommMQTT::onConnected()
     if (m_subscribe)
     {
         m_client->subscribe(m_subTopic, m_subQos);
-        qDebug() << "MQTT topic subscribed:" << m_subTopic;
+        qDebug() << Q_FUNC_INFO << "MQTT topic subscribed:" << m_subTopic;
     }
 }
 
