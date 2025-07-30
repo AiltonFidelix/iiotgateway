@@ -22,7 +22,7 @@ set(COMPONENTS Core)
 
 set(LIBRARIES
     Application
-    Protocols
+    Communication
     gtest_main
     gmock_main
     paho-mqtt3a

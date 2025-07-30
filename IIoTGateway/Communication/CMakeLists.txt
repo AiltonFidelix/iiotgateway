@@ -1,4 +1,4 @@
-set(LIBRARY_NAME Protocols)
+set(LIBRARY_NAME Communication)
 
 set(HEADERS
     comm_global.h

@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-#include "../Protocols/commfactory.h"
+#include "../Communication/commfactory.h"
 
 using comm::CommFactory;
 
