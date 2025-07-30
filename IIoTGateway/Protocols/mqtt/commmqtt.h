@@ -39,7 +39,7 @@ public:
     Q_INVOKABLE explicit CommMQTT(const QJsonObject &settings = QJsonObject());
     ~CommMQTT();
 
-    bool isconnected() override;
+    bool isconnected() const override;
     void setMQTTClient(mqtt::iasync_client *client);
 
 public slots:

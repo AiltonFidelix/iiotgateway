@@ -21,7 +21,7 @@ bool DBStorage::verify() const
 {
     if (!m_connection->open())
     {
-        qFatal() << "Database connection failed:" << m_connection->lastError();
+        qFatal() << Q_FUNC_INFO << "Database connection failed:" << m_connection->lastError();
         return false;
     }
 
@@ -30,17 +30,17 @@ bool DBStorage::verify() const
 
 bool DBStorage::setActive(bool active) const
 {
-    return insertSettings("active", active ? "Y" : "N");
+    return insertSettings(QStringLiteral("active"), active ? QStringLiteral("Y") : QStringLiteral("N"));
 }
 
 bool DBStorage::setCloudProtocol(const QString &protocol) const
 {
-    return insertSettings("cloud_protocol", protocol);
+    return insertSettings(QStringLiteral("cloud_protocol"), protocol);
 }
 
 bool DBStorage::setEdgeProtocol(const QString &protocol) const
 {
-    return insertSettings("edge_protocol", protocol);
+    return insertSettings(QStringLiteral("edge_protocol"), protocol);
 }
 
 bool DBStorage::setProtocolSettings(const QString &protocol, const QJsonObject &settings) const
@@ -139,12 +139,12 @@ QPair<QString, QString> DBStorage::userCredentials() const
 {
     QSqlQuery sqlquery;
 
-    bool ret = sqlquery.prepare("SELECT username, password FROM users WHERE id = 1");
+    bool ret = sqlquery.prepare(QStringLiteral("SELECT username, password FROM users WHERE id = 1"));
 
     ret &= sqlquery.exec();
 
     if (!ret)
-        qWarning() << sqlquery.lastError().text();
+        qWarning() << Q_FUNC_INFO << sqlquery.lastError().text();
 
     ret &= sqlquery.next();
 
@@ -206,5 +206,5 @@ QSqlRecord DBStorage::selectSettings() const
 
 QString DBStorage::currentDateTime() const
 {
-    return QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    return QDateTime::currentDateTime().toString(QStringLiteral("yyyy-MM-dd hh:mm:ss"));
 }

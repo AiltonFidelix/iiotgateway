@@ -7,7 +7,7 @@
 
 using comm::commmodbus::CommModbusSettingsParser;
 
-using TestCases = std::tuple<QByteArray, CommModbusSettingsParser*>;
+using TestCases = std::tuple<QString, CommModbusSettingsParser*>;
 
 class TestCommModbusSettingsParser : public testing::TestWithParam<TestCases>
 {
@@ -19,7 +19,7 @@ TEST_P(TestCommModbusSettingsParser, TestSettingsParser)
 {
     const auto param = GetParam();
 
-    const auto filePath = std::get<QByteArray>(param);
+    const auto filePath = std::get<QString>(param);
     auto expectedParser = std::get<CommModbusSettingsParser*>(param);
 
     ASSERT_TRUE(expectedParser != nullptr);
@@ -52,42 +52,42 @@ std::vector<TestCases> TestCommModbusSettingsParser::LoadTestCases()
     {
         // Test without settings
         auto parser = new CommModbusSettingsParser();
-        testCases.push_back(std::make_tuple("", parser));
+        testCases.push_back(std::make_tuple(QStringLiteral(""), parser));
     }
 
     {
         // Test modbus RTU settings
         QJsonObject settings{};
 
-        settings.insert("port", "default");
-        settings.insert("baudrate", "115200");
-        settings.insert("parity", "None");
-        settings.insert("dataBits", 8);
-        settings.insert("stopBits", 1);
-        settings.insert("retries", 10);
-        settings.insert("timeout", 2000);
-        settings.insert("pollingInterval", 5000);
-        settings.insert("pollingEnabled", true);
+        settings.insert(QStringLiteral("port"), QStringLiteral("default"));
+        settings.insert(QStringLiteral("baudrate"), QStringLiteral("115200"));
+        settings.insert(QStringLiteral("parity"), QStringLiteral("None"));
+        settings.insert(QStringLiteral("dataBits"), 8);
+        settings.insert(QStringLiteral("stopBits"), 1);
+        settings.insert(QStringLiteral("retries"), 10);
+        settings.insert(QStringLiteral("timeout"), 2000);
+        settings.insert(QStringLiteral("pollingInterval"), 5000);
+        settings.insert(QStringLiteral("pollingEnabled"), true);
 
         auto parser = new CommModbusSettingsParser(settings);
 
-        testCases.push_back(std::make_tuple(":/cases/settings/modbusrtu.json", parser));
+        testCases.push_back(std::make_tuple(QStringLiteral(":/cases/settings/modbusrtu.json"), parser));
     }
 
     {
         // Test modbus TCP settings
         QJsonObject settings{};
 
-        settings.insert("host", "192.68.50.94");
-        settings.insert("port", 502);
-        settings.insert("retries", 5);
-        settings.insert("timeout", 500);
-        settings.insert("pollingInterval", 1000);
-        settings.insert("pollingEnabled", false);
+        settings.insert(QStringLiteral("host"), QStringLiteral("192.68.50.94"));
+        settings.insert(QStringLiteral("port"), 502);
+        settings.insert(QStringLiteral("retries"), 5);
+        settings.insert(QStringLiteral("timeout"), 500);
+        settings.insert(QStringLiteral("pollingInterval"), 1000);
+        settings.insert(QStringLiteral("pollingEnabled"), false);
 
         auto parser = new CommModbusSettingsParser(settings);
 
-        testCases.push_back(std::make_tuple(":/cases/settings/modbustcp.json", parser));
+        testCases.push_back(std::make_tuple(QStringLiteral(":/cases/settings/modbustcp.json"), parser));
     }
 
     return testCases;

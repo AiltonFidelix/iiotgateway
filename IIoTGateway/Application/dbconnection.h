@@ -17,14 +17,14 @@ class DBConnection : public QObject
 public:
 
     // History table enum
-    enum class History {
+    enum class History : uint8_t {
         Id = 0,
         Script,
         Created
     };
 
     // Settings table enum
-    enum class Settings {
+    enum class Settings : uint8_t {
         Id = 0,
         Active,
         CloudProtocol,
@@ -34,7 +34,7 @@ public:
     };
 
     // Protocols table enum
-    enum class Protocols {
+    enum class Protocols : uint8_t {
         Id = 0,
         Type,
         Settings,
@@ -44,7 +44,7 @@ public:
 
     static DBConnection *instance();
 
-    bool isOpen();
+    bool isOpen() const;
     bool verifyScripts();
 
     QString lastError() const;

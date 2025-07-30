@@ -86,7 +86,7 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     EXPECT_CALL(*m_mockModbusClient, sendReadRequest(testing::_, testing::_)).WillOnce(testing::Return(reply));
 
-    const QByteArray request = TestUtils::readJsonFile(":/cases/requests/readone.json");
+    const QByteArray request = TestUtils::readJsonFile(QStringLiteral(":/cases/requests/readone.json"));
 
     QTimer::singleShot(1, emitFinished);
 
@@ -103,23 +103,23 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     const QJsonObject jsonResult = QJsonDocument::fromJson(result).object();
 
-    const QJsonArray devices = jsonResult.value("devices").toArray();
+    const QJsonArray devices = jsonResult.value(QStringLiteral("devices")).toArray();
 
     ASSERT_EQ(1, devices.count());
 
     const QJsonObject firstDevice = devices.first().toObject();
 
-    ASSERT_EQ(expectedAddress, firstDevice.value("address").toInt());
+    ASSERT_EQ(expectedAddress, firstDevice.value(QStringLiteral("address")).toInt());
 
-    const QJsonArray registers = firstDevice.value("registers").toArray();
+    const QJsonArray registers = firstDevice.value(QStringLiteral("registers")).toArray();
 
     ASSERT_EQ(maxRegisters, registers.count());
 
     for (const auto &reg : registers)
     {
         const QJsonObject obj = reg.toObject();
-        const int regAddress = obj.value("register").toInt();
-        const int regValue = obj.value("value").toInt();
+        const int regAddress = obj.value(QStringLiteral("register")).toInt();
+        const int regValue = obj.value(QStringLiteral("value")).toInt();
 
         ASSERT_EQ(expectedValues.at(regAddress), regValue);
     }

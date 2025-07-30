@@ -9,7 +9,7 @@ set(HEADERS
     modbus/commmodbusclientadapter.h
     modbus/commmodbusclientinterface.h
     modbus/commmodbusrequestparser.h
-    odbus/commmodbussettingsparser.h
+    modbus/commmodbussettingsparser.h
     modbus/commmodbus.h
     modbus/commmodbusrtu.h
     modbus/commmodbustcp.h

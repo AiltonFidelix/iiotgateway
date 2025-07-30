@@ -5,10 +5,6 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
-constexpr const char *SCRIPTS_PATH = ":/scripts";
-constexpr const char *HISTORY_SCRIPT = "history.sql";
-constexpr const char *HISTORY_TABLE = "history";
-
 DBConnection *DBConnection::m_instance = nullptr;
 
 DBConnection*
@@ -26,11 +22,11 @@ DBConnection::instance()
 
 bool DBConnection::open()
 {
-    auto dbType = qgetenv("DB_TYPE");
-    auto dbName = qgetenv("DB_NAME");
-    auto dbHost = qgetenv("DB_HOST");
-    auto dbUser = qgetenv("DB_USER");
-    auto dbPass = qgetenv("DB_PASS");
+    const QByteArray dbType = qgetenv("DB_TYPE");
+    const QByteArray dbName = qgetenv("DB_NAME");
+    const QByteArray dbHost = qgetenv("DB_HOST");
+    const QByteArray dbUser = qgetenv("DB_USER");
+    const QByteArray dbPass = qgetenv("DB_PASS");
 
     bool ok = false;
     const int port = qEnvironmentVariableIntValue("DB_PORT", &ok);
@@ -54,7 +50,7 @@ void DBConnection::close()
     m_database.close();
 }
 
-bool DBConnection::isOpen()
+bool DBConnection::isOpen() const
 {
     return m_database.isOpen();
 }
@@ -84,7 +80,7 @@ bool DBConnection::verifyScripts()
         if (!ok)
             return ok;
 
-        for (const auto &script : scripts)
+        for (const QByteArray &script : scripts)
         {
             if (script.isEmpty())
                 continue;
@@ -95,7 +91,7 @@ bool DBConnection::verifyScripts()
 
             if (!ret)
             {
-                qWarning() << query.lastError().text();
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
             }
 
             ok &= ret;
@@ -112,7 +108,7 @@ bool DBConnection::verifyScripts()
 
         if (!query.exec(QString("SELECT count(script) FROM history WHERE script = '%1'").arg(script)))
         {
-            qWarning() << query.lastError().text();
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
             return false;
         }
 
@@ -135,9 +131,9 @@ bool DBConnection::verifyScripts()
         return (query.value(0).toInt() == 1);
     };
 
-    const QString historyScript(HISTORY_SCRIPT);
+    const QString historyScript(QStringLiteral("history.sql"));
 
-    QDir dir(SCRIPTS_PATH);
+    QDir dir(QStringLiteral(":/scripts"));
 
     if (!dir.exists())
         return false;
@@ -149,13 +145,13 @@ bool DBConnection::verifyScripts()
 
     files.removeOne(historyScript);
 
-    if (!tableExists(HISTORY_TABLE))
+    if (!tableExists(QStringLiteral("history")))
     {
-        qDebug() << "Executing" << historyScript;
+        qDebug() << Q_FUNC_INFO << "Executing:" << historyScript;
 
         if (!scriptExec(QString("%1/%2").arg(dir.absolutePath(), historyScript)))
         {
-            qWarning() << "Failed to execute" << historyScript;
+            qWarning() << Q_FUNC_INFO << "Failed to execute:" << historyScript;
             return false;
         }
 
@@ -168,11 +164,11 @@ bool DBConnection::verifyScripts()
     {
         if (!scriptExists(fileName))
         {
-            qDebug() << "Executing" << fileName;
+            qDebug() << Q_FUNC_INFO << "Executing:" << fileName;
 
             if (!scriptExec(QString("%1/%2").arg(dir.absolutePath(), fileName)))
             {
-                qWarning() << "Failed to execute" << fileName;
+                qWarning() << Q_FUNC_INFO << "Failed to execute:" << fileName;
                 ok = false;
             }
             else

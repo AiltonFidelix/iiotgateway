@@ -43,7 +43,7 @@ CommMQTT::~CommMQTT()
     }
 }
 
-bool CommMQTT::isconnected()
+bool CommMQTT::isconnected() const
 {
     return m_client->is_connected();
 }

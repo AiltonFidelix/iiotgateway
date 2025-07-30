@@ -29,25 +29,25 @@ Request CommModbusRequestParser::request()
     Request request{};
 
     const QJsonObject jsonObj = m_document.object();
-    const QJsonArray devices = jsonObj.value("devices").toArray();
+    const QJsonArray devices = jsonObj.value(QStringLiteral("devices")).toArray();
 
     for (const auto &device : devices)
     {
         const QJsonObject deviceObj = device.toObject();
-        const auto address = static_cast<quint8>(deviceObj.value("address").toInt(0));
+        const auto address = static_cast<quint8>(deviceObj.value(QStringLiteral("address")).toInt(0));
 
-        const auto registertype = getType(deviceObj.value("type").toString());
-        const auto startRegister = static_cast<quint16>(deviceObj.value("startRegister").toInt(0));
-        const auto numberOfEntries = static_cast<quint16>(deviceObj.value("numberOfEntries").toInt(0));
+        const auto registertype = getType(deviceObj.value(QStringLiteral("type")).toString());
+        const auto startRegister = static_cast<quint16>(deviceObj.value(QStringLiteral("startRegister")).toInt(0));
+        const auto numberOfEntries = static_cast<quint16>(deviceObj.value(QStringLiteral("numberOfEntries")).toInt(0));
 
-        bool hasValues = deviceObj.contains("values");
+        bool hasValues = deviceObj.contains(QStringLiteral("values"));
 
         QJsonArray values{};
         QJsonArray::Iterator current{};
 
         if (hasValues)
         {
-            values = deviceObj.value("values").toArray();
+            values = deviceObj.value(QStringLiteral("values")).toArray();
             current = values.begin();
             m_type = RequestType::Write;
         }

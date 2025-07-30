@@ -11,58 +11,58 @@ CommMQTTSettingsParser::CommMQTTSettingsParser(const QJsonObject &settings)
 
 std::string CommMQTTSettingsParser::protocol() const
 {
-    const QString protocol = m_settings.value("protocol").toString();
+    const QString protocol = m_settings.value(QStringLiteral("protocol")).toString();
     return protocol.split(':').first().toStdString();
 }
 
 std::string CommMQTTSettingsParser::host() const
 {
-    return m_settings.value("host").toString().toStdString();
+    return m_settings.value(QStringLiteral("host")).toString().toStdString();
 }
 
 std::string CommMQTTSettingsParser::username() const
 {
-    return m_settings.value("username").toString().toStdString();
+    return m_settings.value(QStringLiteral("username")).toString().toStdString();
 }
 
 std::string CommMQTTSettingsParser::password() const
 {
-    return m_settings.value("password").toString().toStdString();
+    return m_settings.value(QStringLiteral("password")).toString().toStdString();
 }
 
 std::string CommMQTTSettingsParser::clientId() const
 {
-    return m_settings.value("clientId").toString().toStdString();
+    return m_settings.value(QStringLiteral("clientId")).toString().toStdString();
 }
 
 std::string CommMQTTSettingsParser::publishTopic() const
 {
-    return m_settings.value("publishTopic").toString().toStdString();
+    return m_settings.value(QStringLiteral("publishTopic")).toString().toStdString();
 }
 
 std::string CommMQTTSettingsParser::subscribeTopic() const
 {
-    return m_settings.value("subscribeTopic").toString().toStdString();
+    return m_settings.value(QStringLiteral("subscribeTopic")).toString().toStdString();
 }
 
 int CommMQTTSettingsParser::connectionTimeout() const
 {
-    return m_settings.value("connectionTimeout").toInt(10);
+    return m_settings.value(QStringLiteral("connectionTimeout")).toInt(10);
 }
 
 int CommMQTTSettingsParser::keepAlive() const
 {
-    return m_settings.value("keepAlive").toInt(60);
+    return m_settings.value(QStringLiteral("keepAlive")).toInt(60);
 }
 
 int CommMQTTSettingsParser::port() const
 {
-    return m_settings.value("port").toInt(-1);
+    return m_settings.value(QStringLiteral("port")).toInt(-1);
 }
 
 int CommMQTTSettingsParser::version() const
 {
-    const QString version = m_settings.value("version").toString();
+    const QString version = m_settings.value(QStringLiteral("version")).toString();
 
     if (version == "5.0")
     {
@@ -82,32 +82,32 @@ int CommMQTTSettingsParser::version() const
 
 int CommMQTTSettingsParser::publishQos() const
 {
-    return m_settings.value("publishQos").toInt(0);
+    return m_settings.value(QStringLiteral("publishQos")).toInt(0);
 }
 
 int CommMQTTSettingsParser::subscribeQos() const
 {
-    return m_settings.value("subscribeQos").toInt(0);
+    return m_settings.value(QStringLiteral("subscribeQos")).toInt(0);
 }
 
 bool CommMQTTSettingsParser::autoReconnect() const
 {
-    return m_settings.value("autoReconnect").toBool(false);
+    return m_settings.value(QStringLiteral("autoReconnect")).toBool(false);
 }
 
 bool CommMQTTSettingsParser::cleanStart() const
 {
-    return m_settings.value("cleanStart").toBool(false);
+    return m_settings.value(QStringLiteral("cleanStart")).toBool(false);
 }
 
 bool CommMQTTSettingsParser::publish() const
 {
-    return m_settings.value("publish").toBool(false);
+    return m_settings.value(QStringLiteral("publish")).toBool(false);
 }
 
 bool CommMQTTSettingsParser::subscribe() const
 {
-    return m_settings.value("subscribe").toBool(false);
+    return m_settings.value(QStringLiteral("subscribe")).toBool(false);
 }
 
 COMM_MQTT_END_NAMESPACE

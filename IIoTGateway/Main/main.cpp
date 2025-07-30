@@ -21,10 +21,10 @@ Q_NORETURN void quit(int sig)
     if (sigNames.contains(sig))
     {
         auto sigName = sigNames.value(sig);
-        qCritical("Received %s", sigName.data());
+        qCritical() << Q_FUNC_INFO << "Received:" << sigName.data();
     }
 
-    qDebug("Closing all connections and exiting the process...");
+    qDebug() << Q_FUNC_INFO << "Closing all connections and exiting the process...";
 
     if (control)
     {
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
     if (!dbstorage.verify())
     {
-        qFatal() << "Failed to verify storage!";
+        qFatal() << Q_FUNC_INFO << "Failed to verify storage!";
         return -1;
     }
 

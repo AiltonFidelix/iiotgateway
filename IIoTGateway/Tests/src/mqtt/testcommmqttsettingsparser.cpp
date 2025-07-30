@@ -7,7 +7,7 @@
 
 using comm::commmqtt::CommMQTTSettingsParser;
 
-using TestCases = std::tuple<QByteArray, CommMQTTSettingsParser*>;
+using TestCases = std::tuple<QString, CommMQTTSettingsParser*>;
 
 class TestCommMQTTSettingsParser : public testing::TestWithParam<TestCases>
 {
@@ -19,7 +19,7 @@ TEST_P(TestCommMQTTSettingsParser, TestSettingsParser)
 {
     const auto param = GetParam();
 
-    const auto filePath = std::get<QByteArray>(param);
+    const auto filePath = std::get<QString>(param);
     auto expectedParser = std::get<CommMQTTSettingsParser*>(param);
 
     ASSERT_TRUE(expectedParser != nullptr);
@@ -59,36 +59,36 @@ std::vector<TestCases> TestCommMQTTSettingsParser::LoadTestCases()
     {
         // Test without settings
         auto parser = new CommMQTTSettingsParser();
-        testCases.push_back(std::make_tuple("", parser));
+        testCases.push_back(std::make_tuple(QStringLiteral(""), parser));
     }
 
     {
         // Test with settings
         QJsonObject settings{};
 
-        settings.insert("protocol", "mqtt://");
-        settings.insert("host", "localhost");
-        settings.insert("username", "testeruser");
-        settings.insert("password", "testerpass");
-        settings.insert("clientId", "iiotgateway");
-        settings.insert("publishTopic", "iiotgateway/edge");
-        settings.insert("subscribeTopic", "iiotgateway/cloud");
+        settings.insert(QStringLiteral("protocol"), QStringLiteral("mqtt://"));
+        settings.insert(QStringLiteral("host"), QStringLiteral("localhost"));
+        settings.insert(QStringLiteral("username"), QStringLiteral("testeruser"));
+        settings.insert(QStringLiteral("password"), QStringLiteral("testerpass"));
+        settings.insert(QStringLiteral("clientId"), QStringLiteral("iiotgateway"));
+        settings.insert(QStringLiteral("publishTopic"), QStringLiteral("iiotgateway/edge"));
+        settings.insert(QStringLiteral("subscribeTopic"), QStringLiteral("iiotgateway/cloud"));
 
-        settings.insert("connectionTimeout", 10);
-        settings.insert("keepAlive", 60);
-        settings.insert("port", 1883);
-        settings.insert("version", "3.1");
-        settings.insert("publishQos", 0);
-        settings.insert("subscribeQos", 0);
+        settings.insert(QStringLiteral("connectionTimeout"), 10);
+        settings.insert(QStringLiteral("keepAlive"), 60);
+        settings.insert(QStringLiteral("port"), 1883);
+        settings.insert(QStringLiteral("version"), QStringLiteral("3.1"));
+        settings.insert(QStringLiteral("publishQos"), 0);
+        settings.insert(QStringLiteral("subscribeQos"), 0);
 
-        settings.insert("autoReconnect", true);
-        settings.insert("cleanStart", true);
-        settings.insert("publish", true);
-        settings.insert("subscribe", true);
+        settings.insert(QStringLiteral("autoReconnect"), true);
+        settings.insert(QStringLiteral("cleanStart"), true);
+        settings.insert(QStringLiteral("publish"), true);
+        settings.insert(QStringLiteral("subscribe"), true);
 
         auto parser = new CommMQTTSettingsParser(settings);
 
-        testCases.push_back(std::make_tuple(":/cases/settings/mqtt.json", parser));
+        testCases.push_back(std::make_tuple(QStringLiteral(":/cases/settings/mqtt.json"), parser));
     }
 
     return testCases;

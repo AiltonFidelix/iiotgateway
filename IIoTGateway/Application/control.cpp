@@ -32,7 +32,7 @@ bool Control::start(int port)
         return false;
     }
 
-    qDebug() << "Listening on port" << tcpserver->serverPort();
+    qDebug() << Q_FUNC_INFO << "Listening on port:" << tcpserver->serverPort();
 
     if ((m_gateway != nullptr) && (m_storage != nullptr))
     {
@@ -70,19 +70,19 @@ void Control::registerRoutes()
     {
         Q_UNUSED(request)
 
-        const QString response("<h1>IIoTGateway - by Ailton Fidelix</h1>");
+        const QString response(QStringLiteral("<h1>IIoTGateway - by Ailton Fidelix</h1>"));
         return QHttpServerResponse(response);
     };
 
     /// OPTIONS handler
     auto options = [](const QHttpServerRequest &request)
     {
-        const QByteArray allowMethod(request.headers().value("access-control-request-method"));
+        const QByteArray allowMethod(request.headers().value(QStringLiteral("access-control-request-method")));
 
         QHttpHeaders headers{};
-        headers.append("Access-Control-Allow-Origin", "*");
-        headers.append("Access-Control-Allow-Methods", allowMethod);
-        headers.append("Access-Control-Allow-Headers", "Content-Type");
+        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
+        headers.append(QStringLiteral("Access-Control-Allow-Methods"), allowMethod);
+        headers.append(QStringLiteral("Access-Control-Allow-Headers"), QStringLiteral("Content-Type"));
 
         QHttpServerResponse response(QHttpServerResponse::StatusCode::Ok);
         response.setHeaders(headers);
@@ -105,15 +105,15 @@ void Control::registerRoutes()
         }
 
         const QJsonObject jsonObj = json.object();
-        const QString username = jsonObj.value("username").toString();
-        const QString password = jsonObj.value("password").toString();
+        const QString username = jsonObj.value(QStringLiteral("username")).toString();
+        const QString password = jsonObj.value(QStringLiteral("password")).toString();
         const auto credentials = m_storage->userCredentials();
 
         auto getData = [](const QString &status, const QString &message) -> QByteArray
         {
             QJsonObject obj{};
-            obj.insert("status", status);
-            obj.insert("message", message);
+            obj.insert(QStringLiteral("status"), status);
+            obj.insert(QStringLiteral("message"), message);
             return QJsonDocument(obj).toJson();
         };
 
@@ -124,11 +124,12 @@ void Control::registerRoutes()
             qWarning() << "Login failed: Wrong credentials";
         }
 
-        const QByteArray data = success ? getData("ok", "Login success!") : getData("error", "Wrong credentials!");
+        const QByteArray data = success ? getData(QStringLiteral("ok"), QStringLiteral("Login success!"))
+                                        : getData(QStringLiteral("error"), QStringLiteral("Wrong credentials!"));
 
         QHttpHeaders headers{};
-        headers.append("Access-Control-Allow-Origin", "*");
-        headers.append("Content-Type", "application/json");
+        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
+        headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
 
         QHttpServerResponse response(data);
         response.setHeaders(headers);
@@ -148,13 +149,13 @@ void Control::registerRoutes()
         }
 
         QJsonObject obj{};
-        obj.insert("status", m_gateway->isRunning() ? "running" : "stopped");
+        obj.insert(QStringLiteral("status"), m_gateway->isRunning() ? QStringLiteral("running") : QStringLiteral("stopped"));
 
         const QByteArray data = QJsonDocument(obj).toJson(QJsonDocument::Compact);
 
         QHttpHeaders headers{};
-        headers.append("Access-Control-Allow-Origin", "*");
-        headers.append("Content-Type", "application/json");
+        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
+        headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
 
         QHttpServerResponse response(data);
         response.setHeaders(headers);
@@ -183,7 +184,7 @@ void Control::registerRoutes()
         }
 
         const QJsonObject obj = json.object();
-        const QString command = obj.value("command").toString().toLower();
+        const QString command = obj.value(QStringLiteral("command")).toString().toLower();
 
         if (command == "start")
         {
@@ -199,8 +200,8 @@ void Control::registerRoutes()
         }
 
         QHttpHeaders headers{};
-        headers.append("Access-Control-Allow-Origin", "*");
-        headers.append("Content-Type", "application/json");
+        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
+        headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
 
         QHttpServerResponse response(QHttpServerResponse::StatusCode::Ok);
         response.setHeaders(headers);
@@ -235,8 +236,8 @@ void Control::registerRoutes()
         const QByteArray data = QJsonDocument(obj).toJson(QJsonDocument::Compact);
 
         QHttpHeaders headers{};
-        headers.append("Access-Control-Allow-Origin", "*");
-        headers.append("Content-Type", "application/json");
+        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
+        headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
 
         QHttpServerResponse response(data);
         response.setHeaders(headers);
@@ -260,21 +261,21 @@ void Control::registerRoutes()
             return response;
         }
 
-        const QJsonObject reqObj = json.object();
-        const QStringList protocols = reqObj.keys();
-
         bool ok = true;
 
-        for (const auto &protocol : protocols)
-        {
-            const QJsonValue value = reqObj.value(protocol);
+        const QJsonObject settingsObj = json.object();
 
-            if (!value.isObject())
-                continue;
+        const QJsonObject cloudObj = settingsObj.value(QStringLiteral("cloud")).toObject();
+        const QString cloudProtocol = cloudObj.value(QStringLiteral("protocol")).toString();
 
-            const QJsonObject settings = value.toObject();
-            ok &= m_storage->setProtocolSettings(protocol, settings);
-        }
+        ok &= m_storage->setCloudProtocol(cloudProtocol);
+        ok &= m_storage->setProtocolSettings(cloudProtocol, cloudObj.value(QStringLiteral("settings")).toObject());
+
+        const QJsonObject edgeObj = settingsObj.value(QStringLiteral("edge")).toObject();
+        const QString edgeProtocol = edgeObj.value(QStringLiteral("protocol")).toString();
+
+        ok &= m_storage->setEdgeProtocol(edgeProtocol);
+        ok &= m_storage->setProtocolSettings(edgeProtocol, edgeObj.value(QStringLiteral("settings")).toObject());
 
         if (!ok)
         {
@@ -283,14 +284,14 @@ void Control::registerRoutes()
         }
 
         QJsonObject resObj{};
-        resObj.insert("status", "ok");
-        resObj.insert("message", "Settings successfully saved!");
+        resObj.insert(QStringLiteral("status"), QStringLiteral("ok"));
+        resObj.insert(QStringLiteral("message"), QStringLiteral("Settings successfully saved!"));
 
         const auto data = QJsonDocument(resObj).toJson(QJsonDocument::Compact);
 
         QHttpHeaders headers{};
-        headers.append("Access-Control-Allow-Origin", "*");
-        headers.append("Content-Type", "application/json");
+        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
+        headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
 
         QHttpServerResponse response(data);
         response.setHeaders(headers);
@@ -298,14 +299,14 @@ void Control::registerRoutes()
         return response;
     };
 
-    m_httpServer.route("/", QHttpServerRequest::Method::Get, index);
-    m_httpServer.route("/iiotgateway/login", QHttpServerRequest::Method::Options, options);
-    m_httpServer.route("/iiotgateway/login", QHttpServerRequest::Method::Post, loginPost);
-    m_httpServer.route("/iiotgateway/status", QHttpServerRequest::Method::Options, options);
-    m_httpServer.route("/iiotgateway/status", QHttpServerRequest::Method::Get, statusGet);
-    m_httpServer.route("/iiotgateway/command", QHttpServerRequest::Method::Options, options);
-    m_httpServer.route("/iiotgateway/command", QHttpServerRequest::Method::Post, commandPost);
-    m_httpServer.route("/iiotgateway/settings", QHttpServerRequest::Method::Options, options);
-    m_httpServer.route("/iiotgateway/settings", QHttpServerRequest::Method::Get, settingsGet);
-    m_httpServer.route("/iiotgateway/settings", QHttpServerRequest::Method::Post, settingsPost);
+    m_httpServer.route(QStringLiteral("/"), QHttpServerRequest::Method::Get, index);
+    m_httpServer.route(QStringLiteral("/iiotgateway/login"), QHttpServerRequest::Method::Options, options);
+    m_httpServer.route(QStringLiteral("/iiotgateway/login"), QHttpServerRequest::Method::Post, loginPost);
+    m_httpServer.route(QStringLiteral("/iiotgateway/status"), QHttpServerRequest::Method::Options, options);
+    m_httpServer.route(QStringLiteral("/iiotgateway/status"), QHttpServerRequest::Method::Get, statusGet);
+    m_httpServer.route(QStringLiteral("/iiotgateway/command"), QHttpServerRequest::Method::Options, options);
+    m_httpServer.route(QStringLiteral("/iiotgateway/command"), QHttpServerRequest::Method::Post, commandPost);
+    m_httpServer.route(QStringLiteral("/iiotgateway/settings"), QHttpServerRequest::Method::Options, options);
+    m_httpServer.route(QStringLiteral("/iiotgateway/settings"), QHttpServerRequest::Method::Get, settingsGet);
+    m_httpServer.route(QStringLiteral("/iiotgateway/settings"), QHttpServerRequest::Method::Post, settingsPost);
 }

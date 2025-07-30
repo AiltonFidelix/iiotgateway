@@ -44,7 +44,7 @@ void CommModbus::disconnectComm()
     emit disconnected();
 }
 
-bool CommModbus::isconnected()
+bool CommModbus::isconnected() const
 {
     return (m_modbusClient->state() == QModbusDevice::ConnectedState);
 }
@@ -126,12 +126,12 @@ void CommModbus::readRegisters(const Request &request)
             }
         }
 
-        device.insert("address", address);
-        device.insert("registers", registersToJsonArray(registers));
+        device.insert(QStringLiteral("address"), address);
+        device.insert(QStringLiteral("registers"), registersToJsonArray(registers));
 
         if (!errors.isEmpty())
         {
-            device.insert("errors", errors);
+            device.insert(QStringLiteral("errors"), errors);
         }
 
         devices.append(device);
@@ -141,8 +141,8 @@ void CommModbus::readRegisters(const Request &request)
     {
         QJsonObject json{};
 
-        json.insert("datetime", QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss.zzz"));
-        json.insert("devices", devices);
+        json.insert(QStringLiteral("datetime"), QDateTime::currentDateTime().toString(QStringLiteral("dd/MM/yyyy hh:mm:ss.zzz")));
+        json.insert(QStringLiteral("devices"), devices);
 
         emit outgoing(QJsonDocument(json).toJson(QJsonDocument::Compact));
     }
@@ -261,8 +261,8 @@ QJsonArray CommModbus::registersToJsonArray(const Registers &registers)
     for (const auto &key : keys)
     {
         QJsonObject reg{};
-        reg.insert("register", key);
-        reg.insert("value", registers.value(key));
+        reg.insert(QStringLiteral("register"), key);
+        reg.insert(QStringLiteral("value"), registers.value(key));
         regs.append(reg);
     }
 

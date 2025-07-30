@@ -9,7 +9,7 @@ class CommInterface : public QObject
 public:
     virtual ~CommInterface() = default;
 
-    virtual bool isconnected() = 0;
+    virtual bool isconnected() const = 0;
 
 signals:
     void connected();

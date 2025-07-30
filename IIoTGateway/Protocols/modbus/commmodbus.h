@@ -34,7 +34,7 @@ public:
     explicit CommModbus(const QJsonObject &settings = QJsonObject());
     ~CommModbus();
 
-    bool isconnected() override;
+    bool isconnected() const override;
 
     CommModbusClientInterface *modbusClient();
     void setModbusClient(CommModbusClientInterface *client);

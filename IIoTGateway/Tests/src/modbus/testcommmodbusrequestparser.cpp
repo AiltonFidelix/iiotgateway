@@ -9,7 +9,7 @@ using comm::commmodbus::Request;
 using comm::commmodbus::RequestType;
 using comm::commmodbus::Units;
 
-using TestCases = std::tuple<QByteArray, Request*>;
+using TestCases = std::tuple<QString, Request*>;
 
 class TestCommModbusRequestParser : public testing::TestWithParam<TestCases>
 {
@@ -38,7 +38,7 @@ TEST_P(TestCommModbusRequestParser, TestRequestParser)
 
     const auto param = GetParam();
 
-    const auto filePath = std::get<QByteArray>(param);
+    const auto filePath = std::get<QString>(param);
     auto expectedRequest = std::get<Request*>(param);
 
     ASSERT_TRUE(expectedRequest != nullptr);
@@ -86,7 +86,7 @@ std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases()
 
         request->insert(240, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 0, 10)}));
 
-        testCases.push_back(std::make_tuple(":/cases/requests/readone.json", request));
+        testCases.push_back(std::make_tuple(QStringLiteral(":/cases/requests/readone.json"), request));
     }
 
     {
@@ -101,7 +101,7 @@ std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases()
                                   QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 20, 10),
                                   QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 30, 10)}));
 
-        testCases.push_back(std::make_tuple(":/cases/requests/readmultiple.json", request));
+        testCases.push_back(std::make_tuple(QStringLiteral(":/cases/requests/readmultiple.json"), request));
     }
 
     {
@@ -110,7 +110,7 @@ std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases()
 
         request->insert(55, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 3, { 88, 2, 65533, 4, 5, 0, 7, 8, 255, 10 })}));
 
-        testCases.push_back(std::make_tuple(":/cases/requests/writeone.json", request));
+        testCases.push_back(std::make_tuple(QStringLiteral(":/cases/requests/writeone.json"), request));
     }
 
     {
@@ -122,7 +122,7 @@ std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases()
         request->insert(60, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 0, { 88, 2, 65533, 4, 55, 0, 7, 8, 255, 1080 }),
                                    QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 10, { 68, 72, 780, 2556, 101, 99, 0, 23 })}));
 
-        testCases.push_back(std::make_tuple(":/cases/requests/writemultiple.json", request));
+        testCases.push_back(std::make_tuple(QStringLiteral(":/cases/requests/writemultiple.json"), request));
     }
 
     return testCases;
