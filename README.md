@@ -9,6 +9,15 @@ docker exec -it mosquitto mosquitto_sub -h localhost -t gateway/topic
 docker exec -it mosquitto mosquitto_pub -h localhost -t gateway/topic -m "Hello from Docker!"
 ```
 
+### Mosquitto settings
+
+mosquitto.conf
+
+```
+allow_anonymous true
+listener 1883 0.0.0.0
+```
+
 ### Request JSON
 
 Reading example:
