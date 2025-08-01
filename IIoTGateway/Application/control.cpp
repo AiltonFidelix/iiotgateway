@@ -248,8 +248,6 @@ void Control::registerRoutes()
     /// /iiotgateway/settings POST handler
     auto settingsPost = [this](const QHttpServerRequest &request)
     {
-        qInfo() << "New settings received";
-
         QJsonParseError parser{};
 
         const QByteArray body = request.body();
@@ -264,6 +262,8 @@ void Control::registerRoutes()
         bool ok = true;
 
         const QJsonObject settingsObj = json.object();
+
+        qInfo() << Q_FUNC_INFO << "New settings received:" << settingsObj;
 
         const QJsonObject cloudObj = settingsObj.value(QStringLiteral("cloud")).toObject();
         const QString cloudProtocol = cloudObj.value(QStringLiteral("protocol")).toString();
