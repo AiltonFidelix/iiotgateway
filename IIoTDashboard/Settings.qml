@@ -106,7 +106,7 @@ Item {
             spacing: 10
 
             Column {
-                id: colEdgeProtocol
+                id: colEdgeCommunication
                 spacing: 8
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.horizontalCenter
@@ -114,36 +114,37 @@ Item {
                 height: parent.height - rowHeader.height
 
                 Text {
-                    id: txtEdgeProtocol
-                    text: qsTr("Edge Protocol")
+                    id: txtEdgeCommunication
+                    text: qsTr("Edge Communication")
                     font.pointSize: 15
                     color: Material.color(Material.DeepPurple)
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
+                // TODO: improve to be dynamic
                 ComboBox {
-                    id: cbxEdgeProtocol
+                    id: cbxEdgeCommunication
                     model: ["Modbus RTU"]
                     width: 200
                     height: 35
-                    anchors.horizontalCenter: txtEdgeProtocol.horizontalCenter
-                    anchors.top: txtEdgeProtocol.bottom
+                    anchors.horizontalCenter: txtEdgeCommunication.horizontalCenter
+                    anchors.top: txtEdgeCommunication.bottom
                     anchors.margins: 5
                 }
 
                 ModbusRTU {
                     id: modbusRTUSettings
-                    anchors.top: cbxEdgeProtocol.bottom
-                    anchors.horizontalCenter: cbxEdgeProtocol.horizontalCenter
+                    anchors.top: cbxEdgeCommunication.bottom
+                    anchors.horizontalCenter: cbxEdgeCommunication.horizontalCenter
                     anchors.margins: 5
-                    visible: cbxEdgeProtocol.currentText === "Modbus RTU"
+                    visible: cbxEdgeCommunication.currentText === "Modbus RTU"
                     width: parent.width - 20
-                    height: parent.height - txtEdgeProtocol.height - cbxEdgeProtocol.height
+                    height: parent.height - txtEdgeCommunication.height - cbxEdgeCommunication.height
                 }
             }
 
             Column {
-                id: colCloudProtocol
+                id: colCloudCommunication
                 spacing: 8
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.horizontalCenter
@@ -151,31 +152,32 @@ Item {
                 height: parent.height - rowHeader.height
 
                 Text {
-                    id: txtCloudProtocol
-                    text: qsTr("Cloud Protocol")
+                    id: txtCloudCommunication
+                    text: qsTr("Cloud Communication")
                     font.pointSize: 15
                     color: Material.color(Material.DeepPurple)
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
+                // TODO: improve to be dynamic
                 ComboBox {
-                    id: cbxCloudProtocol
+                    id: cbxCloudCommunication
                     model: ["MQTT"]
                     width: 200
                     height: 35
-                    anchors.horizontalCenter: txtCloudProtocol.horizontalCenter
-                    anchors.top: txtCloudProtocol.bottom
+                    anchors.horizontalCenter: txtCloudCommunication.horizontalCenter
+                    anchors.top: txtCloudCommunication.bottom
                     anchors.margins: 5
                 }
 
                 MQTT {
                     id: mqttSettings
-                    anchors.top: cbxCloudProtocol.bottom
-                    anchors.horizontalCenter: cbxCloudProtocol.horizontalCenter
+                    anchors.top: cbxCloudCommunication.bottom
+                    anchors.horizontalCenter: cbxCloudCommunication.horizontalCenter
                     anchors.margins: 5
-                    visible: cbxCloudProtocol.currentText === "MQTT"
+                    visible: cbxCloudCommunication.currentText === "MQTT"
                     width: parent.width - 20
-                    height: parent.height - txtCloudProtocol.height - cbxCloudProtocol.height
+                    height: parent.height - txtCloudCommunication.height - cbxCloudCommunication.height
                 }
             }
         }
@@ -264,10 +266,19 @@ Item {
         target: btnSave
 
         function onClicked() {
+            // TODO: improve to be dynamic
+
             let deviceSettings = {
-                MQTT: mqttSettings.getSettings(),
-                MODBUS_RTU: modbusRTUSettings.getSettings()
+                cloud: {
+                    protocol: "MQTT",
+                    settings: mqttSettings.getSettings()
+                },
+                edge: {
+                    protocol: "MODBUS_RTU",
+                    settings: modbusRTUSettings.getSettings()
+                }
             }
+
             deviceController.setSettings(JSON.stringify(deviceSettings))
         }
     }
