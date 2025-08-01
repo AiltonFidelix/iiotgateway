@@ -16,6 +16,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${COMPONENTS})
 
 add_subdirectory(Application)
 add_subdirectory(Communication)
+add_subdirectory(Drivers)
 add_subdirectory(Main)
 add_subdirectory(Tests)
 
