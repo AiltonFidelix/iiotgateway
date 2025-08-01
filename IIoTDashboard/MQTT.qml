@@ -120,6 +120,7 @@ Item {
                         id: spbPort
                         width: 150
                         height: parent.height
+                        editable: true
                         value: 1883
                         from: 1
                         to: 65535
@@ -240,6 +241,7 @@ Item {
                         id: spbTimeout
                         width: 150
                         height: parent.height
+                        editable: true
                         value: 10
                         from: 1
                         to: 3600
@@ -272,6 +274,7 @@ Item {
                         id: spbKeepAlive
                         width: 150
                         height: parent.height
+                        editable: true
                         value: 60
                         from: 1
                         to: 3600
@@ -354,6 +357,7 @@ Item {
                                 id: spbQosPublish
                                 width: 150
                                 height: parent.height
+                                editable: true
                                 value: 0
                                 from: 0
                                 to: 2
@@ -412,6 +416,7 @@ Item {
                                 id: spbQosSubscribe
                                 width: 150
                                 height: parent.height
+                                editable: true
                                 value: 0
                                 from: 0
                                 to: 2
