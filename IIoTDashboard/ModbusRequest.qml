@@ -20,17 +20,17 @@ Rectangle {
         horizontalCenter: parent.horizontalCenter
     }
 
-    property int address: 0
+    property int address: 1
     property int startRegister: 0
-    property int numberOfEntries: 0
-    property string regysterType: "HoldingRegisters"
+    property int numberOfEntries: 1
+    property string regysterType: "holdingregisters"
 
     property int itemsHeight: 35
 
     function getSettings() {
         const data = {
             address: spbAddress.value,
-            type: cbxRegisterType.currentText,
+            type: cbxRegisterType.currentValue,
             startRegister: spbStartRegister.value,
             numberOfEntries: spbEntries.value
         }
@@ -40,7 +40,7 @@ Rectangle {
 
     function setSettings(data) {
         spbAddress.value = data.address
-        cbxRegisterType.currentText = data.type
+        cbxRegisterType.currentText = cbxRegisterType.find(data.type)
         spbStartRegister.value = data.startRegister
         spbEntries.value = data.numberOfEntries
     }
@@ -92,11 +92,22 @@ Rectangle {
 
                 ComboBox {
                     id: cbxRegisterType
-                    model: ["HoldingRegisters"] // TODO: Add items left
-                    // TODO: Add current value
+
                     Layout.preferredHeight: root.itemsHeight
                     Layout.minimumWidth: 200
                     anchors.verticalCenter: parent.verticalCenter
+
+                    textRole: "text"
+                    valueRole: "value"
+
+                    Component.onCompleted: currentIndex = indexOfValue(root.regysterType)
+
+                    model: [
+                        { value: "coils", text: "Coils" },
+                        { value: "discreteinputs", text: "Discrete Inputs" },
+                        { value: "holdingregisters", text: "Holding Registers" },
+                        { value: "inputregisters", text: "Input Registers" }
+                    ]
                 }
             }
 
