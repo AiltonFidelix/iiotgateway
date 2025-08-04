@@ -7,7 +7,14 @@ Item {
 
     property int itemsHeight: 35
 
+    // TODO: Change all JSON objects for QObject DTOs
     function getSettings() {
+        let requests = []
+
+        for (var i = 0; i < listRepeater.count; ++i) {
+            requests.push(listRepeater.itemAt(i).getSettings())
+        }
+
         const data = {
             "pollingEnabled": chbPolling.checked,
             "pollingTimeout": spbPolling.value,
@@ -17,12 +24,9 @@ Item {
             "dataBits": spbDatabits.value,
             "stopBits": spbStopbits.value,
             "retries": spbRetries.value,
-            "timeout": spbTimeout.value
+            "timeout": spbTimeout.value,
+            "requests": requests
         }
-
-        // for (let i = 0; i < listRepeater.count; ++i) {
-        //     console.log(i, JSON.stringify(listRepeater.itemAt(i).getSettings()))
-        // }
 
         return data
     }
@@ -37,20 +41,32 @@ Item {
         spbStopbits.value = data.retries
         spbTimeout.value = data.timeout
 
-        // TODO: Add list of requests
-        // listModel.append([{
-        //                       "addressValue": 105,
-        //                       "startRegisterValue": 10,
-        //                       "numberOfEntriesValue": 12
-        //                   }, {
-        //                       "addressValue": 240,
-        //                       "startRegisterValue": 0,
-        //                       "numberOfEntriesValue": 40
-        //                   }, {
-        //                       "addressValue": 18,
-        //                       "startRegisterValue": 8,
-        //                       "numberOfEntriesValue": 1
-        //                   }])
+        data.requests.forEach(function (request) {
+            root.addRequestItem(request)
+        })
+    }
+
+    function addRequestItem(data) {
+
+        if (typeof (data) === "undefined") {
+            listModel.append({
+                                 "addressValue": 1,
+                                 "startRegisterValue": 0,
+                                 "numberOfEntriesValue": 1,
+                                 "registerTypeValue": "holdingregisters"
+                             })
+        } else {
+            listModel.append({
+                                 "addressValue": data.address,
+                                 "startRegisterValue": data.startRegister,
+                                 "numberOfEntriesValue": data.numberOfEntries,
+                                 "registerTypeValue": data.registerType
+                             })
+        }
+    }
+
+    function removeRequestItem() {
+        listModel.remove(listModel.count - 1)
     }
 
     GroupBox {
@@ -271,7 +287,48 @@ Item {
                             regysterType: registerTypeValue
                         }
                     }
+
+                    Row {
+                        spacing: 10
+                        width: parent.width
+                        rightPadding: 20
+                        layoutDirection: Qt.RightToLeft
+
+                        Button {
+                            id: addRequest
+
+                            text: "<b>+</b>"
+                            enabled: chbPolling.checked
+                            visible: chbPolling.checked
+                            highlighted: true
+
+                            onClicked: root.addRequestItem()
+                        }
+
+                        Button {
+                            id: removeRequest
+
+                            text: "<b>-</b>"
+                            enabled: chbPolling.checked && (listModel.count > 1)
+                            visible: chbPolling.checked && (listModel.count > 1)
+                            highlighted: true
+
+                            onClicked: root.removeRequestItem()
+                        }
+                    }
                 }
+            }
+        }
+    }
+
+    Connections {
+        target: chbPolling
+
+        function onClicked() {
+            if (chbPolling.checked) {
+                root.addRequestItem()
+            } else {
+                listModel.clear()
             }
         }
     }
