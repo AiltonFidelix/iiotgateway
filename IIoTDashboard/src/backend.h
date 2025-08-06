@@ -1,11 +1,11 @@
-#ifndef GATEWAYCONTROLLER_H
-#define GATEWAYCONTROLLER_H
+#ifndef BACKEND_H
+#define BACKEND_H
 
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
-class GatewayController : public QObject
+class Backend : public QObject
 {
     Q_OBJECT
 
@@ -16,7 +16,7 @@ class GatewayController : public QObject
     QString errorHandler(QNetworkReply::NetworkError e);
 
 public:
-    explicit GatewayController(QObject *parent = nullptr);
+    explicit Backend(QObject *parent = nullptr);
 
 signals:
     void settings(QByteArray settings);
@@ -34,4 +34,4 @@ public slots:
     void restart();
 };
 
-#endif // GATEWAYCONTROLLER_H
+#endif // BACKEND_H

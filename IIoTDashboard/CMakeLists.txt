@@ -10,11 +10,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(HEADERS
-    src/gatewaycontroller.h
+    src/backend.h
 )
 
 set(SOURCES
-    src/gatewaycontroller.cpp
+    src/backend.cpp
     src/main.cpp
 )
 

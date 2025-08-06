@@ -1,11 +1,14 @@
 <RCC>
     <qresource prefix="/">
-        <file>Main.qml</file>
-        <file>Login.qml</file>
-        <file>Settings.qml</file>
-        <file>ModbusRTU.qml</file>
-        <file>MQTT.qml</file>
-        <file>Footer.qml</file>
-        <file>ModbusRequest.qml</file>
+        <file>ui/Main.qml</file>
+        <file>ui/Settings.qml</file>
+        <file>ui/ModbusRTU.qml</file>
+        <file>ui/MQTT.qml</file>
+        <file>ui/ModbusRequest.qml</file>
+        <file>ui/components/Footer.qml</file>
+        <file>ui/components/InfoPopUp.qml</file>
+        <file>ui/pages/Login.qml</file>
+        <file>ui/pages/Settings.qml</file>
+        <file>ui/pages/Communication.qml</file>
     </qresource>
 </RCC>

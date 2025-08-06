@@ -35,14 +35,14 @@ Rectangle {
             numberOfEntries: spbEntries.value
         }
 
-        return data
+        return data;
     }
 
     function setSettings(data) {
-        spbAddress.value = data.address
-        cbxRegisterType.currentText = cbxRegisterType.find(data.type)
-        spbStartRegister.value = data.startRegister
-        spbEntries.value = data.numberOfEntries
+        spbAddress.value = data.address;
+        cbxRegisterType.currentText = cbxRegisterType.find(data.type);
+        spbStartRegister.value = data.startRegister;
+        spbEntries.value = data.numberOfEntries;
     }
 
     Item {

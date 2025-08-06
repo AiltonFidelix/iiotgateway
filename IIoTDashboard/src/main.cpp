@@ -2,7 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 
-#include "gatewaycontroller.h"
+#include "backend.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,10 +15,10 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
-    const QUrl url(QStringLiteral("qrc:/Main.qml"));
+    const QUrl url(QStringLiteral("qrc:/ui/Main.qml"));
 
-    GatewayController gtwController;
-    engine.rootContext()->setContextProperty("deviceController", &gtwController);
+    Backend backend;
+    engine.rootContext()->setContextProperty("backend", &backend);
 
     QObject::connect(
         &engine,

@@ -2,6 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 
+import "./ui/components"
+
 Item {
     id: root
 
@@ -11,33 +13,10 @@ Item {
 
     signal logout
 
-    Popup {
+    InfoPopUp {
         id: statusPopup
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        anchors.centerIn: parent
-        width: 280
-        height: 180
-        modal: true
-        focus: true
-
-        Label {
-            id: statusLabel
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: (root.y / 2) + btnStatus.height
-            text: root.statusText
-            font.bold: true
-            color: root.statusColor
-        }
-
-        Button {
-            id: btnStatus
-            text: qsTr("Ok")
-            anchors.bottom: parent.bottom
-            anchors.margins: 2
-            anchors.horizontalCenter: parent.horizontalCenter
-            highlighted: true
-            enabled: true
-        }
+        statusText: root.statusText
+        statusColor: root.statusColor
     }
 
     Column {
@@ -204,7 +183,7 @@ Item {
             highlighted: root.gtwRunning
             enabled: root.gtwRunning
 
-            onClicked: deviceController.restart()
+            onClicked: backend.restart()
         }
 
         Button {
@@ -218,7 +197,7 @@ Item {
             highlighted: !root.gtwRunning
             enabled: !root.gtwRunning
 
-            onClicked: deviceController.start()
+            onClicked: backend.start()
         }
 
         Button {
@@ -232,7 +211,7 @@ Item {
             highlighted: root.gtwRunning
             enabled: root.gtwRunning
 
-            onClicked: deviceController.stop()
+            onClicked: backend.stop()
         }
 
         Footer {
@@ -249,7 +228,7 @@ Item {
 
         function onVisibleChanged() {
             if (root.visible) {
-                deviceController.requestSettings(["MQTT", "MODBUS_RTU"])
+                backend.requestSettings(["MQTT", "MODBUS_RTU"])
             }
         }
     }
@@ -279,7 +258,7 @@ Item {
                 }
             }
 
-            deviceController.setSettings(JSON.stringify(deviceSettings))
+            backend.setSettings(JSON.stringify(deviceSettings))
         }
     }
 
@@ -292,28 +271,29 @@ Item {
     }
 
     Connections {
-        target: deviceController
+        target: backend
 
         function onStatus(status) {
-            let data = JSON.parse(String(status))
-            root.gtwRunning = (data.status  === "running")
+            let data = JSON.parse(String(status));
+            root.gtwRunning = (data.status  === "running");
         }
     }
 
     Connections {
-        target: deviceController
+        target: backend
 
         function onSettings(settings) {
-            let data = JSON.parse(String(settings))
+            let data = JSON.parse(String(settings));
 
-            mqttSettings.setSettings(data.MQTT)
-            modbusRTUSettings.setSettings(data.MODBUS_RTU)
+            console.log("Received:", data);
+
+            mqttSettings.setSettings(data.MQTT);
+            modbusRTUSettings.setSettings(data.MODBUS_RTU);
         }
     }
 
     Connections {
-        id: connSuccess
-        target: deviceController
+        target: backend
         enabled: root.visible
 
         function onSuccess(message) {
@@ -326,8 +306,7 @@ Item {
     }
 
     Connections {
-        id: connError
-        target: deviceController
+        target: backend
         enabled: root.visible
 
         function onError(error) {

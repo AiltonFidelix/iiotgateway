@@ -7,12 +7,34 @@ Item {
 
     property int itemsHeight: 35
 
+    function addRequestItem(data) {
+        if (typeof (data) === "undefined") {
+            listModel.append({
+                                 "addressValue": 1,
+                                 "startRegisterValue": 0,
+                                 "numberOfEntriesValue": 1,
+                                 "registerTypeValue": "holdingregisters"
+                             });
+        } else {
+            listModel.append({
+                                 "addressValue": data.address,
+                                 "startRegisterValue": data.startRegister,
+                                 "numberOfEntriesValue": data.numberOfEntries,
+                                 "registerTypeValue": data.registerType
+                             });
+        }
+    }
+
+    function removeRequestItem() {
+        listModel.remove(listModel.count - 1);
+    }
+
     // TODO: Change all JSON objects for QObject DTOs
     function getSettings() {
-        let requests = []
+        let requests = [];
 
         for (var i = 0; i < listRepeater.count; ++i) {
-            requests.push(listRepeater.itemAt(i).getSettings())
+            requests.push(listRepeater.itemAt(i).getSettings());
         }
 
         const data = {
@@ -28,45 +50,25 @@ Item {
             "requests": requests
         }
 
-        return data
+        return data;
     }
 
     function setSettings(data) {
-        chbPolling.checked = data.pollingEnabled
-        spbPolling.value = data.pollingTimeout
-        txtSerialPort.text = data.port
-        txtBaudrate.text = data.baudrate
-        cbxParity.currentIndex = cbxParity.find(data.parity)
-        spbDatabits.value = data.dataBits
-        spbStopbits.value = data.retries
-        spbTimeout.value = data.timeout
+        chbPolling.checked = data.pollingEnabled;
+        spbPolling.value = data.pollingTimeout;
+        txtSerialPort.text = data.port;
+        txtBaudrate.text = data.baudrate;
+        cbxParity.currentIndex = cbxParity.find(data.parity);
+        spbDatabits.value = data.dataBits;
+        spbStopbits.value = data.stopBits;
+        spbRetries.value = data.retries;
+        spbTimeout.value = data.timeout;
+
+        listModel.clear();
 
         data.requests.forEach(function (request) {
-            root.addRequestItem(request)
+            root.addRequestItem(request);
         })
-    }
-
-    function addRequestItem(data) {
-
-        if (typeof (data) === "undefined") {
-            listModel.append({
-                                 "addressValue": 1,
-                                 "startRegisterValue": 0,
-                                 "numberOfEntriesValue": 1,
-                                 "registerTypeValue": "holdingregisters"
-                             })
-        } else {
-            listModel.append({
-                                 "addressValue": data.address,
-                                 "startRegisterValue": data.startRegister,
-                                 "numberOfEntriesValue": data.numberOfEntries,
-                                 "registerTypeValue": data.registerType
-                             })
-        }
-    }
-
-    function removeRequestItem() {
-        listModel.remove(listModel.count - 1)
     }
 
     GroupBox {
@@ -116,7 +118,6 @@ Item {
                     }
 
                     Row {
-                        id: rowBaud
                         spacing: 10
                         width: parent.width
                         height: root.itemsHeight
@@ -137,7 +138,6 @@ Item {
                     }
 
                     Row {
-                        id: rowParams
                         spacing: 10
                         width: parent.width
                         height: root.itemsHeight
@@ -194,7 +194,6 @@ Item {
                     }
 
                     Row {
-                        id: rowTimeout
                         spacing: 10
                         width: parent.width
                         height: root.itemsHeight
@@ -243,7 +242,6 @@ Item {
                     }
 
                     Row {
-                        id: rowPolling
                         spacing: 10
                         width: parent.width
                         height: root.itemsHeight
@@ -326,9 +324,9 @@ Item {
 
         function onClicked() {
             if (chbPolling.checked) {
-                root.addRequestItem()
+                root.addRequestItem();
             } else {
-                listModel.clear()
+                listModel.clear();
             }
         }
     }

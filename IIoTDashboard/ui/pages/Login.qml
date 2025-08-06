@@ -1,48 +1,25 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.Material
+import "../components"
 
-Item {
+Page {
     id: root
 
-    property string username: "a"
-    property string password: "a"
+    property string username: ""
+    property string password: ""
     property string error: "Failed!"
 
-    signal login
+    signal loginSuccess
 
     function clear() {
         usernameField.clear()
         passwordField.clear()
     }
 
-    Popup {
+    InfoPopUp {
         id: errorPopup
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        anchors.centerIn: parent
-        width: 380
-        height: 220
-        modal: true
-        focus: true
-
-        Label {
-            id: errorLabel
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: (root.y / 2) + btnPopup.height
-            text: root.error
-            font.bold: true
-            color: Material.color(Material.Red)
-        }
-
-        Button {
-            id: btnPopup
-            text: qsTr("Ok")
-            anchors.bottom: parent.bottom
-            anchors.margins: 2
-            anchors.horizontalCenter: parent.horizontalCenter
-            highlighted: true
-            enabled: true
-        }
+        statusText: root.error
+        statusColor: Material.color(Material.Red)
     }
 
     Rectangle {
@@ -83,41 +60,26 @@ Item {
         }
     }
 
-    Footer {
-        anchors.bottom: root.bottom
-        anchors.horizontalCenter: root.horizontalCenter
-        anchors.margins: 5
-    }
-
-    // Slots Connections
-
-    Connections {
-        target: btnPopup
-
-        function onClicked() {
-            errorPopup.close()
-        }
-    }
-
     Connections {
         id: connSuccess
-        target: deviceController
+        target: backend
         enabled: root.visible
 
         function onSuccess(message) {
-            root.login()
+            root.clear();
+            root.loginSuccess();
         }
     }
 
     Connections {
         id: connError
-        target: deviceController
+        target: backend
         enabled: root.visible
 
         function onError(error) {
-            root.error = qsTr(error)
-            errorPopup.open()
-            root.clear()
+            root.error = qsTr(error);
+            errorPopup.open();
+            root.clear();
         }
     }
 
@@ -125,7 +87,7 @@ Item {
         target: btnLogin
 
         function onClicked() {
-            deviceController.login(usernameField.text, passwordField.text)
+            backend.login(usernameField.text, passwordField.text);
         }
     }
 }

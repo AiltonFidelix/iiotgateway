@@ -1,4 +1,4 @@
-#include "gatewaycontroller.h"
+#include "backend.h"
 
 #include <QCryptographicHash>
 #include <QDebug>
@@ -6,8 +6,6 @@
 #include <QMetaEnum>
 #include <QJsonDocument>
 #include <QJsonObject>
-
-constexpr const char* DEFAULT_SERVER_URL = "http://localhost:8084";
 
 #ifdef Q_OS_WASM
 #include <emscripten/emscripten.h>
@@ -19,10 +17,10 @@ EM_JS(emscripten::EM_VAL, getServerUrl, (), {
 });
 #endif
 
-GatewayController::GatewayController(QObject *parent)
+Backend::Backend(QObject *parent)
     : QObject(parent),
     m_manager(),
-    m_serverUrl(DEFAULT_SERVER_URL)
+    m_serverUrl(QStringLiteral("http://localhost:8084"))
 {
 #ifdef Q_OS_WASM
     auto url = emscripten::val::take_ownership(getServerUrl());
@@ -32,7 +30,7 @@ GatewayController::GatewayController(QObject *parent)
     m_manager.setTransferTimeout(5000);
 }
 
-void GatewayController::login(const QString &username, const QString &password)
+void Backend::login(const QString &username, const QString &password)
 {
     QCryptographicHash hash(QCryptographicHash::Sha1);
     hash.addData(password.toUtf8());
@@ -40,8 +38,8 @@ void GatewayController::login(const QString &username, const QString &password)
     const QString hashPass(hash.result().toHex());
 
     QJsonObject obj{};
-    obj.insert("username", username);
-    obj.insert("password", hashPass);
+    obj.insert(QStringLiteral("username"), username);
+    obj.insert(QStringLiteral("password"), hashPass);
 
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/login").arg(m_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
@@ -73,11 +71,11 @@ void GatewayController::login(const QString &username, const QString &password)
         }
 
         const QJsonObject obj = doc.object();
-        const QString status = obj.value("status").toString();
+        const QString status = obj.value(QStringLiteral("status")).toString();
 
         if (status.toLower() == "error")
         {
-            const QString errorOcurred = obj.value("message").toString();
+            const QString errorOcurred = obj.value(QStringLiteral("message")).toString();
             const QString errorMessage = QString("Login failed!\n\n%1").arg(errorOcurred);
             emit error(errorMessage);
             return;
@@ -87,7 +85,7 @@ void GatewayController::login(const QString &username, const QString &password)
     });
 }
 
-void GatewayController::setSettings(const QByteArray &settings)
+void Backend::setSettings(const QByteArray &settings)
 {
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/settings").arg(m_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
@@ -105,14 +103,13 @@ void GatewayController::setSettings(const QByteArray &settings)
         reply->disconnect();
         reply->deleteLater();
 
-        emit success("Successfully saved!");
+        emit success(QStringLiteral("Successfully saved!"));
     });
 }
 
-void
-GatewayController::requestSettings(const QStringList &protocols)
+void Backend::requestSettings(const QStringList &protocols)
 {
-    QString query = !protocols.isEmpty() ? "?" : "";
+    QString query = !protocols.isEmpty() ? QStringLiteral("?") : QStringLiteral("");
 
     for (const auto &protocol : protocols)
     {
@@ -127,8 +124,12 @@ GatewayController::requestSettings(const QStringList &protocols)
     auto reply = m_manager.get(request);
 
     connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError e){
+        auto reply = qobject_cast<QNetworkReply*>(sender());
+        reply->deleteLater();
+
         const QString errorOcurred = errorHandler(e);
         const QString errorMessage = QString("Failed to load device settings!\n\n%1").arg(errorOcurred);
+
         emit error(errorMessage);
     });
 
@@ -143,7 +144,7 @@ GatewayController::requestSettings(const QStringList &protocols)
     });
 }
 
-void GatewayController::requestStatus()
+void Backend::requestStatus()
 {
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/status").arg(m_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
@@ -162,31 +163,28 @@ void GatewayController::requestStatus()
     });
 }
 
-void GatewayController::start()
+void Backend::start()
 {
-    const QString cmd = "start";
-    sendCommand(cmd);
+    sendCommand(QStringLiteral("start"));
 }
 
-void GatewayController::stop()
+void Backend::stop()
 {
-    const QString cmd = "stop";
-    sendCommand(cmd);
+    sendCommand(QStringLiteral("stop"));
 }
 
-void GatewayController::restart()
+void Backend::restart()
 {
-    const QString cmd = "restart";
-    sendCommand(cmd);
+    sendCommand(QStringLiteral("restart"));
 }
 
-void GatewayController::sendCommand(const QString &command)
+void Backend::sendCommand(const QString &command)
 {
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/command").arg(m_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
 
     QJsonObject obj{};
-    obj.insert("command", command);
+    obj.insert(QStringLiteral("command"), command);
 
     auto reply = m_manager.post(request, QJsonDocument(obj).toJson(QJsonDocument::Compact));
 
@@ -204,7 +202,7 @@ void GatewayController::sendCommand(const QString &command)
     });
 }
 
-QString GatewayController::errorHandler(QNetworkReply::NetworkError e)
+QString Backend::errorHandler(QNetworkReply::NetworkError e)
 {
     auto reply = qobject_cast<QNetworkReply*>(sender());
     reply->disconnect();

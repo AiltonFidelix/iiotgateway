@@ -235,6 +235,8 @@ void Control::registerRoutes()
 
         const QByteArray data = QJsonDocument(obj).toJson(QJsonDocument::Compact);
 
+        qInfo() << Q_FUNC_INFO << "Sending data:" << data;
+
         QHttpHeaders headers{};
         headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
         headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
