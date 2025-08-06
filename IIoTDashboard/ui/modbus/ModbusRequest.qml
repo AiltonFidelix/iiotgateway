@@ -5,7 +5,7 @@ import QtQuick.Layouts
 Rectangle {
     id: root
 
-    width: parent.width * 0.95
+    width: parent.width * 0.99
 
     height: item.implicitHeight
     radius: 8
@@ -30,7 +30,7 @@ Rectangle {
     function getSettings() {
         const data = {
             address: spbAddress.value,
-            type: cbxRegisterType.currentValue,
+            registerType: cbxRegisterType.currentValue,
             startRegister: spbStartRegister.value,
             numberOfEntries: spbEntries.value
         }
@@ -40,7 +40,7 @@ Rectangle {
 
     function setSettings(data) {
         spbAddress.value = data.address;
-        cbxRegisterType.currentText = cbxRegisterType.find(data.type);
+        cbxRegisterType.currentText = cbxRegisterType.find(data.registerType);
         spbStartRegister.value = data.startRegister;
         spbEntries.value = data.numberOfEntries;
     }
@@ -68,7 +68,6 @@ Rectangle {
 
                 Text {
                     text: qsTr("Device address:")
-                    anchors.verticalCenter: parent.verticalCenter
                     Layout.preferredWidth: 120
                 }
 
@@ -81,12 +80,10 @@ Rectangle {
                     from: 1
                     to: 247
                     stepSize: 1
-                    anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Text {
                     text: qsTr("Register type:")
-                    anchors.verticalCenter: parent.verticalCenter
                     Layout.preferredWidth: 145
                 }
 
@@ -95,7 +92,6 @@ Rectangle {
 
                     Layout.preferredHeight: root.itemsHeight
                     Layout.minimumWidth: 200
-                    anchors.verticalCenter: parent.verticalCenter
 
                     textRole: "text"
                     valueRole: "value"
@@ -121,7 +117,6 @@ Rectangle {
 
                 Text {
                     text: qsTr("Start register:")
-                    anchors.verticalCenter: parent.verticalCenter
                     Layout.preferredWidth: 120
                 }
 
@@ -134,12 +129,10 @@ Rectangle {
                     from: 0
                     to: 65534
                     stepSize: 1
-                    anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Text {
                     text: qsTr("Number of entries:")
-                    anchors.verticalCenter: parent.verticalCenter
                     Layout.preferredWidth: 145
                 }
 
@@ -152,7 +145,6 @@ Rectangle {
                     from: 0
                     to: 65534
                     stepSize: 1
-                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }

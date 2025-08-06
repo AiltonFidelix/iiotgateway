@@ -289,7 +289,7 @@ Item {
                     Row {
                         spacing: 10
                         width: parent.width
-                        rightPadding: 20
+                        rightPadding: 9
                         layoutDirection: Qt.RightToLeft
 
                         Button {
@@ -300,7 +300,7 @@ Item {
                             visible: chbPolling.checked
                             highlighted: true
 
-                            onClicked: root.addRequestItem()
+                            onClicked: root.addRequestItem();
                         }
 
                         Button {
@@ -311,7 +311,7 @@ Item {
                             visible: chbPolling.checked && (listModel.count > 1)
                             highlighted: true
 
-                            onClicked: root.removeRequestItem()
+                            onClicked: root.removeRequestItem();
                         }
                     }
                 }
