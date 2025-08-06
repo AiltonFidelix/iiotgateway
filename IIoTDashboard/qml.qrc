@@ -1,10 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file>ui/Main.qml</file>
-        <file>ui/components/Footer.qml</file>
         <file>ui/components/InfoPopUp.qml</file>
-        <file>ui/components/MenuButton.qml</file>
-        <file>ui/components/MenuItemDelegate.qml</file>
+        <file>ui/components/layout/Footer.qml</file>
+        <file>ui/components/menu/MenuButton.qml</file>
+        <file>ui/components/menu/MenuItemDelegate.qml</file>
+        <file>ui/components/network/WiFiGroupBox.qml</file>
         <file>ui/modbus/ModbusRTU.qml</file>
         <file>ui/modbus/ModbusRequest.qml</file>
         <file>ui/mqtt/MQTT.qml</file>

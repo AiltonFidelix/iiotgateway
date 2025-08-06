@@ -1,7 +1,8 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls.Material
-import "components"
+import "components/layout"
+import "components/menu"
 import "pages"
 
 ApplicationWindow {
