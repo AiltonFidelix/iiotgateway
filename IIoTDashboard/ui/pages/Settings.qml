@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../components/network"
 
 Page {
     id: root
@@ -23,6 +24,7 @@ Page {
 
         GroupBox {
             id: gpbNetwork
+
             Layout.leftMargin: 10
             Layout.rightMargin: 10
             Layout.fillWidth: true
@@ -34,62 +36,70 @@ Page {
                 radius: 8
             }
 
-            RowLayout {
+            ColumnLayout {
+                width: parent.width
                 spacing: 10
 
-                Text {
-                    text: qsTr("Network type:")
-                    anchors.verticalCenter: parent.verticalCenter
-                    Layout.preferredWidth: 110
+                RowLayout {
+                    spacing: 10
+
+                    Text {
+                        text: qsTr("Network type")
+                        Layout.preferredWidth: 110
+                    }
+
+                    ComboBox {
+                        id: connectionType
+
+                        Layout.preferredHeight: root.itemsHeight
+                        Layout.minimumWidth: 200
+                        textRole: "text"
+                        valueRole: "value"
+
+                        // Component.onCompleted: currentIndex = indexOfValue(root.regysterType)
+
+                        model: [
+                            { value: "eth0", text: "Ethernet" },
+                            { value: "wlan0", text: "Wi-Fi" }
+                        ]
+                    }
+
+                    Text {
+                        text: qsTr("Method type")
+                        Layout.preferredWidth: 110
+                    }
+
+                    ComboBox {
+                        id: methodType
+
+                        Layout.preferredHeight: root.itemsHeight
+                        Layout.minimumWidth: 200
+
+                        textRole: "text"
+                        valueRole: "value"
+
+                        // Component.onCompleted: currentIndex = indexOfValue(root.regysterType)
+
+                        model: [
+                            { value: "dhcp", text: "DHCP" },
+                            { value: "manual", text: "Manual" }
+                        ]
+                    }
+
+                    // TODO: Add SSID and password if Wi-Fi
+                    // TODO: Add IPv4 address if manually
+                    // TODO: Add Net mask if manually
+                    // TODO: Add Router/Gateway if manually
+                    // TODO: Add DNS if manually
                 }
 
-                ComboBox {
-                    id: connectionType
+                WiFiGroupBox {
+                    id: gpbWiFi
 
-                    Layout.preferredHeight: root.itemsHeight
-                    Layout.minimumWidth: 200
-                    anchors.verticalCenter: parent.verticalCenter
+                    Layout.fillWidth: true
 
-                    textRole: "text"
-                    valueRole: "value"
-
-                    // Component.onCompleted: currentIndex = indexOfValue(root.regysterType)
-
-                    model: [
-                        { value: "wlan0", text: "Wi-Fi" },
-                        { value: "eth0", text: "Ethernet" }
-                    ]
+                    visible: connectionType.currentIndex === 1
                 }
-
-                Text {
-                    text: qsTr("Method type:")
-                    anchors.verticalCenter: parent.verticalCenter
-                    Layout.preferredWidth: 110
-                }
-
-                ComboBox {
-                    id: methodType
-
-                    Layout.preferredHeight: root.itemsHeight
-                    Layout.minimumWidth: 200
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    textRole: "text"
-                    valueRole: "value"
-
-                    // Component.onCompleted: currentIndex = indexOfValue(root.regysterType)
-
-                    model: [
-                        { value: "dhcp", text: "DHCP" },
-                        { value: "manual", text: "Manually" }
-                    ]
-                }
-
-                // TODO: Add SSID and password if Wi-Fi
-                // TODO: Add IPv4 address if manually
-                // TODO: Add Net mask if manually
-                // TODO: Add Router/Gateway if manually
-                // TODO: Add DNS if manually
             }
         }
     }
@@ -98,8 +108,18 @@ Page {
         id: btnSave
         text: qsTr("Save")
         anchors.bottom: parent.bottom
-        anchors.margins: 5
+        anchors.margins: 8
         anchors.right: parent.right
+        highlighted: true
+        enabled: true
+    }
+
+    Button {
+        id: btnReboot
+        text: qsTr("Reboot")
+        anchors.bottom: parent.bottom
+        anchors.margins: 8
+        anchors.right: btnSave.left
         highlighted: true
         enabled: true
     }
