@@ -28,7 +28,6 @@ GroupBox {
 
         Text {
             text: qsTr("Topic")
-            anchors.verticalCenter: parent.verticalCenter
             enabled: checkbox.checked
         }
 
@@ -37,7 +36,6 @@ GroupBox {
 
             Layout.fillWidth: true
             Layout.preferredHeight: parent.height
-            anchors.verticalCenter: parent.verticalCenter
 
             height: parent.height
             text: root.topic
@@ -50,7 +48,6 @@ GroupBox {
 
         Text {
             text: qsTr("QOS")
-            anchors.verticalCenter: parent.verticalCenter
             enabled: checkbox.checked
         }
 
@@ -59,7 +56,6 @@ GroupBox {
 
             Layout.preferredWidth: 150
             Layout.preferredHeight: parent.height
-            anchors.verticalCenter: parent.verticalCenter
 
             editable: true
             value: root.qos

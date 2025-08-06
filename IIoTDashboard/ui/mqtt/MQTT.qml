@@ -296,62 +296,11 @@ Item {
 
                         PubSubGroup {
                             id: gpbPublish
-                            anchors.fill: parent
+                            width: parent.width
 
                             text: qsTr("Publish")
                             checked: false
                         }
-
-                        // GroupBox {
-                        //     id: gpbPublish
-                        //     anchors.fill: parent
-
-                        //     label: Switch {
-                        //         id: chbPublish
-                        //         text: qsTr("Publish")
-                        //         checked: false
-                        //     }
-
-                        //     Row {
-                        //         spacing: 10
-                        //         width: parent.width
-                        //         height: root.itemsHeight
-
-                        //         Text {
-                        //             text: qsTr("Topic")
-                        //             anchors.verticalCenter: parent.verticalCenter
-                        //             enabled: chbPublish.checked
-                        //         }
-
-                        //         TextField {
-                        //             id: txtPublishTopic
-                        //             anchors.verticalCenter: parent.verticalCenter
-                        //             width: 300
-                        //             height: parent.height
-                        //             text: ""
-                        //             enabled: chbPublish.checked
-                        //         }
-
-                        //         Text {
-                        //             text: qsTr("QOS")
-                        //             anchors.verticalCenter: parent.verticalCenter
-                        //             enabled: chbPublish.checked
-                        //         }
-
-                        //         SpinBox {
-                        //             id: spbQosPublish
-                        //             width: 150
-                        //             height: parent.height
-                        //             editable: true
-                        //             value: 0
-                        //             from: 0
-                        //             to: 2
-                        //             stepSize: 1
-                        //             anchors.verticalCenter: parent.verticalCenter
-                        //             enabled: chbPublish.checked
-                        //         }
-                        //     }
-                        // }
                     }
 
                     Row {
@@ -361,61 +310,11 @@ Item {
 
                         PubSubGroup {
                             id: gpbSubscribe
-                            anchors.fill: parent
+                            width: parent.width
 
                             text: qsTr("Subscribe")
                             checked: false
                         }
-
-                        // GroupBox {
-                        //     id: gpbSubscribe
-                        //     anchors.fill: parent
-
-                        //     label: Switch {
-                        //         id: chbSubscribe
-                        //         text: qsTr("Subscribe")
-                        //         checked: false
-                        //     }
-
-                        //     Row {
-                        //         spacing: 10
-                        //         width: parent.width
-                        //         height: root.itemsHeight
-
-                        //         Text {
-                        //             text: qsTr("Topic")
-                        //             anchors.verticalCenter: parent.verticalCenter
-                        //             enabled: chbSubscribe.checked
-                        //         }
-
-                        //         TextField {
-                        //             id: txtSubscribeTopic
-                        //             width: 300
-                        //             height: parent.height
-                        //             text: ""
-                        //             enabled: chbSubscribe.checked
-                        //         }
-
-                        //         Text {
-                        //             text: qsTr("QOS")
-                        //             anchors.verticalCenter: parent.verticalCenter
-                        //             enabled: chbSubscribe.checked
-                        //         }
-
-                        //         SpinBox {
-                        //             id: spbQosSubscribe
-                        //             width: 150
-                        //             height: parent.height
-                        //             editable: true
-                        //             value: 0
-                        //             from: 0
-                        //             to: 2
-                        //             stepSize: 1
-                        //             anchors.verticalCenter: parent.verticalCenter
-                        //             enabled: chbSubscribe.checked
-                        //         }
-                        //     }
-                        // }
                     }
                 }
             }
