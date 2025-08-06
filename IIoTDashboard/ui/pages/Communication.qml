@@ -14,6 +14,10 @@ Page {
 
     signal logout
 
+    Component.onCompleted: {
+        backend.requestSettings(["MQTT", "MODBUS_RTU"]);
+    }
+
     InfoPopUp {
         id: statusPopup
         statusText: root.statusText
@@ -28,6 +32,7 @@ Page {
             id: rowHeader
             width: parent.width
             height: 50
+            spacing: 5
 
             Rectangle {
                 id: gtwStatusIndicator
@@ -64,48 +69,8 @@ Page {
             spacing: 10
 
             Column {
-                id: colEdgeCommunication
-                spacing: 8
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.horizontalCenter
-                width: parent.width / 2
-                height: parent.height - rowHeader.height
-
-                Text {
-                    id: txtEdgeCommunication
-                    text: qsTr("Edge Communication")
-                    font.pointSize: 15
-                    color: Material.color(Material.DeepPurple)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                // TODO: improve to be dynamic
-                ComboBox {
-                    id: cbxEdgeCommunication
-                    model: ["Modbus RTU"]
-                    width: 200
-                    height: 35
-                    anchors.horizontalCenter: txtEdgeCommunication.horizontalCenter
-                    anchors.top: txtEdgeCommunication.bottom
-                    anchors.margins: 5
-                }
-
-                ModbusRTU {
-                    id: modbusRTUSettings
-                    anchors.top: cbxEdgeCommunication.bottom
-                    anchors.horizontalCenter: cbxEdgeCommunication.horizontalCenter
-                    anchors.margins: 5
-                    visible: cbxEdgeCommunication.currentText === "Modbus RTU"
-                    width: parent.width - 20
-                    height: parent.height - txtEdgeCommunication.height - cbxEdgeCommunication.height
-                }
-            }
-
-            Column {
                 id: colCloudCommunication
                 spacing: 8
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.horizontalCenter
                 width: parent.width / 2
                 height: parent.height - rowHeader.height
 
@@ -138,6 +103,42 @@ Page {
                     height: parent.height - txtCloudCommunication.height - cbxCloudCommunication.height
                 }
             }
+
+            Column {
+                id: colEdgeCommunication
+                spacing: 8
+                width: parent.width / 2
+                height: parent.height - rowHeader.height
+
+                Text {
+                    id: txtEdgeCommunication
+                    text: qsTr("Edge Communication")
+                    font.pointSize: 15
+                    color: Material.color(Material.DeepPurple)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                // TODO: improve to be dynamic
+                ComboBox {
+                    id: cbxEdgeCommunication
+                    model: ["Modbus RTU"]
+                    width: 200
+                    height: 35
+                    anchors.horizontalCenter: txtEdgeCommunication.horizontalCenter
+                    anchors.top: txtEdgeCommunication.bottom
+                    anchors.margins: 5
+                }
+
+                ModbusRTU {
+                    id: modbusRTUSettings
+                    anchors.top: cbxEdgeCommunication.bottom
+                    anchors.horizontalCenter: cbxEdgeCommunication.horizontalCenter
+                    anchors.margins: 5
+                    visible: cbxEdgeCommunication.currentText === "Modbus RTU"
+                    width: parent.width - 20
+                    height: parent.height - txtEdgeCommunication.height - cbxEdgeCommunication.height
+                }
+            }
         }
 
         Button {
@@ -149,7 +150,6 @@ Page {
             highlighted: true
             enabled: true
         }
-
 
         Button {
             id: btnRestart
@@ -187,17 +187,6 @@ Page {
             enabled: root.gtwRunning
 
             onClicked: backend.stop();
-        }
-    }
-
-    // Request protocols settings from backend
-    Connections {
-        target: root
-
-        function onVisibleChanged() {
-            if (root.visible) {
-                backend.requestSettings(["MQTT", "MODBUS_RTU"]);
-            }
         }
     }
 
