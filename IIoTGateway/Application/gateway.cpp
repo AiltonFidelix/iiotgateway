@@ -13,7 +13,7 @@ Gateway::Gateway(StorageInterface *storage, QObject *parent)
     m_threadCloud(nullptr),
     m_storage(storage)
 {
-    qInfo() << Q_FUNC_INFO << "Creating gateway instance...";
+    qInfo() << "Creating gateway instance...";
 }
 
 Gateway::~Gateway()
@@ -29,11 +29,11 @@ bool Gateway::isRunning()
 
 bool Gateway::start()
 {
-    qDebug() << Q_FUNC_INFO << "Starting gateway...";
+    qDebug() << "Starting gateway...";
 
     if (m_storage == nullptr)
     {
-        qWarning() << Q_FUNC_INFO << "Failed to start: No settings storage!";
+        qWarning() << "Failed to start: No settings storage!";
         return false;
     }
 
@@ -45,7 +45,7 @@ bool Gateway::start()
 
     if (cloudProtocol.isEmpty() || edgeProtocol.isEmpty())
     {
-        qWarning() << Q_FUNC_INFO << "Failed to start: Missing Protocol configuration!";
+        qWarning() << "Failed to start: Missing Protocol configuration!";
         return false;
     }
 
@@ -119,17 +119,17 @@ void Gateway::stop()
     m_isRunning = false;
     m_storage->setActive(m_isRunning);
 
-    qDebug() << Q_FUNC_INFO << "Stoping gateway...";
+    qDebug() << "Stoping gateway...";
 }
 
 bool Gateway::restart()
 {
-    qDebug() << Q_FUNC_INFO << "Restarting gateway...";
+    qDebug() << "Restarting gateway...";
     stop();
     return start();
 }
 
 void Gateway::notifyError(const QByteArray &error)
 {
-    qWarning() << Q_FUNC_INFO << error;
+    qWarning() << "Error notification:" << error;
 }

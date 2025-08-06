@@ -21,7 +21,7 @@ bool DBStorage::verify() const
 {
     if (!m_connection->open())
     {
-        qFatal() << Q_FUNC_INFO << "Database connection failed:" << m_connection->lastError();
+        qFatal() << "Database connection failed:" << m_connection->lastError();
         return false;
     }
 
@@ -144,7 +144,7 @@ QPair<QString, QString> DBStorage::userCredentials() const
     ret &= sqlquery.exec();
 
     if (!ret)
-        qWarning() << Q_FUNC_INFO << sqlquery.lastError().text();
+        qWarning() << "Query failed:" << sqlquery.lastError().text();
 
     ret &= sqlquery.next();
 

@@ -42,11 +42,14 @@ bool DBConnection::open()
         m_database.setPort(ok ? port : -1);
     }
 
+    qInfo() << "Opening connection..";
+
     return m_database.open();
 }
 
 void DBConnection::close()
 {
+    qInfo() << "Closing connection..";
     m_database.close();
 }
 
@@ -91,7 +94,7 @@ bool DBConnection::verifyScripts()
 
             if (!ret)
             {
-                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                qWarning() << "Query failed:" << query.lastError().text();
             }
 
             ok &= ret;
@@ -108,7 +111,7 @@ bool DBConnection::verifyScripts()
 
         if (!query.exec(QString("SELECT count(script) FROM history WHERE script = '%1'").arg(script)))
         {
-            qWarning() << Q_FUNC_INFO << query.lastError().text();
+            qWarning() << "Query failed:" << query.lastError().text();
             return false;
         }
 
@@ -147,11 +150,11 @@ bool DBConnection::verifyScripts()
 
     if (!tableExists(QStringLiteral("history")))
     {
-        qDebug() << Q_FUNC_INFO << "Executing:" << historyScript;
+        qDebug() << "Executing script:" << historyScript;
 
         if (!scriptExec(QString("%1/%2").arg(dir.absolutePath(), historyScript)))
         {
-            qWarning() << Q_FUNC_INFO << "Failed to execute:" << historyScript;
+            qWarning() << "Failed to execute script:" << historyScript;
             return false;
         }
 
@@ -164,11 +167,11 @@ bool DBConnection::verifyScripts()
     {
         if (!scriptExists(fileName))
         {
-            qDebug() << Q_FUNC_INFO << "Executing:" << fileName;
+            qDebug() << "Executing script:" << fileName;
 
             if (!scriptExec(QString("%1/%2").arg(dir.absolutePath(), fileName)))
             {
-                qWarning() << Q_FUNC_INFO << "Failed to execute:" << fileName;
+                qWarning() << "Failed to execute script:" << fileName;
                 ok = false;
             }
             else

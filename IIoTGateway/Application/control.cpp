@@ -32,7 +32,7 @@ bool Control::start(int port)
         return false;
     }
 
-    qDebug() << Q_FUNC_INFO << "Listening on port:" << tcpserver->serverPort();
+    qDebug() << "Listening on port:" << tcpserver->serverPort();
 
     if ((m_gateway != nullptr) && (m_storage != nullptr))
     {
@@ -93,6 +93,8 @@ void Control::registerRoutes()
     /// /iiotgateway/login POST handler
     auto loginPost = [this](const QHttpServerRequest &request)
     {
+        qInfo() << "Login attempt";
+
         const QByteArray body = request.body();
 
         QJsonParseError parser{};
@@ -100,6 +102,7 @@ void Control::registerRoutes()
 
         if ((parser.error != QJsonParseError::NoError) || (m_storage == nullptr))
         {
+            qWarning() << "Login failed:" << parser.errorString();
             QHttpServerResponse response(QHttpServerResponse::StatusCode::InternalServerError);
             return response;
         }
@@ -122,6 +125,10 @@ void Control::registerRoutes()
         if (!success)
         {
             qWarning() << "Login failed: Wrong credentials";
+        }
+        else
+        {
+            qInfo() << "Login successful";
         }
 
         const QByteArray data = success ? getData(QStringLiteral("ok"), QStringLiteral("Login success!"))
@@ -233,9 +240,9 @@ void Control::registerRoutes()
             obj.insert(protocol, settings);
         }
 
-        const QByteArray data = QJsonDocument(obj).toJson(QJsonDocument::Compact);
+        qInfo() << "Sending data:" << obj;
 
-        qInfo() << Q_FUNC_INFO << "Sending data:" << data;
+        const QByteArray data = QJsonDocument(obj).toJson(QJsonDocument::Compact);
 
         QHttpHeaders headers{};
         headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
@@ -265,7 +272,7 @@ void Control::registerRoutes()
 
         const QJsonObject settingsObj = json.object();
 
-        qInfo() << Q_FUNC_INFO << "New settings received:" << settingsObj;
+        qInfo() << "New settings received:" << settingsObj;
 
         const QJsonObject cloudObj = settingsObj.value(QStringLiteral("cloud")).toObject();
         const QString cloudProtocol = cloudObj.value(QStringLiteral("protocol")).toString();
