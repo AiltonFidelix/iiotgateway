@@ -1,10 +1,12 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick
+import QtQuick.Controls
 import "../components"
-import ".."
+import "../modbus"
+import "../mqtt"
 
-Item {
+Page {
     id: root
+    title: "Communication"
 
     property string statusText: "Failed!"
     property color statusColor: Material.color(Material.Red)
@@ -53,28 +55,6 @@ Item {
                 text: root.gtwRunning ? qsTr("Gateway running") : qsTr("Gateway stopped")
                 font.pointSize: 12
                 color: Material.color(Material.DeepPurple)
-            }
-
-            // Text {
-            //     id: txtTitle
-            //     anchors.top: parent.top
-            //     anchors.horizontalCenter: parent.horizontalCenter
-            //     anchors.margins: 5
-            //     text: qsTr("IIoTGateway Settings")
-            //     font.bold: true
-            //     font.pointSize: 20
-            //     color: Material.color(Material.DeepPurple)
-            // }
-
-            Button {
-                id: btnLogout
-                text: qsTr("Logout")
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.margins: 5
-                highlighted: true
-                enabled: true
-                height: parent.height - 8
             }
         }
 
@@ -166,7 +146,6 @@ Item {
             anchors.bottom: parent.bottom
             anchors.margins: 5
             anchors.right: parent.right
-            height: btnLogout.height
             highlighted: true
             enabled: true
         }
@@ -178,7 +157,6 @@ Item {
             anchors.bottom: parent.bottom
             anchors.margins: 5
             anchors.right: btnSave.left
-            height: btnLogout.height
             highlighted: root.gtwRunning
             enabled: root.gtwRunning
 
@@ -191,7 +169,6 @@ Item {
             anchors.bottom: parent.bottom
             anchors.margins: 5
             anchors.right: btnRestart.left
-            height: btnLogout.height
             visible: !root.gtwRunning
             highlighted: !root.gtwRunning
             enabled: !root.gtwRunning
@@ -205,7 +182,6 @@ Item {
             anchors.bottom: parent.bottom
             anchors.margins: 5
             anchors.right: btnRestart.left
-            height: btnLogout.height
             visible: root.gtwRunning
             highlighted: root.gtwRunning
             enabled: root.gtwRunning

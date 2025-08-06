@@ -45,15 +45,14 @@ ApplicationWindow {
                 text: qsTr("⋮")
                 font.pixelSize: Qt.application.font.pixelSize * 1.8
 
-                onClicked: drawer.open()
+                onClicked: drawer.open();
             }
 
             Label {
                 text: stackView.currentItem.title
                 anchors.centerIn: parent
-                font.pointSize: 22
-                font.bold: true
-                color: "transparent"
+                font.pointSize: 20
+                color: "#FFF"
             }
         }
     }
@@ -72,76 +71,34 @@ ApplicationWindow {
         Column {
             anchors.fill: parent
 
-            Button {
+            MenuButton {
                 id: btnHide
                 text: qsTr("‹")
-                width: parent.width
-
-                background: Rectangle {
-                    color: btnHide.hovered ? Material.color(Material.DeepPurple) : "transparent"
-                }
-
-                contentItem: Text {
-                    text: btnHide.text
-                    color: btnHide.hovered ? "#FFF" : Material.color(Material.DeepPurple)
-                }
 
                 onClicked: drawer.close();
             }
 
-            ItemDelegate {
+            MenuItemDelegate {
                 id: settings
                 text: qsTr("Settings")
-                width: parent.width
-
-                background: Rectangle {
-                    color: settings.hovered ? Material.color(Material.DeepPurple) : "transparent"
-                }
-
-                contentItem: Text {
-                    text: settings.text
-                    color: settings.hovered ? "#FFF" : Material.color(Material.DeepPurple)
-                }
 
                 onClicked: app.pushPage("Settings");
             }
 
-            ItemDelegate {
+            MenuItemDelegate {
                 id: communication
                 text: qsTr("Communication")
-                width: parent.width
-
-                background: Rectangle {
-                    color: communication.hovered ? Material.color(Material.DeepPurple) : "transparent"
-                }
-
-                contentItem: Text {
-                    text: communication.text
-                    color: communication.hovered ? "#FFF" : Material.color(Material.DeepPurple)
-                }
 
                 onClicked: app.pushPage("Communication");
             }
         }
 
-        Button {
+        MenuButton {
             id: btnLogout
             text: qsTr("Logout")
-            width: parent.width
+            font.bold: true
 
             anchors.bottom: parent.bottom
-
-            background: Rectangle {
-                color: btnLogout.hovered ? Material.color(Material.DeepPurple) : "transparent"
-            }
-
-            contentItem: Text {
-                text: btnLogout.text
-                font.bold: true
-                color: btnLogout.hovered ? "#FFF" : Material.color(Material.DeepPurple)
-            }
-
-            // onClicked: drawer.close();
         }
     }
 
