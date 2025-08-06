@@ -7,6 +7,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+constexpr const int TIMEOUT = 5000;
+
 #ifdef Q_OS_WASM
 #include <emscripten/emscripten.h>
 #include <emscripten/val.h>
@@ -27,7 +29,7 @@ Backend::Backend(QObject *parent)
     m_serverUrl = QString("%1:8084").arg(QString::fromStdString(url.as<std::string>()));
 #endif
 
-    m_manager.setTransferTimeout(5000);
+    m_manager.setTransferTimeout(TIMEOUT);
 }
 
 void Backend::login(const QString &username, const QString &password)
@@ -109,7 +111,7 @@ void Backend::setSettings(const QByteArray &settings)
 
 void Backend::requestSettings(const QStringList &protocols)
 {
-    QString query = !protocols.isEmpty() ? QStringLiteral("?") : QStringLiteral("");
+    QString query = !protocols.isEmpty() ? QStringLiteral("?") : "";
 
     for (const auto &protocol : protocols)
     {
