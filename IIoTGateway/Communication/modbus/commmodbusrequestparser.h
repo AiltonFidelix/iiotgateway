@@ -23,21 +23,17 @@ class CommModbusRequestParser : public QObject
 {
     Q_OBJECT
 
-    QJsonDocument m_document;
     quint16 m_maxEntries;
+    Request m_request;
     RequestType m_type;
 
+    void parser(const QJsonDocument &document);
     QModbusDataUnit::RegisterType getType(const QString &type) const;
 
 public:
     explicit CommModbusRequestParser(const QByteArray &data, quint16 maxEntries = 10);
 
-    Request request();
-
-    /*
-     * @brief The type is defined after request() be called
-     * @see request()
-     */
+    Request request() const;
     RequestType type() const;
 
     static Addresses sortedAddress(const Request &request);

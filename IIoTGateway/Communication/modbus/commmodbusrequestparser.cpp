@@ -6,13 +6,43 @@
 COMM_MODBUS_BEGIN_NAMESPACE
 
 CommModbusRequestParser::CommModbusRequestParser(const QByteArray &data, quint16 maxEntries)
-    : m_document(QJsonDocument::fromJson(data)),
-    m_maxEntries(maxEntries),
+    : m_maxEntries(maxEntries),
+    m_request({}),
     m_type(RequestType::Unknown)
 {
+    parser(std::move(QJsonDocument::fromJson(data)));
 }
 
-Request CommModbusRequestParser::request()
+Request CommModbusRequestParser::request() const
+{
+    return m_request;
+}
+
+RequestType CommModbusRequestParser::type() const
+{
+    return m_type;
+}
+
+Addresses CommModbusRequestParser::sortedAddress(const Request &request)
+{
+    auto keys = request.keys();
+
+    std::sort(keys.begin(), keys.end());
+
+    return keys;
+}
+
+void CommModbusRequestParser::sortRequestUnits(Units &units)
+{
+    auto sort = [](const QModbusDataUnit &a, const QModbusDataUnit &b) -> bool
+    {
+        return a.startAddress() < b.startAddress();
+    };
+
+    std::sort(units.begin(), units.end(), sort);
+}
+
+void CommModbusRequestParser::parser(const QJsonDocument &document)
 {
     auto setValues = [](auto &current, const QJsonArray &values, QModbusDataUnit &unit) -> void
     {
@@ -26,9 +56,7 @@ Request CommModbusRequestParser::request()
         }
     };
 
-    Request request{};
-
-    const QJsonObject jsonObj = m_document.object();
+    const QJsonObject jsonObj = document.object();
     const QJsonArray devices = jsonObj.value(QStringLiteral("devices")).toArray();
 
     for (const auto &device : devices)
@@ -67,35 +95,9 @@ Request CommModbusRequestParser::request()
                 setValues(current, values, unit);
             }
 
-            request[address].append(unit);
+            m_request[address].append(unit);
         }
     }
-
-    return request;
-}
-
-RequestType CommModbusRequestParser::type() const
-{
-    return m_type;
-}
-
-Addresses CommModbusRequestParser::sortedAddress(const Request &request)
-{
-    auto keys = request.keys();
-
-    std::sort(keys.begin(), keys.end());
-
-    return keys;
-}
-
-void CommModbusRequestParser::sortRequestUnits(Units &units)
-{
-    auto sort = [](const QModbusDataUnit &a, const QModbusDataUnit &b) -> bool
-    {
-        return a.startAddress() < b.startAddress();
-    };
-
-    std::sort(units.begin(), units.end(), sort);
 }
 
 QModbusDataUnit::RegisterType CommModbusRequestParser::getType(const QString &type) const
