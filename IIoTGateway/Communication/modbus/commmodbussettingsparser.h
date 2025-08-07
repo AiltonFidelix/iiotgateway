@@ -17,8 +17,8 @@ public:
 
     QVariant host() const;
     QVariant port() const;
-    QVariant baudrate() const;
     QVariant parity() const;
+    QString baudrate() const;
 
     int databits() const;
     int stopbits() const;
@@ -27,6 +27,8 @@ public:
     int pollingInterval() const;
 
     bool pollingEnabled() const;
+
+    friend QDebug &operator<<(QDebug &debug, const CommModbusSettingsParser &parser);
 };
 
 COMM_MODBUS_END_NAMESPACE

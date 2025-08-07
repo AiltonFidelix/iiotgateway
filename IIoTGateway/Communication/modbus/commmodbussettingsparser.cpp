@@ -17,14 +17,14 @@ QVariant CommModbusSettingsParser::port() const
     return m_settings.value(QStringLiteral("port"));
 }
 
-QVariant CommModbusSettingsParser::baudrate() const
-{
-    return m_settings.value(QStringLiteral("baudrate"));
-}
-
 QVariant CommModbusSettingsParser::parity() const
 {
     return m_settings.value(QStringLiteral("parity"));
+}
+
+QString CommModbusSettingsParser::baudrate() const
+{
+    return m_settings.value(QStringLiteral("baudrate")).toString();
 }
 
 int CommModbusSettingsParser::databits() const
@@ -55,6 +55,13 @@ int CommModbusSettingsParser::pollingInterval() const
 bool CommModbusSettingsParser::pollingEnabled() const
 {
     return m_settings.value(QStringLiteral("pollingEnabled")).toBool();
+}
+
+QDebug &operator<<(QDebug &debug, const CommModbusSettingsParser &parser)
+{
+    debug << parser.m_settings;
+
+    return debug;
 }
 
 COMM_MODBUS_END_NAMESPACE
