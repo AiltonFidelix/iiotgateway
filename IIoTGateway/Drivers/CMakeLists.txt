@@ -1,6 +1,10 @@
 set(LIBRARY_NAME Drivers)
 
 set(HEADERS
+    gpio/gpio_global.h
+    gpio/gpiopin.h
+    gpio/gpiostate.h
+    gpio/gpiomode.h
 )
 
 set(SOURCES
