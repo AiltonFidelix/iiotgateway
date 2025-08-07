@@ -14,9 +14,7 @@ def create_virtual_serial():
 
 def modbus_serial_server(slave_name, master_fd):
 
-    ser = Serial(slave_name)
-    ser.timeout = 1
-    ser.baudrate = 115200
+    ser = Serial(slave_name, 115200, timeout=1, exclusive=False)
 
     print("[INFO] Fake modbus device is listening...")
 
