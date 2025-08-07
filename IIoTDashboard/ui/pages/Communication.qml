@@ -15,7 +15,7 @@ Page {
     signal logout
 
     Component.onCompleted: {
-        backend.requestSettings(["MQTT", "MODBUS_RTU"]);
+        backend.requestCommnunicationSettings(["MQTT", "MODBUS_RTU"]);
     }
 
     InfoPopUp {
@@ -197,7 +197,7 @@ Page {
         function onClicked() {
             // TODO: improve to be dynamic
 
-            let deviceSettings = {
+            let settings = {
                 cloud: {
                     protocol: "MQTT",
                     settings: mqttSettings.getSettings()
@@ -208,7 +208,7 @@ Page {
                 }
             };
 
-            backend.setSettings(JSON.stringify(deviceSettings));
+            backend.setCommunicationSettings(JSON.stringify(settings));
         }
     }
 
@@ -222,11 +222,11 @@ Page {
         }
     }
 
-    // Handle gateway protocols settings comming from the backend
+    // Handle gateway communication settings comming from the backend
     Connections {
         target: backend
 
-        function onSettings(settings) {
+        function onCommnunicationSettings(settings) {
             let data = JSON.parse(String(settings));
 
             mqttSettings.setSettings(data.MQTT);
