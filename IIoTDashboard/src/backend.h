@@ -19,19 +19,23 @@ public:
     explicit Backend(QObject *parent = nullptr);
 
 signals:
-    void settings(QByteArray settings);
+    void commnunicationSettings(QByteArray settings);
+    void networkSettings(QByteArray settings);
     void status(QString status);
     void success(QString message);
     void error(QString error);
 
 public slots:
     void login(const QString &username, const QString &password);
-    void setSettings(const QByteArray &settings);
-    void requestSettings(const QStringList &protocols);
+    void setCommnunicationSettings(const QByteArray &settings);
+    void requestCommnunicationSettings(const QStringList &protocols);
+    void setNetworkSettings(const QByteArray &settings);
+    void requestNetworkSettings();
     void requestStatus();
     void start();
     void stop();
     void restart();
+    void reboot();
 };
 
 #endif // BACKEND_H

@@ -13,5 +13,6 @@
         <file>ui/pages/Settings.qml</file>
         <file>ui/pages/Communication.qml</file>
         <file>ui/mqtt/PubSubGroup.qml</file>
+        <file>ui/components/network/IpGroupBox.qml</file>
     </qresource>
 </RCC>

@@ -9,6 +9,46 @@ Page {
 
     property int itemsHeight: 35
 
+    function getNetworkSettings() {
+        let data = {
+            "network": connectionType.currentValue,
+            "method": methodType.currentValue,
+        };
+
+        if (methodType.currentIndex === 1) {
+            data["ipv4"] = gpbIp.ipv4;
+            data["netmask"] = gpbIp.netmask;
+            data["router"] = gpbIp.router;
+            data["dns"] = gpbIp.dns;
+        }
+
+        if (connectionType.currentIndex === 1) {
+            data["wifi"] = {
+                "ssdi": gpbWiFi.ssid,
+                "password": gpbWiFi.password
+            };
+        }
+
+        return data;
+    }
+
+    function setNetworkSettings(data) {
+        connectionType.currentText = connectionType.find(data.network);
+        methodType.currentText = methodType.find(data.method);
+
+        if (methodType.currentIndex === 1) {
+            gpbIp.ipv4 = data.ipv4;
+            gpbIp.netmask = data.netmask;
+            gpbIp.router = data.router;
+            gpbIp.dns = data.dns;
+        }
+
+        if (connectionType.currentIndex === 1) {
+            gpbWiFi.ssid = data["wifi"].ssid;
+            gpbWiFi.password = data["wifi"].password;
+        }
+    }
+
     ColumnLayout {
         width: parent.width
         spacing: 10
@@ -56,8 +96,6 @@ Page {
                         textRole: "text"
                         valueRole: "value"
 
-                        // Component.onCompleted: currentIndex = indexOfValue(root.regysterType)
-
                         model: [
                             { value: "eth0", text: "Ethernet" },
                             { value: "wlan0", text: "Wi-Fi" }
@@ -78,27 +116,23 @@ Page {
                         textRole: "text"
                         valueRole: "value"
 
-                        // Component.onCompleted: currentIndex = indexOfValue(root.regysterType)
-
                         model: [
                             { value: "dhcp", text: "DHCP" },
                             { value: "manual", text: "Manual" }
                         ]
                     }
-
-                    // TODO: Add SSID and password if Wi-Fi
-                    // TODO: Add IPv4 address if manually
-                    // TODO: Add Net mask if manually
-                    // TODO: Add Router/Gateway if manually
-                    // TODO: Add DNS if manually
                 }
 
                 WiFiGroupBox {
                     id: gpbWiFi
-
                     Layout.fillWidth: true
-
                     visible: connectionType.currentIndex === 1
+                }
+
+                IpGroupBox {
+                    id: gpbIp
+                    Layout.fillWidth: true
+                    visible: methodType.currentIndex === 1
                 }
             }
         }
@@ -122,5 +156,25 @@ Page {
         anchors.right: btnSave.left
         highlighted: true
         enabled: true
+    }
+
+    // Save gateway network settings
+    Connections {
+        target: btnSave
+
+        function onClicked() {
+            let settings = root.getNetworkSettings();
+            backend.setNetworkSettings(JSON.stringify(settings));
+        }
+    }
+
+    // Handle gateway network settings comming from the backend
+    Connections {
+        target: backend
+
+        function onNetworkSettings(settings) {
+            let data = JSON.parse(String(settings));
+            root.setNetworkSettings(settings);
+        }
     }
 }

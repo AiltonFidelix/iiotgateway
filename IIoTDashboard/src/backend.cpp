@@ -87,16 +87,16 @@ void Backend::login(const QString &username, const QString &password)
     });
 }
 
-void Backend::setSettings(const QByteArray &settings)
+void Backend::setCommnunicationSettings(const QByteArray &settings)
 {
-    QNetworkRequest request(QUrl(QString("%1/iiotgateway/settings").arg(m_serverUrl)));
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/communication").arg(m_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
 
     auto reply = m_manager.post(request, settings);
 
     connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError e){
         const QString errorOcurred = errorHandler(e);
-        const QString errorMessage = QString("Failed to save device settings!\n\n%1").arg(errorOcurred);
+        const QString errorMessage = QString("Failed to save communication settings!\n\n%1").arg(errorOcurred);
         emit error(errorMessage);
     });
 
@@ -109,7 +109,7 @@ void Backend::setSettings(const QByteArray &settings)
     });
 }
 
-void Backend::requestSettings(const QStringList &protocols)
+void Backend::requestCommnunicationSettings(const QStringList &protocols)
 {
     QString query = !protocols.isEmpty() ? QStringLiteral("?") : "";
 
@@ -120,17 +120,14 @@ void Backend::requestSettings(const QStringList &protocols)
 
     query.removeLast();
 
-    QNetworkRequest request(QUrl(QString("%1/iiotgateway/settings%2").arg(m_serverUrl, query)));
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/communication%2").arg(m_serverUrl, query)));
     request.setRawHeader("Content-Type", "application/json");
 
     auto reply = m_manager.get(request);
 
     connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError e){
-        auto reply = qobject_cast<QNetworkReply*>(sender());
-        reply->deleteLater();
-
         const QString errorOcurred = errorHandler(e);
-        const QString errorMessage = QString("Failed to load device settings!\n\n%1").arg(errorOcurred);
+        const QString errorMessage = QString("Failed to load communication settings!\n\n%1").arg(errorOcurred);
 
         emit error(errorMessage);
     });
@@ -142,7 +139,54 @@ void Backend::requestSettings(const QStringList &protocols)
         auto data = reply->readAll();
         reply->deleteLater();
 
-        emit settings(data);
+        emit commnunicationSettings(data);
+    });
+}
+
+void Backend::setNetworkSettings(const QByteArray &settings)
+{
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/network").arg(m_serverUrl)));
+    request.setRawHeader("Content-Type", "application/json");
+
+    auto reply = m_manager.post(request, settings);
+
+    connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError e){
+        const QString errorOcurred = errorHandler(e);
+        const QString errorMessage = QString("Failed to save network settings!\n\n%1").arg(errorOcurred);
+        emit error(errorMessage);
+    });
+
+    connect(reply, &QNetworkReply::finished, this, [this](){
+        auto reply = qobject_cast<QNetworkReply*>(sender());
+        reply->disconnect();
+        reply->deleteLater();
+
+        emit success(QStringLiteral("Successfully saved!"));
+    });
+}
+
+void Backend::requestNetworkSettings()
+{
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/network").arg(m_serverUrl)));
+    request.setRawHeader("Content-Type", "application/json");
+
+    auto reply = m_manager.get(request);
+
+    connect(reply, &QNetworkReply::errorOccurred, this, [this](QNetworkReply::NetworkError e){
+        const QString errorOcurred = errorHandler(e);
+        const QString errorMessage = QString("Failed to load network settings!\n\n%1").arg(errorOcurred);
+
+        emit error(errorMessage);
+    });
+
+    connect(reply, &QNetworkReply::finished, this, [this](){
+        auto reply = qobject_cast<QNetworkReply*>(sender());
+        reply->disconnect();
+
+        auto data = reply->readAll();
+        reply->deleteLater();
+
+        emit networkSettings(data);
     });
 }
 
@@ -180,6 +224,11 @@ void Backend::restart()
     sendCommand(QStringLiteral("restart"));
 }
 
+void Backend::reboot()
+{
+    sendCommand(QStringLiteral("reboot"));
+}
+
 void Backend::sendCommand(const QString &command)
 {
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/command").arg(m_serverUrl)));
@@ -207,8 +256,12 @@ void Backend::sendCommand(const QString &command)
 QString Backend::errorHandler(QNetworkReply::NetworkError e)
 {
     auto reply = qobject_cast<QNetworkReply*>(sender());
-    reply->disconnect();
-    reply->deleteLater();
+
+    if (reply != nullptr)
+    {
+        reply->disconnect();
+        reply->deleteLater();
+    }
 
     auto metaEnum = QMetaEnum::fromType<QNetworkReply::NetworkError>();
     auto errorMessage = metaEnum.valueToKey(e);
