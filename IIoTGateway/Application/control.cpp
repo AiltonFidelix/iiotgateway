@@ -134,14 +134,7 @@ void Control::registerRoutes()
         const QByteArray data = success ? getData(QStringLiteral("ok"), QStringLiteral("Login success!"))
                                         : getData(QStringLiteral("error"), QStringLiteral("Wrong credentials!"));
 
-        QHttpHeaders headers{};
-        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
-        headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
-
-        QHttpServerResponse response(data);
-        response.setHeaders(headers);
-
-        return response;
+        return makeResponse(data);
     };
 
     /// /iiotgateway/status GET handler
@@ -160,14 +153,7 @@ void Control::registerRoutes()
 
         const QByteArray data = QJsonDocument(obj).toJson(QJsonDocument::Compact);
 
-        QHttpHeaders headers{};
-        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
-        headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
-
-        QHttpServerResponse response(data);
-        response.setHeaders(headers);
-
-        return response;
+        return makeResponse(data);
     };
 
     /// /iiotgateway/command POST handler
@@ -186,6 +172,7 @@ void Control::registerRoutes()
 
         if (parser.error != QJsonParseError::NoError)
         {
+            qWarning() << "Command failed:" << parser.errorString();
             QHttpServerResponse response(QHttpServerResponse::StatusCode::InternalServerError);
             return response;
         }
@@ -216,8 +203,8 @@ void Control::registerRoutes()
         return response;
     };
 
-    /// /iiotgateway/settings GET handler
-    auto settingsGet = [this](const QHttpServerRequest &request)
+    /// /iiotgateway/commnunication GET handler
+    auto communicationGet = [this](const QHttpServerRequest &request)
     {
         if (m_storage == nullptr)
         {
@@ -240,22 +227,15 @@ void Control::registerRoutes()
             obj.insert(protocol, settings);
         }
 
-        qInfo() << "Sending data:" << obj;
+        qInfo() << "Sending communication settings:" << obj;
 
         const QByteArray data = QJsonDocument(obj).toJson(QJsonDocument::Compact);
 
-        QHttpHeaders headers{};
-        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
-        headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
-
-        QHttpServerResponse response(data);
-        response.setHeaders(headers);
-
-        return response;
+        return makeResponse(data);
     };
 
-    /// /iiotgateway/settings POST handler
-    auto settingsPost = [this](const QHttpServerRequest &request)
+    /// /iiotgateway/commnunication POST handler
+    auto commnunicationPost = [this](const QHttpServerRequest &request)
     {
         QJsonParseError parser{};
 
@@ -272,7 +252,7 @@ void Control::registerRoutes()
 
         const QJsonObject settingsObj = json.object();
 
-        qInfo() << "New settings received:" << settingsObj;
+        qInfo() << "New communication settings received:" << settingsObj;
 
         const QJsonObject cloudObj = settingsObj.value(QStringLiteral("cloud")).toObject();
         const QString cloudProtocol = cloudObj.value(QStringLiteral("protocol")).toString();
@@ -292,20 +272,40 @@ void Control::registerRoutes()
             return response;
         }
 
-        QJsonObject resObj{};
-        resObj.insert(QStringLiteral("status"), QStringLiteral("ok"));
-        resObj.insert(QStringLiteral("message"), QStringLiteral("Settings successfully saved!"));
+        return makeResponse(QStringLiteral("ok"), QStringLiteral("Settings successfully saved!"));;
+    };
 
-        const auto data = QJsonDocument(resObj).toJson(QJsonDocument::Compact);
+    /// /iiotgateway/network GET handler
+    auto networkGet = [this](const QHttpServerRequest &request)
+    {
+#warning // TODO: implement network info
 
-        QHttpHeaders headers{};
-        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
-        headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
+        const QByteArray data{"Yet needs implementation..."};
 
-        QHttpServerResponse response(data);
-        response.setHeaders(headers);
+        return makeResponse(data);
+    };
 
-        return response;
+
+    /// /iiotgateway/network POST handler
+    auto networkPost = [this](const QHttpServerRequest &request)
+    {
+#warning // TODO: implement network changes
+        QJsonParseError parser{};
+
+        const QByteArray body = request.body();
+        const auto json = QJsonDocument::fromJson(body, &parser);
+
+        if (parser.error != QJsonParseError::NoError)
+        {
+            QHttpServerResponse response(QHttpServerResponse::StatusCode::InternalServerError);
+            return response;
+        }
+
+        const QJsonObject settingsObj = json.object();
+
+        qInfo() << "New network settings received:" << settingsObj;
+
+        return makeResponse(QStringLiteral("ok"), QStringLiteral("Settings successfully saved!"));
     };
 
     m_httpServer.route(QStringLiteral("/"), QHttpServerRequest::Method::Get, index);
@@ -315,7 +315,40 @@ void Control::registerRoutes()
     m_httpServer.route(QStringLiteral("/iiotgateway/status"), QHttpServerRequest::Method::Get, statusGet);
     m_httpServer.route(QStringLiteral("/iiotgateway/command"), QHttpServerRequest::Method::Options, options);
     m_httpServer.route(QStringLiteral("/iiotgateway/command"), QHttpServerRequest::Method::Post, commandPost);
-    m_httpServer.route(QStringLiteral("/iiotgateway/settings"), QHttpServerRequest::Method::Options, options);
-    m_httpServer.route(QStringLiteral("/iiotgateway/settings"), QHttpServerRequest::Method::Get, settingsGet);
-    m_httpServer.route(QStringLiteral("/iiotgateway/settings"), QHttpServerRequest::Method::Post, settingsPost);
+    m_httpServer.route(QStringLiteral("/iiotgateway/communication"), QHttpServerRequest::Method::Options, options);
+    m_httpServer.route(QStringLiteral("/iiotgateway/communication"), QHttpServerRequest::Method::Get, communicationGet);
+    m_httpServer.route(QStringLiteral("/iiotgateway/communication"), QHttpServerRequest::Method::Post, commnunicationPost);
+    m_httpServer.route(QStringLiteral("/iiotgateway/network"), QHttpServerRequest::Method::Options, options);
+    m_httpServer.route(QStringLiteral("/iiotgateway/network"), QHttpServerRequest::Method::Get, networkGet);
+    m_httpServer.route(QStringLiteral("/iiotgateway/network"), QHttpServerRequest::Method::Post, networkPost);
+}
+
+QHttpServerResponse Control::makeResponse(const QByteArray &data) const
+{
+    QHttpHeaders headers{};
+    headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
+    headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
+
+    QHttpServerResponse response(data);
+    response.setHeaders(headers);
+
+    return response;
+}
+
+QHttpServerResponse Control::makeResponse(const QString &status, const QString &message) const
+{
+    QJsonObject resObj{};
+    resObj.insert(QStringLiteral("status"), status);
+    resObj.insert(QStringLiteral("message"), message);
+
+    const auto data = QJsonDocument(resObj).toJson(QJsonDocument::Compact);
+
+    QHttpHeaders headers{};
+    headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
+    headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
+
+    QHttpServerResponse response(data);
+    response.setHeaders(headers);
+
+    return response;
 }

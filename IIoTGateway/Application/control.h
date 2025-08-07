@@ -16,6 +16,8 @@ class Control : public QObject
     StorageInterface *m_storage;
 
     void registerRoutes();
+    QHttpServerResponse makeResponse(const QByteArray &data) const;
+    QHttpServerResponse makeResponse(const QString &status, const QString &message) const;
 
 public:
     explicit Control(QObject *parent = nullptr);
