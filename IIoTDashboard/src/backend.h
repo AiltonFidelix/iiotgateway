@@ -19,7 +19,7 @@ public:
     explicit Backend(QObject *parent = nullptr);
 
 signals:
-    void commnunicationSettings(QByteArray settings);
+    void communicationSettings(QByteArray settings);
     void networkSettings(QByteArray settings);
     void status(QString status);
     void success(QString message);
@@ -27,8 +27,8 @@ signals:
 
 public slots:
     void login(const QString &username, const QString &password);
-    void setCommnunicationSettings(const QByteArray &settings);
-    void requestCommnunicationSettings(const QStringList &protocols);
+    void setCommunicationSettings(const QByteArray &settings);
+    void requestCommunicationSettings(const QStringList &protocols);
     void setNetworkSettings(const QByteArray &settings);
     void requestNetworkSettings();
     void requestStatus();

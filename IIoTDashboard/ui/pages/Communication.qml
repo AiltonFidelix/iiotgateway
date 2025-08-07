@@ -15,7 +15,7 @@ Page {
     signal logout
 
     Component.onCompleted: {
-        backend.requestCommnunicationSettings(["MQTT", "MODBUS_RTU"]);
+        backend.requestCommunicationSettings(["MQTT", "MODBUS_RTU"]);
     }
 
     InfoPopUp {
@@ -226,7 +226,7 @@ Page {
     Connections {
         target: backend
 
-        function onCommnunicationSettings(settings) {
+        function onCommunicationSettings(settings) {
             let data = JSON.parse(String(settings));
 
             mqttSettings.setSettings(data.MQTT);

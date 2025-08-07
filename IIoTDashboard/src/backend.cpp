@@ -87,7 +87,7 @@ void Backend::login(const QString &username, const QString &password)
     });
 }
 
-void Backend::setCommnunicationSettings(const QByteArray &settings)
+void Backend::setCommunicationSettings(const QByteArray &settings)
 {
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/communication").arg(m_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
@@ -109,7 +109,7 @@ void Backend::setCommnunicationSettings(const QByteArray &settings)
     });
 }
 
-void Backend::requestCommnunicationSettings(const QStringList &protocols)
+void Backend::requestCommunicationSettings(const QStringList &protocols)
 {
     QString query = !protocols.isEmpty() ? QStringLiteral("?") : "";
 
@@ -139,7 +139,7 @@ void Backend::requestCommnunicationSettings(const QStringList &protocols)
         auto data = reply->readAll();
         reply->deleteLater();
 
-        emit commnunicationSettings(data);
+        emit communicationSettings(data);
     });
 }
 
