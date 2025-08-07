@@ -69,9 +69,7 @@ void Control::registerRoutes()
     auto index = [](const QHttpServerRequest &request)
     {
         Q_UNUSED(request)
-
-        const QString response(QStringLiteral("<h1>IIoTGateway - by Ailton Fidelix</h1>"));
-        return QHttpServerResponse(response);
+        return QHttpServerResponse(QStringLiteral("<h1>IIoTGateway - by Ailton Fidelix</h1>"));
     };
 
     /// OPTIONS handler
@@ -112,29 +110,16 @@ void Control::registerRoutes()
         const QString password = jsonObj.value(QStringLiteral("password")).toString();
         const auto credentials = m_storage->userCredentials();
 
-        auto getData = [](const QString &status, const QString &message) -> QByteArray
-        {
-            QJsonObject obj{};
-            obj.insert(QStringLiteral("status"), status);
-            obj.insert(QStringLiteral("message"), message);
-            return QJsonDocument(obj).toJson();
-        };
+        const bool ok = ((username == credentials.first) && (password == credentials.second));
+        QString message = QStringLiteral("Login success!");
 
-        const bool success = ((username == credentials.first) && (password == credentials.second)) ;
-
-        if (!success)
+        if (!ok)
         {
-            qWarning() << "Login failed: Wrong credentials";
-        }
-        else
-        {
-            qInfo() << "Login successful";
+            message = QStringLiteral("Wrong credentials!");
+            qWarning() << "Login failed:" << message;
         }
 
-        const QByteArray data = success ? getData(QStringLiteral("ok"), QStringLiteral("Login success!"))
-                                        : getData(QStringLiteral("error"), QStringLiteral("Wrong credentials!"));
-
-        return makeResponse(data);
+        return makeResponse(ok, message);
     };
 
     /// /iiotgateway/status GET handler
@@ -180,27 +165,26 @@ void Control::registerRoutes()
         const QJsonObject obj = json.object();
         const QString command = obj.value(QStringLiteral("command")).toString().toLower();
 
+        bool ok = true;
+        QString message{};
+
         if (command == "start")
         {
-            m_gateway->start();
+            ok = m_gateway->start();
+            message = ok ? QStringLiteral("Gateway started successfully!") : QStringLiteral("Failure to start the gateway!");
         }
         else if (command == "stop")
         {
             m_gateway->stop();
+            message = ok ? QStringLiteral("Gateway stopped successfully!") : QStringLiteral("Failure to stop the gateway!");
         }
         else if (command == "restart")
         {
-            m_gateway->restart();
+            ok = m_gateway->restart();
+            message = ok ? QStringLiteral("Gateway restarted successfully!") : QStringLiteral("Failure to restart the gateway!");
         }
 
-        QHttpHeaders headers{};
-        headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
-        headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
-
-        QHttpServerResponse response(QHttpServerResponse::StatusCode::Ok);
-        response.setHeaders(headers);
-
-        return response;
+        return makeResponse(ok, message);
     };
 
     /// /iiotgateway/commnunication GET handler
@@ -272,7 +256,7 @@ void Control::registerRoutes()
             return response;
         }
 
-        return makeResponse(QStringLiteral("ok"), QStringLiteral("Settings successfully saved!"));;
+        return makeResponse(ok, QStringLiteral("Settings successfully saved!"));
     };
 
     /// /iiotgateway/network GET handler
@@ -305,7 +289,9 @@ void Control::registerRoutes()
 
         qInfo() << "New network settings received:" << settingsObj;
 
-        return makeResponse(QStringLiteral("ok"), QStringLiteral("Settings successfully saved!"));
+        bool ok = true;
+
+        return makeResponse(ok, QStringLiteral("Settings successfully saved!"));
     };
 
     m_httpServer.route(QStringLiteral("/"), QHttpServerRequest::Method::Get, index);
@@ -335,20 +321,13 @@ QHttpServerResponse Control::makeResponse(const QByteArray &data) const
     return response;
 }
 
-QHttpServerResponse Control::makeResponse(const QString &status, const QString &message) const
+QHttpServerResponse Control::makeResponse(bool ok, const QString &message) const
 {
     QJsonObject resObj{};
-    resObj.insert(QStringLiteral("status"), status);
+    resObj.insert(QStringLiteral("status"), ok ? QStringLiteral("ok") : QStringLiteral("error"));
     resObj.insert(QStringLiteral("message"), message);
 
     const auto data = QJsonDocument(resObj).toJson(QJsonDocument::Compact);
 
-    QHttpHeaders headers{};
-    headers.append(QStringLiteral("Access-Control-Allow-Origin"), QStringLiteral("*"));
-    headers.append(QStringLiteral("Content-Type"), QStringLiteral("application/json"));
-
-    QHttpServerResponse response(data);
-    response.setHeaders(headers);
-
-    return response;
+    return makeResponse(data);
 }

@@ -17,7 +17,7 @@ class Control : public QObject
 
     void registerRoutes();
     QHttpServerResponse makeResponse(const QByteArray &data) const;
-    QHttpServerResponse makeResponse(const QString &status, const QString &message) const;
+    QHttpServerResponse makeResponse(bool ok, const QString &message) const;
 
 public:
     explicit Control(QObject *parent = nullptr);
