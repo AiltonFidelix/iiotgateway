@@ -52,7 +52,7 @@ std::vector<TestCases> TestCommModbusSettingsParser::LoadTestCases()
     {
         // Test without settings
         auto parser = new CommModbusSettingsParser();
-        testCases.push_back(std::make_tuple(QStringLiteral(""), parser));
+        testCases.push_back(std::make_tuple("", parser));
     }
 
     {
