@@ -9,6 +9,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+message(STATUS "Compiler detected: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "Architecture detected: ${CMAKE_SYSTEM_PROCESSOR}")
+
 set(COMPONENTS Core)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${COMPONENTS})
