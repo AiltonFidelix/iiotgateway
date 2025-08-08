@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <QJsonArray>
 #include <QJsonDocument>
 
 #include "testutils.h"
@@ -6,6 +7,8 @@
 #include "modbus/commmodbussettingsparser.h"
 
 using comm::commmodbus::CommModbusSettingsParser;
+using comm::commmodbus::Request;
+using comm::commmodbus::Units;
 
 using TestCases = std::tuple<QString, CommModbusSettingsParser*>;
 
@@ -17,6 +20,23 @@ public:
 
 TEST_P(TestCommModbusSettingsParser, TestSettingsParser)
 {
+    auto testUnit = [] (const QModbusDataUnit &expected, const QModbusDataUnit &actual) -> bool
+    {
+        bool result = (expected.registerType() == actual.registerType());
+        result &= (expected.startAddress() == actual.startAddress());
+
+        const auto expectedValues = expected.values();
+        const auto actualValues = actual.values();
+
+        result &= (expectedValues.count() == actualValues.count());
+
+        result &= std::equal(actualValues.cbegin(), actualValues.cend(), expectedValues.cbegin(), [](const int a, const int b) {
+            return (a == b);
+        });
+
+        return result;
+    };
+
     const auto param = GetParam();
 
     const auto filePath = std::get<QString>(param);
@@ -41,6 +61,28 @@ TEST_P(TestCommModbusSettingsParser, TestSettingsParser)
     ASSERT_EQ(expectedParser->pollingInterval(), actualParser.pollingInterval());
 
     ASSERT_EQ(expectedParser->pollingEnabled(), actualParser.pollingEnabled());
+
+    const Request expectedRequest = expectedParser->requests();
+    const Request actualRequest = actualParser.requests();
+
+    ASSERT_EQ(expectedRequest.count(), actualRequest.count());
+
+    const auto keys = actualRequest.keys();
+
+    for (const quint8 &key : keys)
+    {
+        ASSERT_TRUE(expectedRequest.contains(key));
+
+        const Units expectedUnits = expectedRequest.value(key);
+        const Units actualUnits = actualRequest.value(key);
+
+        ASSERT_EQ(expectedUnits.count(), actualUnits.count());
+
+        const bool result = std::equal(expectedUnits.cbegin(), expectedUnits.cend(), actualUnits.cbegin(), testUnit);
+
+        ASSERT_TRUE(result) << "Units are not equal";
+    }
+
 
     delete expectedParser;
 }
@@ -68,6 +110,17 @@ std::vector<TestCases> TestCommModbusSettingsParser::LoadTestCases()
         settings.insert(QStringLiteral("timeout"), 2000);
         settings.insert(QStringLiteral("pollingInterval"), 5000);
         settings.insert(QStringLiteral("pollingEnabled"), true);
+
+        QJsonObject request{};
+
+        request.insert(QStringLiteral("address"), 240);
+        request.insert(QStringLiteral("startRegister"), 0);
+        request.insert(QStringLiteral("numberOfEntries"), 10);
+        request.insert(QStringLiteral("registerType"), QStringLiteral("HoldingRegisters"));
+
+        const QJsonArray array{request};
+
+        settings.insert(QStringLiteral("requests"), array);
 
         auto parser = new CommModbusSettingsParser(settings);
 
