@@ -56,34 +56,16 @@ void Backend::login(const QString &username, const QString &password)
 
     connect(reply, &QNetworkReply::finished, this, [this](){
         auto reply = qobject_cast<QNetworkReply*>(sender());
-        reply->disconnect();
+        auto resp = parserReply(reply);
 
-        const QByteArray data = reply->readAll();
-
-        reply->deleteLater();
-
-        QJsonParseError parser{};
-        auto doc = QJsonDocument::fromJson(data, &parser);
-
-        if (parser.error != QJsonParseError::NoError)
+        if (resp.first)
         {
-            const QString errorMessage = QString("Login failed!\n\n%1").arg(parser.errorString());
-            emit error(errorMessage);
-            return;
+            emit success(QByteArray());
         }
-
-        const QJsonObject obj = doc.object();
-        const QString status = obj.value(QStringLiteral("status")).toString();
-
-        if (status.toLower() == "error")
+        else
         {
-            const QString errorOcurred = obj.value(QStringLiteral("message")).toString();
-            const QString errorMessage = QString("Login failed!\n\n%1").arg(errorOcurred);
-            emit error(errorMessage);
-            return;
+            emit error(resp.second);
         }
-
-        emit success(QByteArray());
     });
 }
 
@@ -199,13 +181,16 @@ void Backend::requestStatus()
 
     connect(reply, &QNetworkReply::finished, this, [this](){
         auto reply = qobject_cast<QNetworkReply*>(sender());
-        reply->disconnect();
+        auto resp = parserReply(reply);
 
-        auto data = reply->readAll();
-
-        reply->deleteLater();
-
-        emit status(data);
+        if (resp.first)
+        {
+            emit status(resp.second);
+        }
+        else
+        {
+            emit error(resp.second);
+        }
     });
 }
 
@@ -229,6 +214,37 @@ void Backend::reboot()
     sendCommand(QStringLiteral("reboot"));
 }
 
+QPair<bool, QString> Backend::parserReply(QNetworkReply *reply) const
+{
+    if (reply == nullptr)
+    {
+        return qMakePair(false, QStringLiteral("Server haven't replied!"));
+    }
+
+    reply->disconnect();
+
+    const QByteArray data = reply->readAll();
+
+    reply->deleteLater();
+
+    QJsonParseError parser{};
+    auto doc = QJsonDocument::fromJson(data, &parser);
+
+    if (parser.error != QJsonParseError::NoError)
+    {
+        const QString errorMessage = QString("Failed!\n\n%1").arg(parser.errorString());
+        return qMakePair(false, errorMessage);
+    }
+
+    const QJsonObject obj = doc.object();
+    const QString status = obj.value(QStringLiteral("status")).toString();
+    const QString message = obj.value(QStringLiteral("message")).toString();
+
+    const bool ok = status == "ok";
+
+    return qMakePair(ok, message);
+}
+
 void Backend::sendCommand(const QString &command)
 {
     QNetworkRequest request(QUrl(QString("%1/iiotgateway/command").arg(m_serverUrl)));
@@ -247,9 +263,16 @@ void Backend::sendCommand(const QString &command)
 
     connect(reply, &QNetworkReply::finished, this, [this](){
         auto reply = qobject_cast<QNetworkReply*>(sender());
-        reply->disconnect();
-        reply->deleteLater();
-#warning // TODO: handle response message
+        auto resp = parserReply(reply);
+
+        if (resp.first)
+        {
+            emit success(resp.second);
+        }
+        else
+        {
+            emit error(resp.second);
+        }
     });
 }
 

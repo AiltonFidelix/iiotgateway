@@ -12,6 +12,7 @@ class Backend : public QObject
     QNetworkAccessManager m_manager;
     QString m_serverUrl;
 
+    QPair<bool, QString> parserReply(QNetworkReply *reply) const;
     void sendCommand(const QString &command);
     QString errorHandler(QNetworkReply::NetworkError e);
 
