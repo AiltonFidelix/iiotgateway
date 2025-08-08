@@ -1,5 +1,7 @@
 #include "commmodbussettingsparser.h"
 
+#include <QJsonArray>
+
 COMM_MODBUS_BEGIN_NAMESPACE
 
 CommModbusSettingsParser::CommModbusSettingsParser(const QJsonObject &settings)
@@ -9,12 +11,12 @@ CommModbusSettingsParser::CommModbusSettingsParser(const QJsonObject &settings)
 
 QVariant CommModbusSettingsParser::host() const
 {
-    return m_settings.value(QStringLiteral("host"));
+    return m_settings.value(QStringLiteral("host")).toVariant();
 }
 
 QVariant CommModbusSettingsParser::port() const
 {
-    return m_settings.value(QStringLiteral("port"));
+    return m_settings.value(QStringLiteral("port")).toVariant();
 }
 
 QVariant CommModbusSettingsParser::parity() const
@@ -22,9 +24,9 @@ QVariant CommModbusSettingsParser::parity() const
     return m_settings.value(QStringLiteral("parity"));
 }
 
-QString CommModbusSettingsParser::baudrate() const
+QVariant CommModbusSettingsParser::baudrate() const
 {
-    return m_settings.value(QStringLiteral("baudrate")).toString();
+    return m_settings.value(QStringLiteral("baudrate")).toVariant();
 }
 
 int CommModbusSettingsParser::databits() const
@@ -55,6 +57,23 @@ int CommModbusSettingsParser::pollingInterval() const
 bool CommModbusSettingsParser::pollingEnabled() const
 {
     return m_settings.value(QStringLiteral("pollingEnabled")).toBool();
+}
+
+Request CommModbusSettingsParser::requests() const
+{
+    const QJsonValue value = m_settings.value(QStringLiteral("requests"));
+
+    if (!value.isArray())
+    {
+        return Request();
+    }
+
+    QJsonObject devices{};
+    devices.insert(QStringLiteral("devices"), value.toArray());
+
+    CommModbusRequestParser parser(QJsonDocument(devices).toJson(QJsonDocument::Compact));
+
+    return parser.request();
 }
 
 QDebug &operator<<(QDebug &debug, const CommModbusSettingsParser &parser)

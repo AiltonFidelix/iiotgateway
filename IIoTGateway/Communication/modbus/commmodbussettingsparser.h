@@ -4,6 +4,7 @@
 #include <QJsonObject>
 
 #include "commmodbus_global.h"
+#include "commmodbusrequestparser.h"
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
@@ -18,7 +19,7 @@ public:
     QVariant host() const;
     QVariant port() const;
     QVariant parity() const;
-    QString baudrate() const;
+    QVariant baudrate() const;
 
     int databits() const;
     int stopbits() const;
@@ -27,6 +28,8 @@ public:
     int pollingInterval() const;
 
     bool pollingEnabled() const;
+
+    Request requests() const;
 
     friend QDebug &operator<<(QDebug &debug, const CommModbusSettingsParser &parser);
 };
