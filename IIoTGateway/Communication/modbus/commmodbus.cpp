@@ -217,7 +217,7 @@ void CommModbus::initPolling()
 {
     if (ispolling())
     {
-        m_readRequest = loadReadRequestSettings();
+        m_readRequest = m_settingsParser.requests();
 
         connect(m_polling, &QTimer::timeout, this, &CommModbus::pollingCallback);
 
@@ -232,24 +232,6 @@ void CommModbus::pollingCallback()
     readRegisters(m_readRequest);
 
     m_polling->start();
-}
-
-Request CommModbus::loadReadRequestSettings()
-{
-    QFile file(QString("%1/read.json").arg(QCoreApplication::applicationDirPath()));
-
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        emit error("Failed opening read.json");
-
-        return Request();
-    }
-
-    CommModbusRequestParser parser(file.readAll());
-
-    file.close();
-
-    return parser.request();
 }
 
 QJsonArray CommModbus::registersToJsonArray(const Registers &registers)

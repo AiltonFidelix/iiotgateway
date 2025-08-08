@@ -27,7 +27,6 @@ class CommModbus : public CommInterface
 
     Registers readReady(QModbusReply *reply);
 
-    Request loadReadRequestSettings();
     QJsonArray registersToJsonArray(const Registers &registers);
 
 public:
