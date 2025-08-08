@@ -15,7 +15,17 @@ Page {
     signal logout
 
     Component.onCompleted: {
+        backend.requestStatus();
         backend.requestCommunicationSettings(["MQTT", "MODBUS_RTU"]);
+        gtwRequestStatus.running = true;
+    }
+
+    Timer {
+        id: gtwRequestStatus
+        interval: 1500
+        running: false
+        repeat: true
+        onTriggered: backend.requestStatus();
     }
 
     InfoPopUp {
@@ -45,7 +55,7 @@ Page {
                 color: Material.color(Material.Red)
 
                 Timer {
-                    id: gtwStatusTimer
+                    id: gtwStatusIndicatorTimer
                     interval: 500
                     running: root.gtwRunning
                     repeat: true
@@ -57,7 +67,7 @@ Page {
                 anchors.left: gtwStatusIndicator.right
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.margins: 5
-                text: root.gtwRunning ? qsTr("Gateway running") : qsTr("Gateway stopped")
+                text: qsTr("Stopped")
                 font.pointSize: 12
                 color: Material.color(Material.DeepPurple)
             }
@@ -151,24 +161,24 @@ Page {
             enabled: true
         }
 
-        Button {
-            id: btnRestart
-            text: qsTr("Restart")
-            anchors.bottom: parent.bottom
-            anchors.margins: 5
-            anchors.right: btnSave.left
-            highlighted: root.gtwRunning
-            enabled: root.gtwRunning
+        // Button {
+        //     id: btnRestart
+        //     text: qsTr("Restart")
+        //     anchors.bottom: parent.bottom
+        //     anchors.margins: 5
+        //     anchors.right: btnSave.left
+        //     highlighted: root.gtwRunning
+        //     enabled: root.gtwRunning
 
-            onClicked: backend.restart();
-        }
+        //     onClicked: backend.restart();
+        // }
 
         Button {
             id: btnStart
             text: qsTr("Start")
             anchors.bottom: parent.bottom
             anchors.margins: 5
-            anchors.right: btnRestart.left
+            anchors.right: btnSave.left
             visible: !root.gtwRunning
             highlighted: !root.gtwRunning
             enabled: !root.gtwRunning
@@ -181,7 +191,7 @@ Page {
             text: qsTr("Stop")
             anchors.bottom: parent.bottom
             anchors.margins: 5
-            anchors.right: btnRestart.left
+            anchors.right: btnSave.left
             visible: root.gtwRunning
             highlighted: root.gtwRunning
             enabled: root.gtwRunning
@@ -217,8 +227,12 @@ Page {
         target: backend
 
         function onStatus(status) {
-            let data = JSON.parse(String(status));
-            root.gtwRunning = (data.status  === "running");
+            txtGtwStatus.text = qsTr(status);
+            root.gtwRunning = (status === "Running");
+
+            if (!root.gtwRunning) {
+                gtwStatusIndicator.color = Material.color(Material.Red);
+            }
         }
     }
 
@@ -263,15 +277,7 @@ Page {
     }
 
     Connections {
-        target: gtwStatusIndicator
-
-        function onColorChanged() {
-            root.gtwRunning = !(gtwStatusIndicator.color === Material.color(Material.Red));
-        }
-    }
-
-    Connections {
-        target: gtwStatusTimer
+        target: gtwStatusIndicatorTimer
 
         function onTriggered() {
             if (gtwStatusIndicator.color === Material.color(Material.Green)) {
