@@ -64,7 +64,7 @@ void CommModbusRequestParser::parser(const QJsonDocument &document)
         const QJsonObject deviceObj = device.toObject();
         const auto address = static_cast<quint8>(deviceObj.value(QStringLiteral("address")).toInt(0));
 
-        const auto registertype = getType(deviceObj.value(QStringLiteral("type")).toString());
+        const auto registertype = getType(deviceObj.value(QStringLiteral("registerType")).toString());
         const auto startRegister = static_cast<quint16>(deviceObj.value(QStringLiteral("startRegister")).toInt(0));
         const auto numberOfEntries = static_cast<quint16>(deviceObj.value(QStringLiteral("numberOfEntries")).toInt(0));
 
