@@ -133,12 +133,7 @@ void Control::registerRoutes()
             return response;
         }
 
-        QJsonObject obj{};
-        obj.insert(QStringLiteral("status"), m_gateway->isRunning() ? QStringLiteral("running") : QStringLiteral("stopped"));
-
-        const QByteArray data = QJsonDocument(obj).toJson(QJsonDocument::Compact);
-
-        return makeResponse(data);
+        return makeResponse(true, m_gateway->isRunning() ? QStringLiteral("Running") : QStringLiteral("Stopped"));
     };
 
     /// /iiotgateway/command POST handler
