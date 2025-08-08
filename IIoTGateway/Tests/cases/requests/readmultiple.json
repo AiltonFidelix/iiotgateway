@@ -2,19 +2,19 @@
     "devices": [
         {
             "address": 1,
-            "type": "HoldingRegisters",
+            "registerType": "HoldingRegisters",
             "startRegister": 0,
             "numberOfEntries": 10
         },
         {
             "address": 1,
-            "type": "HoldingRegisters",
+            "registerType": "HoldingRegisters",
             "startRegister": 10,
             "numberOfEntries": 10
         },
         {
             "address": 2,
-            "type": "HoldingRegisters",
+            "registerType": "HoldingRegisters",
             "startRegister": 0,
             "numberOfEntries": 40
         }

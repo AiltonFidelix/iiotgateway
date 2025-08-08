@@ -7,5 +7,13 @@
     "retries": 10,
     "timeout": 2000,
     "pollingInterval": 5000,
-    "pollingEnabled": true
+    "pollingEnabled": true,
+    "requests": [
+        {
+            "address": 240,
+            "registerType": "HoldingRegisters",
+            "startRegister": 0,
+            "numberOfEntries": 10
+        }
+    ]
 }

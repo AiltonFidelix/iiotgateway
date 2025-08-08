@@ -2,7 +2,7 @@
     "devices": [
         {
             "address": 240,
-            "type": "HoldingRegisters",
+            "registerType": "HoldingRegisters",
             "startRegister": 0,
             "numberOfEntries": 10
         }
