@@ -1,0 +1,9 @@
+#ifndef NETWORK_GLOBAL_H
+#define NETWORK_GLOBAL_H
+
+#include "../device_global.h"
+
+#define NETWORK_BEGIN_NAMESPACE DEVICE_BEGIN_NAMESPACE namespace network {
+#define NETWORK_END_NAMESPACE DEVICE_END_NAMESPACE }
+
+#endif // NETWORK_GLOBAL_H
