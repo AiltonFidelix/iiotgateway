@@ -23,6 +23,11 @@ set(QT_COMPONENTS
     Sql
 )
 
+set(LIBRARIES
+    Communication
+    Device
+)
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPONENTS})
 
@@ -33,3 +38,8 @@ foreach(component IN LISTS QT_COMPONENTS)
 endforeach()
 
 target_include_directories(${LIBRARY_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+
+foreach(library IN LISTS LIBRARIES)
+    target_link_libraries(${LIBRARY_NAME} ${library})
+    target_include_directories(${LIBRARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/${library}")
+endforeach()

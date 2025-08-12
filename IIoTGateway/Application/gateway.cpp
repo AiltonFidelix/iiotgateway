@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-#include "../Communication/commfactory.h"
+#include "commfactory.h"
 
 using comm::CommFactory;
 
@@ -22,7 +22,7 @@ Gateway::~Gateway()
         stop();
 }
 
-bool Gateway::isRunning()
+bool Gateway::isRunning() const
 {
     return m_isRunning;
 }

@@ -22,7 +22,7 @@ public:
     explicit Gateway(StorageInterface *storage = nullptr, QObject *parent = nullptr);
     ~Gateway();
 
-    bool isRunning();
+    bool isRunning() const;
 
 public slots:
     bool start();

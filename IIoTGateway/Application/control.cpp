@@ -1,16 +1,20 @@
 #include "control.h"
 #include "gateway.h"
 #include "storageinterface.h"
+#include "network/networkmanagerfactory.h"
 
 #include <QTcpServer>
 #include <QJsonDocument>
 #include <QJsonObject>
 
-Control::Control(QObject *parent)
+using device::network::NetworkManagerFactory;
+
+Control::Control(const QString &platform, QObject *parent)
     : QObject(parent),
     m_httpServer(),
     m_gateway(nullptr),
-    m_storage(nullptr)
+    m_storage(nullptr),
+    m_networkManager(NetworkManagerFactory::getNetworkManager(platform.toUtf8()))
 {
 }
 
@@ -18,6 +22,11 @@ Control::~Control()
 {
     auto servers = m_httpServer.servers();
     qDeleteAll(servers);
+
+    if (m_networkManager)
+    {
+        delete m_networkManager;
+    }
 }
 
 bool Control::start(int port)
@@ -257,34 +266,41 @@ void Control::registerRoutes()
     /// /iiotgateway/network GET handler
     auto networkGet = [this](const QHttpServerRequest &request)
     {
-#warning // TODO: implement network info
+        Q_UNUSED(request)
 
-        const QByteArray data{"Yet needs implementation..."};
+        if (m_networkManager == nullptr)
+        {
+            return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
+        }
 
-        return makeResponse(data);
+        const bool ok = m_networkManager->load();
+
+        if (!ok)
+        {
+            return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
+        }
+
+        return makeResponse(ok, m_networkManager->settings());
     };
 
 
     /// /iiotgateway/network POST handler
     auto networkPost = [this](const QHttpServerRequest &request)
     {
-#warning // TODO: implement network changes
-        QJsonParseError parser{};
-
-        const QByteArray body = request.body();
-        const auto json = QJsonDocument::fromJson(body, &parser);
-
-        if (parser.error != QJsonParseError::NoError)
+        if (m_networkManager == nullptr)
         {
-            QHttpServerResponse response(QHttpServerResponse::StatusCode::InternalServerError);
-            return response;
+            return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
         }
 
-        const QJsonObject settingsObj = json.object();
+        const QByteArray body = request.body();
 
-        qInfo() << "New network settings received:" << settingsObj;
+        bool ok = m_networkManager->setSettings(body);
+        ok &= m_networkManager->save();
 
-        bool ok = true;
+        if (!ok)
+        {
+            return QHttpServerResponse(QHttpServerResponse::StatusCode::InternalServerError);
+        }
 
         return makeResponse(ok, QStringLiteral("Settings successfully saved!"));
     };

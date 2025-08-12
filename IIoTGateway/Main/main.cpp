@@ -61,7 +61,9 @@ int main(int argc, char *argv[])
 
     Gateway gateway(&dbstorage);
 
-    control = new Control();
+    const QString platform = qEnvironmentVariable("PLATFORM", QStringLiteral("host"));
+
+    control = new Control(platform);
 
     control->setGateway(&gateway);
     control->setStorage(&dbstorage);

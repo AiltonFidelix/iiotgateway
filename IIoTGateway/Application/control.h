@@ -4,8 +4,12 @@
 #include <QObject>
 #include <QHttpServer>
 
+#include "network/networkmanager.h"
+
 class StorageInterface;
 class Gateway;
+
+using device::network::NetworkManager;
 
 class Control : public QObject
 {
@@ -14,13 +18,14 @@ class Control : public QObject
     QHttpServer m_httpServer;
     Gateway *m_gateway;
     StorageInterface *m_storage;
+    NetworkManager *m_networkManager;
 
     void registerRoutes();
     QHttpServerResponse makeResponse(const QByteArray &data) const;
     QHttpServerResponse makeResponse(bool ok, const QString &message) const;
 
 public:
-    explicit Control(QObject *parent = nullptr);
+    explicit Control(const QString &platform, QObject *parent = nullptr);
     ~Control();
 
     bool start(int port = 8084);
