@@ -83,13 +83,26 @@ void CommModbus::incoming(QByteArray data)
 
 void CommModbus::stateChanged(QModbusDevice::State state)
 {
-    if (state == QModbusDevice::UnconnectedState)
+    switch (state)
     {
-        emit disconnected();
-    }
-    else if (state == QModbusDevice::ConnectedState)
-    {
-        emit connected();
+        case QModbusDevice::UnconnectedState:
+            qDebug() << "Modbus received unconnected state";
+            emit disconnected();
+            break;
+        case QModbusDevice::ConnectedState:
+            qDebug() << "Modbus received connected state";
+            emit connected();
+            break;
+        case QModbusDevice::ConnectingState:
+            qDebug() << "Modbus received connecting state";
+            emit connected();
+            break;
+        case QModbusDevice::ClosingState:
+            qDebug() << "Modbus received closing state";
+            emit connected();
+            break;
+        default:
+            break;
     }
 }
 
