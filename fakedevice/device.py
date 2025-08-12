@@ -35,6 +35,7 @@ def modbus_serial_server(slave_name, master_fd):
 
     except KeyboardInterrupt:
         ser.close()
+        os.close(master_fd)
         print("Closing...")
 
 
