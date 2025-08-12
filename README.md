@@ -72,6 +72,7 @@ MQTT_SUB_TOPIC=iiotgateway/mqtt
 MQTT_QOS=0
 DB_TYPE=QSQLITE
 DB_NAME=IIoTGateway.db
+PLATFORM=host | raspberry
 ```
 
 Dashboard login:
