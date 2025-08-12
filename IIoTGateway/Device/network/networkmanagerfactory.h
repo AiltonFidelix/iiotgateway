@@ -13,15 +13,15 @@ NETWORK_BEGIN_NAMESPACE
 class NetworkManagerFactory
 {
     using Creator = std::function<NetworkManager*()>;
-    using NetworkManagerList = QHash<QByteArray, Creator>;
+    using NetworkManagerList = QHash<QString, Creator>;
 
     static NetworkManagerList *m_managerList;
 
 public:
     NetworkManagerFactory() = delete;
 
-    static NetworkManager *getNetworkManager(const QByteArray &platform);
-    static int registerNetworkManager(const QByteArray &platform, Creator creator);
+    static NetworkManager *getNetworkManager(const QString &platform);
+    static int registerNetworkManager(const QString &platform, Creator creator);
 };
 
 NETWORK_END_NAMESPACE

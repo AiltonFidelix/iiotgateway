@@ -14,7 +14,7 @@ Control::Control(const QString &platform, QObject *parent)
     m_httpServer(),
     m_gateway(nullptr),
     m_storage(nullptr),
-    m_networkManager(NetworkManagerFactory::getNetworkManager(platform.toUtf8()))
+    m_networkManager(NetworkManagerFactory::getNetworkManager(platform))
 {
 }
 

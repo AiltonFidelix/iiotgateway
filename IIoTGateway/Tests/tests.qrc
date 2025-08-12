@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
+        <file>cases/network/networkmanager.json</file>
         <file>cases/requests/readone.json</file>
         <file>cases/requests/readmultiple.json</file>
         <file>cases/requests/writeone.json</file>

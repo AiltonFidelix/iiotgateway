@@ -5,7 +5,7 @@
 
 NETWORK_BEGIN_NAMESPACE
 
-int HostNetworkManager::m_id = NetworkManagerFactory::registerNetworkManager("host", HostNetworkManager::create);
+int HostNetworkManager::m_id = NetworkManagerFactory::registerNetworkManager(QStringLiteral("host"), HostNetworkManager::create);
 
 bool HostNetworkManager::load()
 {
@@ -33,15 +33,17 @@ QByteArray HostNetworkManager::settings() const
 {
     const QByteArray settings{
         R"(
-            "network": "wlan0",
-            "method": "manual",
-            "ipv4": "192.168.4.45",
-            "netmask": "255.255.255.0",
-            "router": "192.168.4.1",
-            "dns": "8.8.8.8",
-            "wifi": {
-                "ssdi": "FakeNet",
-                "password": "FakePass"
+            {
+                "network": "wlan0",
+                "method": "manual",
+                "ipv4": "192.168.4.45",
+                "netmask": "255.255.255.0",
+                "router": "192.168.4.1",
+                "dns": "8.8.8.8",
+                "wifi": {
+                    "ssdi": "FakeNet",
+                    "password": "FakePass"
+                }
             }
         )"
     };

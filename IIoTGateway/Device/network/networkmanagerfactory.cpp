@@ -4,7 +4,7 @@ NETWORK_BEGIN_NAMESPACE
 
 NetworkManagerFactory::NetworkManagerList *NetworkManagerFactory::m_managerList = nullptr;
 
-NetworkManager *NetworkManagerFactory::getNetworkManager(const QByteArray &platform)
+NetworkManager *NetworkManagerFactory::getNetworkManager(const QString &platform)
 {
     if (m_managerList->contains(platform))
     {
@@ -14,7 +14,7 @@ NetworkManager *NetworkManagerFactory::getNetworkManager(const QByteArray &platf
     return nullptr;
 }
 
-int NetworkManagerFactory::registerNetworkManager(const QByteArray &platform, Creator creator)
+int NetworkManagerFactory::registerNetworkManager(const QString &platform, Creator creator)
 {
     if (m_managerList == nullptr)
     {

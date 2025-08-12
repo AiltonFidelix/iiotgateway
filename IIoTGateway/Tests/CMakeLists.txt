@@ -13,6 +13,7 @@ set(SOURCES
     src/modbus/testcommmodbussettingsparser.cpp
     src/mqtt/testcommmqtt.cpp
     src/mqtt/testcommmqttsettingsparser.cpp
+    src/network/testnetworkmanager.cpp
     src/main.cpp
 )
 
@@ -23,6 +24,7 @@ set(COMPONENTS Core)
 set(LIBRARIES
     Application
     Communication
+    Device
     gtest_main
     gmock_main
     paho-mqtt3a
