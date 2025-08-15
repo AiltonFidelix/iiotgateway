@@ -25,6 +25,7 @@ int NetworkManagerFactory::registerNetworkManager(const QString &platform, Creat
 
     return m_managerList->size();
 }
+
 NETWORK_END_NAMESPACE
 
 
