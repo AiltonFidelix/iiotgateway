@@ -2,13 +2,16 @@
 #define CONTROL_H
 
 #include <QObject>
+#include <QTimer>
 #include <QHttpServer>
 
+#include "driver/gpio/gpiopin.h"
 #include "network/networkmanager.h"
 
 class StorageInterface;
 class Gateway;
 
+using device::driver::gpio::GPIOPin;
 using device::network::NetworkManager;
 
 class Control : public QObject
@@ -16,8 +19,10 @@ class Control : public QObject
     Q_OBJECT
 
     QHttpServer m_httpServer;
+    QTimer m_ledTimer;
     Gateway *m_gateway;
     StorageInterface *m_storage;
+    GPIOPin *m_ledPin;
     NetworkManager *m_networkManager;
 
     void registerRoutes();

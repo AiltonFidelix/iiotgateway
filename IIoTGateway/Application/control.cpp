@@ -1,21 +1,29 @@
 #include "control.h"
 #include "gateway.h"
 #include "storageinterface.h"
+
+#include "driver/gpio/gpiopinfactory.h"
 #include "network/networkmanagerfactory.h"
 
 #include <QTcpServer>
 #include <QJsonDocument>
 #include <QJsonObject>
 
+using device::driver::gpio::GPIOPinFactory;
 using device::network::NetworkManagerFactory;
 
 Control::Control(const QString &platform, QObject *parent)
     : QObject(parent),
     m_httpServer(),
+    m_ledTimer(),
     m_gateway(nullptr),
     m_storage(nullptr),
+    m_ledPin(GPIOPinFactory::getGPIOPin(platform)),
     m_networkManager(NetworkManagerFactory::getNetworkManager(platform))
 {
+    connect(&m_ledTimer, &QTimer::timeout, this, [this]() -> void {
+        if (m_ledPin != nullptr) m_ledPin->toggle();
+    });
 }
 
 Control::~Control()
@@ -43,11 +51,16 @@ bool Control::start(int port)
 
     qDebug() << "Listening on port:" << tcpserver->serverPort();
 
+    bool started = false;
+
     if ((m_gateway != nullptr) && (m_storage != nullptr))
     {
         if (m_storage->active())
-            m_gateway->start();
+            started = m_gateway->start();
     }
+
+    m_ledTimer.setInterval(started ? 200: 1'000);
+    m_ledTimer.start();
 
     return true;
 }
