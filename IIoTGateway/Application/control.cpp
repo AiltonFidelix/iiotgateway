@@ -19,7 +19,8 @@ Control::Control(const QString &platform, QObject *parent)
     m_gateway(nullptr),
     m_storage(nullptr),
     m_ledPin(GPIOPinFactory::getGPIOPin(platform)),
-    m_networkManager(NetworkManagerFactory::getNetworkManager(platform))
+    m_networkManager(NetworkManagerFactory::getNetworkManager(platform)),
+    m_reboot(rebootMethod(platform))
 {
     connect(&m_ledTimer, &QTimer::timeout, this, [this]() -> void {
         if (m_ledPin != nullptr) m_ledPin->toggle();
@@ -83,6 +84,14 @@ void Control::setGateway(Gateway *gateway)
 void Control::setStorage(StorageInterface *storage)
 {
     m_storage = storage;
+}
+
+Control::Reboot Control::rebootMethod(const QString &platform)
+{
+    if (platform == "host") {
+        return []() -> void { qDebug() << "Host rebooting..."; };
+    }
+    return []() -> void { qDebug() << "Rebooting..."; };
 }
 
 void Control::registerRoutes()
@@ -199,6 +208,11 @@ void Control::registerRoutes()
         {
             ok = m_gateway->restart();
             message = ok ? QStringLiteral("Gateway restarted successfully!") : QStringLiteral("Failure to restart the gateway!");
+        }
+        else if (command == "reboot")
+        {
+            m_reboot();
+            message = QStringLiteral("Gateway rebooting...");
         }
 
         return makeResponse(ok, message);

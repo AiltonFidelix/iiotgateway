@@ -156,6 +156,8 @@ Page {
         anchors.right: btnSave.left
         highlighted: true
         enabled: true
+
+        onClicked: backend.reboot();
     }
 
     // Save gateway network settings

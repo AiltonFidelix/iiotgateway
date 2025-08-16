@@ -1,6 +1,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include <functional>
 #include <QObject>
 #include <QTimer>
 #include <QHttpServer>
@@ -18,13 +19,17 @@ class Control : public QObject
 {
     Q_OBJECT
 
+    using Reboot = std::function<void()>;
+
     QHttpServer m_httpServer;
     QTimer m_ledTimer;
     Gateway *m_gateway;
     StorageInterface *m_storage;
     GPIOPin *m_ledPin;
     NetworkManager *m_networkManager;
+    Reboot m_reboot;
 
+    Reboot rebootMethod(const QString &platform);
     void registerRoutes();
     QHttpServerResponse makeResponse(const QByteArray &data) const;
     QHttpServerResponse makeResponse(bool ok, const QString &message) const;
