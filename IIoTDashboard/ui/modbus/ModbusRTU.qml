@@ -39,7 +39,7 @@ Item {
 
         const data = {
             "pollingEnabled": chbPolling.checked,
-            "pollingTimeout": spbPolling.value,
+            "pollingInterval": spbPolling.value,
             "port": txtSerialPort.text,
             "baudrate": txtBaudrate.text,
             "parity": cbxParity.currentText,
@@ -55,7 +55,7 @@ Item {
 
     function setSettings(data) {
         chbPolling.checked = data.pollingEnabled;
-        spbPolling.value = data.pollingTimeout;
+        spbPolling.value = data.pollingInterval;
         txtSerialPort.text = data.port;
         txtBaudrate.text = data.baudrate;
         cbxParity.currentIndex = cbxParity.find(data.parity);
