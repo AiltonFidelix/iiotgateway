@@ -8,6 +8,7 @@ set(HEADERS
 
 set(SOURCES
     src/utils/testutils.cpp
+    src/gpio/testgpiopin.cpp
     src/modbus/testcommmodbus.cpp
     src/modbus/testcommmodbusrequestparser.cpp
     src/modbus/testcommmodbussettingsparser.cpp
