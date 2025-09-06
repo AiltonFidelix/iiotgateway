@@ -8,6 +8,7 @@
 #include <QTcpServer>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QProcess>
 
 using device::driver::gpio::GPIOPinFactory;
 using device::network::NetworkManagerFactory;
@@ -88,10 +89,25 @@ void Control::setStorage(StorageInterface *storage)
 
 Control::Reboot Control::rebootMethod(const QString &platform)
 {
-    if (platform == "host") {
-        return []() -> void { qDebug() << "Host rebooting..."; };
+    if (platform == "rapsberry")
+    {
+        return []() -> void
+        {
+            QProcess process;
+            process.start(QStringLiteral("sudo"), QStringList() << QStringLiteral("reboot"));
+
+            if (!process.waitForStarted())
+            {
+                qWarning() << "Failed to start reboot process";
+                return;
+            }
+
+            process.waitForFinished();
+            qDebug() << "Reboot command sent";
+        };
     }
-    return []() -> void { qDebug() << "Rebooting..."; };
+
+    return []() -> void { qDebug() << "Host rebooting..."; };
 }
 
 void Control::registerRoutes()
