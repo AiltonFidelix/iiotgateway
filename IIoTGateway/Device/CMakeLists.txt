@@ -27,6 +27,12 @@ set(SOURCES
     network/networkmanagerfactory.cpp
 )
 
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+    message(STATUS "Adding aarch64 resources to the device library")
+    list(APPEND HEADERS driver/gpio/raspberrygpiopin.h)
+    list(APPEND SOURCES driver/gpio/raspberrygpiopin.cpp)
+endif()
+
 set(QT_COMPONENTS
     Core
     Network
@@ -44,3 +50,7 @@ endforeach()
 target_include_directories(${LIBRARY_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}"
 )
+
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+    target_link_libraries(${LIBRARY_NAME} wiringPi)
+endif()
