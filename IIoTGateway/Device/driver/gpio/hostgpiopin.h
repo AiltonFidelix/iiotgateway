@@ -21,7 +21,6 @@ class HostGPIOPin : public GPIOPin
 public:
     HostGPIOPin();
 
-    bool configure() override;
     void setPin(uint8_t pin) override;
     void setMode(GPIOMode mode) override;
     void write(GPIOState state) override;

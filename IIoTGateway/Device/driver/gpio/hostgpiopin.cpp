@@ -18,11 +18,6 @@ void HostGPIOPin::printState(const QString &method)
     qDebug() << "HostGPIO" << m_pin << method << ((m_state == GPIOState::High) ? "GPIOState::Low" : "GPIOState::High");
 }
 
-bool HostGPIOPin::configure()
-{
-    return true;
-}
-
 void HostGPIOPin::setPin(uint8_t pin)
 {
     m_pin = pin;
