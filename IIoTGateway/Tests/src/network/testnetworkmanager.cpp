@@ -28,5 +28,7 @@ TEST_F(TestNetworkManager, TestCreation)
     const auto actualJson = QJsonDocument::fromJson(actualData);
 
     ASSERT_EQ(expectedJson.toJson(QJsonDocument::Compact), actualJson.toJson(QJsonDocument::Compact));
+
+    delete manager;
 }
 
