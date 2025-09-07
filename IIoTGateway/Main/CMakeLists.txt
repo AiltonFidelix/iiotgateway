@@ -1,10 +1,8 @@
 set(EXECUTABLE_NAME IIoTGateway)
 set(SOURCES main.cpp)
 set(QT_COMPONENTS Core)
-set(LIBRARIES Application Communication)
+set(LIBRARIES Application Device)
 set(PROJECT_SOURCES ${SOURCES})
-
-add_compile_definitions(APP_NAME="${EXECUTABLE_NAME}")
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPONENTS})

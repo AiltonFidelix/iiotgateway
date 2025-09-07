@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 
 project(IIoTGateway VERSION 1.0.0 LANGUAGES CXX)
 
+add_compile_definitions(APP_NAME="${PROJECT_NAME}")
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
