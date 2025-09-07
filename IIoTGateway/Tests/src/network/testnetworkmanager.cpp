@@ -14,7 +14,7 @@ class TestNetworkManager: public testing::Test
 {
 };
 
-TEST_F(TestNetworkManager, TestCreation)
+TEST_F(TestNetworkManager, TestMethods)
 {
     const QByteArray expectedData = TestUtils::readJsonFile(QStringLiteral(":/cases/network/networkmanager.json"));
     const auto expectedJson = QJsonDocument::fromJson(expectedData);

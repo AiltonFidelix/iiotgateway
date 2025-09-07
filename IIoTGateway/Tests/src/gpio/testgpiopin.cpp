@@ -11,11 +11,12 @@ class TestGPIOPin: public testing::Test
 {
 };
 
-TEST_F(TestGPIOPin, TestCreation)
+TEST_F(TestGPIOPin, TestMethods)
 {
     GPIOPin *pin = GPIOPinFactory::getGPIOPin(QStringLiteral("host"));
 
     ASSERT_TRUE(pin != nullptr);
+    ASSERT_EQ(GPIOState::Low, pin->read());
 
     pin->write(GPIOState::High);
 
