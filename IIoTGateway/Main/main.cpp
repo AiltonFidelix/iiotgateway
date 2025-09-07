@@ -1,9 +1,12 @@
 #include <QCoreApplication>
 #include <signal.h>
 
+#include "logging/loghandler.h"
 #include "control.h"
 #include "dbstorage.h"
 #include "gateway.h"
+
+using device::logging::LogHandler;
 
 static Control *control = nullptr;
 
@@ -50,6 +53,9 @@ int main(int argc, char *argv[])
     app.setApplicationName(APP_NAME);
 
     setup_unix_signal_handlers();
+
+    auto logHandler = LogHandler::instance();
+    qInstallMessageHandler(logHandler->syslogHandler);
 
     DBStorage dbstorage;
 

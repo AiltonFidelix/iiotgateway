@@ -11,6 +11,9 @@ set(HEADERS
     driver/gpio/gpiomode.h
     driver/gpio/gpiopinfactory.h
 
+    logging/logging_global.h
+    logging/loghandler.h
+
     network/network_global.h
     network/networkmanager.h
     network/raspberrynetworkmanager.h
@@ -21,6 +24,8 @@ set(HEADERS
 set(SOURCES
     driver/gpio/hostgpiopin.cpp
     driver/gpio/gpiopinfactory.cpp
+
+    logging/loghandler.cpp
 
     network/raspberrynetworkmanager.cpp
     network/hostnetworkmanager.cpp

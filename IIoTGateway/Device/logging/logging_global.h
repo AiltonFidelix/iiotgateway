@@ -1,0 +1,9 @@
+#ifndef LOGGING_GLOBAL_H
+#define LOGGING_GLOBAL_H
+
+#include "device_global.h"
+
+#define LOGGING_BEGIN_NAMESPACE DEVICE_BEGIN_NAMESPACE namespace logging {
+#define LOGGING_END_NAMESPACE DEVICE_END_NAMESPACE }
+
+#endif // LOGGING_GLOBAL_H
