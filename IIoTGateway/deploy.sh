@@ -7,12 +7,13 @@ APP_VERSION="1.0.0"
 APP_NAME="IIoTGateway"
 APP_FOLDER="$APP_NAME-deploy"
 
-QT_VERSION="6.8.3"
-QT_DEPENDENCIES=("libQt6Core" "libQt6HttpServer" "libQt6Sql" "libQt6Network" "libQt6WebSockets" "libQt6SerialBus" "libQt6SerialPort")
-QT_LIB_PATH=$HOME/Qt/$QT_VERSION/gcc_64/lib
-QT_PLUGINS_PATH=$HOME/Qt/$QT_VERSION/gcc_64/plugins
+QT_MAJOR_VERSION="6"
+QT_MINOR_VERSION="8.3"
+QT_VERSION="$QT_MAJOR_VERSION.$QT_MINOR_VERSION"
+QT_LIBRARIES=("libQt6Core" "libQt6HttpServer" "libQt6Sql" "libQt6Network" "libQt6WebSockets" "libQt6SerialBus" "libQt6SerialPort")
+QT_LIBRARIES_PATH="/Qt/$QT_VERSION/arm64/lib"
 
-LIB_PATH=$APP_FOLDER/usr/lib
+LIBRARIES_INSTALL_PATH=$APP_FOLDER/usr/lib
 
 DOCKER_IMAGE="qt-$ARCH:$QT_VERSION"
 DOCKER_CONTAINER="qt-$QT_VERSION-$ARCH"
@@ -37,30 +38,31 @@ rm -rf $APP_FOLDER
 mkdir $APP_FOLDER
 mkdir -p $APP_FOLDER/DEBIAN
 mkdir -p $APP_FOLDER/usr/bin
-mkdir -p $LIB_PATH
+mkdir -p $LIBRARIES_INSTALL_PATH
 
 # Copy scripts and application files
 cp control $APP_FOLDER/DEBIAN
 cp build-$ARCH/Main/$APP_NAME $APP_FOLDER/usr/bin/$APP_NAME
-cp build-$ARCH/Application/libApplication.so $LIB_PATH
-cp build-$ARCH/Communication/libCommunication.so $LIB_PATH
-cp build-$ARCH/Device/libDevice.so $LIB_PATH
-
-if [ $ARCH == "aarch64" ]; then
-    QT_LIB_PATH="/Qt/$QT_VERSION/arm64/lib"
-fi
+cp build-$ARCH/Application/libApplication.so $LIBRARIES_INSTALL_PATH
+cp build-$ARCH/Communication/libCommunication.so $LIBRARIES_INSTALL_PATH
+cp build-$ARCH/Device/libDevice.so $LIBRARIES_INSTALL_PATH
 
 docker run -d --name=$DOCKER_CONTAINER $DOCKER_IMAGE
 
 # Copy Qt shared libraries
-for qtlib in ${QT_DEPENDENCIES[@]}
+for qtlib in ${QT_LIBRARIES[@]}
 do
-    docker cp $DOCKER_CONTAINER:$QT_LIB_PATH/$qtlib.so.$QT_VERSION ./$LIB_PATH
+    docker cp $DOCKER_CONTAINER:$QT_LIBRARIES_PATH/$qtlib.so.$QT_VERSION ./$LIBRARIES_INSTALL_PATH
+    docker cp $DOCKER_CONTAINER:$QT_LIBRARIES_PATH/$qtlib.so.$QT_MAJOR_VERSION ./$LIBRARIES_INSTALL_PATH
 done
 
-# docker cp $DOCKER_CONTAINER:$QT_LIB_PATH/libicui18n.so.73 ./$LIB_PATH
-# docker cp $DOCKER_CONTAINER:$QT_LIB_PATH/libicuuc.so.73 ./$LIB_PATH
-# docker cp $DOCKER_CONTAINER:$QT_LIB_PATH/libicudata.so.73 ./$LIB_PATH
+# Copy other shared libraries
+docker cp $DOCKER_CONTAINER:/qt/arm64/sysroot/usr/lib/libwiringPi.so ./$LIBRARIES_INSTALL_PATH
+docker cp $DOCKER_CONTAINER:/qt/arm64/sysroot/usr/lib/libwiringPi.so.3.16 ./$LIBRARIES_INSTALL_PATH
+docker cp $DOCKER_CONTAINER:/qt/arm64/sysroot/usr/local/lib/libpaho-mqttpp3.so.1 ./$LIBRARIES_INSTALL_PATH
+docker cp $DOCKER_CONTAINER:/qt/arm64/sysroot/usr/local/lib/libpaho-mqttpp3.so.1.5.1 ./$LIBRARIES_INSTALL_PATH
+docker cp $DOCKER_CONTAINER:/qt/arm64/sysroot/usr/local/lib/libpaho-mqtt3as.so.1 ./$LIBRARIES_INSTALL_PATH
+docker cp $DOCKER_CONTAINER:/qt/arm64/sysroot/usr/local/lib/libpaho-mqtt3as.so.1.3.14 ./$LIBRARIES_INSTALL_PATH
 
 docker container rm $DOCKER_CONTAINER
 

@@ -24,7 +24,7 @@ if [ $ARCH == "aarch64" ]; then
         -v $(pwd):/src \
         -w /src/build-$ARCH \
         $DOCKER_IMAGE \
-        qt-cmake ..q    
+        qt-cmake ..
 
     docker run --rm \
         -v $(pwd):/src \

@@ -1,8 +1,14 @@
+# folders
 build
+build-*
 venv
 old
 .vscode
+*-deploy
+
+# files
 *.txt.user
 *.drawio.bkp
 *.env
 *.db
+*.deb
