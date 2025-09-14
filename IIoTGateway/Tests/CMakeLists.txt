@@ -1,4 +1,4 @@
-set(EXECUTABLE_NAME TestsRunner)
+set(EXECUTABLE_NAME Runner)
 
 set(HEADERS
     src/utils/testutils.h
