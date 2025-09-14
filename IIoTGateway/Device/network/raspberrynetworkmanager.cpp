@@ -1,117 +1,163 @@
 #include "raspberrynetworkmanager.h"
 
-RaspberryNetworkManager::RaspberryNetworkManager() {}
+#include <QDebug>
+#include <QProcess>
+#include <QRegularExpression>
 
-// void createOrUpdateEthernet(const QString &ip, const QString &gateway, const QStringList &dns) {
-//     QString conName = "my-ethernet";
-//     QString dnsStr = dns.join(",");
+// setIPConfig("Wired connection 1", false, "192.168.1.50", "192.168.1.1", "8.8.8.8");
 
-//     // Delete if existing (optional for overwrite behavior)
-//     QProcess::execute("nmcli", {"con", "delete", conName});
+NETWORK_BEGIN_NAMESPACE
 
-//     // Add new connection
-//     QProcess::execute("nmcli", {
-//                                    "con", "add", "type", "ethernet",
-//                                    "ifname", "eth0",
-//                                    "con-name", conName,
-//                                    "ipv4.addresses", ip,
-//                                    "ipv4.gateway", gateway,
-//                                    "ipv4.dns", dnsStr,
-//                                    "ipv4.method", "manual"
-//                                });
+QString RaspberryNetworkManager::runCommand(const QString &program, const QStringList &args)
+{
+    QProcess process;
+    process.start(program, args);
+    process.waitForFinished();
 
-//     qDebug() << "Ethernet config added/updated";
-// }
-// void createOrUpdateWiFi(const QString &ssid, const QString &password) {
-//     QString conName = "my-wifi";
+    const QString output = process.readAllStandardOutput();
+    const QString error = process.readAllStandardError();
 
-//     // Delete if existing (optional)
-//     QProcess::execute("nmcli", {"con", "delete", conName});
+    return output + error;
+}
 
-//     // Add new Wi-Fi connection
-//     QProcess::execute("nmcli", {
-//                                    "con", "add", "type", "wifi",
-//                                    "ifname", "wlan0",
-//                                    "con-name", conName,
-//                                    "ssid", ssid
-//                                });
+QString RaspberryNetworkManager::nmcliCommand(const QStringList &args)
+{
+    return runCommand(QStringLiteral("nmcli"), args);
+}
 
-//     QProcess::execute("nmcli", {"con", "modify", conName, "wifi-sec.key-mgmt", "wpa-psk"});
-//     QProcess::execute("nmcli", {"con", "modify", conName, "wifi-sec.psk", password});
-//     QProcess::execute("nmcli", {"con", "modify", conName, "ipv4.method", "auto"});
+QString RaspberryNetworkManager::activeInterface()
+{
+    const QString output = runCommand(QStringLiteral("ip"), {QStringLiteral("route")});
+    const QStringList lines = output.split('\n');
 
-//     qDebug() << "Wi-Fi config added/updated";
-// }
-// void createOrUpdateEthernet(const QString &ip, const QString &netmask,
-//                             const QString &gateway, const QStringList &dns) {
-//     QString conName = "my-ethernet";
-//     QString dnsStr = dns.join(",");
-//     QString ipWithCIDR = getIPWithCIDR(ip, netmask);
+    for (const QString &line : lines)
+    {
+        if (line.startsWith(QStringLiteral("default")))
+        {
+            static const QRegularExpression re("dev\\s+(\\w+)");
+            const QRegularExpressionMatch match = re.match(line);
 
-//     // Optional: delete previous config
-//     QProcess::execute("nmcli", {"con", "delete", conName});
+            if (match.hasMatch())
+            {
+                return match.captured(1);  // "eth0" or "wlan0"
+            }
+        }
+    }
 
-//     // Add new connection
-//     QProcess::execute("nmcli", {
-//                                    "con", "add", "type", "ethernet",
-//                                    "ifname", "eth0",
-//                                    "con-name", conName,
-//                                    "ipv4.addresses", ipWithCIDR,
-//                                    "ipv4.gateway", gateway,
-//                                    "ipv4.dns", dnsStr,
-//                                    "ipv4.method", "manual"
-//                                });
+    return QStringLiteral("unknown");
+}
 
-//     QProcess::execute("nmcli", {"con", "modify", conName, "connection.autoconnect", "yes"});
+QString RaspberryNetworkManager::connectionDetails(const QString &connectionName)
+{
+    return nmcliCommand({
+        QStringLiteral("connection"),
+        QStringLiteral("show"),
+        connectionName,
+        QStringLiteral("--show-secrets")
+    });
+}
 
-//     qDebug() << "Ethernet configuration set:" << ipWithCIDR;
-// }
+void RaspberryNetworkManager::switchToWiFi()
+{
+    nmcliCommand({
+        QStringLiteral("device"),
+        QStringLiteral("disconnect"),
+        QStringLiteral("eth0")
+    });
+    nmcliCommand({
+        QStringLiteral("connection"),
+        QStringLiteral("up"),
+        QStringLiteral("preconfigured")
+    });
+}
 
-// int cidrToNetmaskBits(const QString &cidr) {
-//     bool ok;
-//     int bits = cidr.toInt(&ok);
-//     return ok ? bits : 24;
-// }
+void RaspberryNetworkManager::switchToEthernet()
+{
+    nmcliCommand({
+        QStringLiteral("device"),
+        QStringLiteral("disconnect"),
+        QStringLiteral("wlan0")
+    });
 
-// QString cidrToNetmask(int bits) {
-//     quint32 mask = bits == 0 ? 0 : (~0U << (32 - bits));
-//     QHostAddress addr(mask);
-//     return addr.toString();
-// }
+    nmcliCommand({
+        QStringLiteral("device"),
+        QStringLiteral("connect"),
+        QStringLiteral("eth0")
+    });
+}
 
-// struct NetworkConfig {
-//     QString ip;
-//     QString netmask;
-//     QString gateway;
-//     QStringList dns;
-// };
+void RaspberryNetworkManager::connectToWiFi(const QString &ssid, const QString &password)
+{
+    const QStringList args{
+        QStringLiteral("device"),
+        QStringLiteral("wifi"),
+        QStringLiteral("connect"),
+        ssid,
+        QStringLiteral("password"),
+        password,
+        QStringLiteral("ifname"),
+        QStringLiteral("wlan0")
+    };
 
-// NetworkConfig getConnectionConfig(const QString &connectionName) {
-//     NetworkConfig config;
+    const QString result = nmcliCommand(args);
 
-//     QProcess process;
-//     process.start("nmcli", {"con", "show", connectionName});
-//     process.waitForFinished();
+    qDebug() << "Wi-Fi connection result:" << result;
+}
 
-//     QString output = process.readAllStandardOutput();
-//     QStringList lines = output.split('\n', Qt::SkipEmptyParts);
+void RaspberryNetworkManager::setIPConfig(const QString &connectionName,
+                                          const bool useDHCP,
+                                          const QString &ip,
+                                          const QString &gateway,
+                                          const QString &dns)
+{
+    if (useDHCP)
+    {
+        nmcliCommand({
+            QStringLiteral("con"),
+            QStringLiteral("mod"),
+            connectionName,
+            QStringLiteral("ipv4.method"),
+            QStringLiteral("auto")
+        });
+    }
+    else
+    {
+        if (ip.isEmpty() || gateway.isEmpty())
+        {
+            qWarning() << "Static IP config requires IP and gateway";
+            return;
+        }
 
-//     for (const QString &line : lines) {
-//         if (line.contains("ipv4.addresses:")) {
-//             QString value = line.section(':', 1).trimmed(); // e.g. 192.168.1.150/24
-//             QString ip = value.section('/', 0, 0);
-//             QString cidr = value.section('/', 1, 1);
-//             config.ip = ip;
-//             config.netmask = cidrToNetmask(cidrToNetmaskBits(cidr));
-//         }
-//         if (line.contains("ipv4.gateway:")) {
-//             config.gateway = line.section(':', 1).trimmed();
-//         }
-//         if (line.contains("ipv4.dns:")) {
-//             QString dnsString = line.section(':', 1).trimmed();
-//             config.dns = dnsString.split(',', Qt::SkipEmptyParts);
-//         }
-//     }
+        nmcliCommand({
+            QStringLiteral("con"),
+            QStringLiteral("mod"),
+            connectionName,
+            QStringLiteral("ipv4.addresses"),
+            QString("%1/24").arg(ip),
+            QStringLiteral("ipv4.gateway"),
+            gateway,
+            QStringLiteral("ipv4.method"),
+            QStringLiteral("manual")
+        });
 
-//     return config;
-// }
+        if (!dns.isEmpty())
+        {
+            nmcliCommand({
+                QStringLiteral("con"),
+                QStringLiteral("mod"),
+                connectionName,
+                QStringLiteral("ipv4.dns"),
+                dns
+            });
+        }
+    }
+
+    nmcliCommand({
+        QStringLiteral("con"),
+        QStringLiteral("up"),
+        connectionName
+    });
+}
+
+
+NETWORK_END_NAMESPACE
