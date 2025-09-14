@@ -1,9 +1,23 @@
 #!/bin/bash
 
 ARCH=$1
+FLAG=$2
+ARGS=$#
 ARCHS=("amd64" "aarch64")
 QT_VERSION="6.8.3"
 DOCKER_IMAGE="qt-$ARCH:$QT_VERSION"
+
+verifyBuildfolder() {
+    if [ $ARGS -eq 2 ]; then
+        if [ $FLAG == "-c" ]; then
+            rm -rf build-$ARCH
+        fi
+    fi
+
+    if [ ! -d "build-$ARCH" ]; then
+        mkdir build-$ARCH 
+    fi
+}
 
 options() {
     echo "Usage ./build.sh [OPTION]"
@@ -11,14 +25,14 @@ options() {
     exit 0
 }
 
-if [ $# -eq 0 ]; then
+if [ $ARGS -eq 0 ]; then
     options
 elif [[ ! ${ARCHS[@]} =~ $ARCH ]]; then
     options
 fi
 
 if [ $ARCH == "aarch64" ]; then
-    rm -rf build-$ARCH && mkdir build-$ARCH 
+    verifyBuildfolder
 
     docker run --rm \
         -v $(pwd):/src \
@@ -34,7 +48,9 @@ if [ $ARCH == "aarch64" ]; then
 
 elif [ $ARCH == "amd64" ]; then
     # TODO: create a docker image for amd64 build system and refactor script
-    rm -rf build-$ARCH && mkdir build-$ARCH && cd build-$ARCH
+
+    verifyBuildfolder
+    cd build-$ARCH
 
     $HOME/Qt/$QT_VERSION/gcc_64/bin/qt-cmake ..
     cmake --build . --parallel 12
