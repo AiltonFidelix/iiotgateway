@@ -157,7 +157,9 @@ void CommModbus::readRegisters(const Request &request)
         json.insert(QStringLiteral("datetime"), QDateTime::currentDateTime().toString(QStringLiteral("dd/MM/yyyy hh:mm:ss.zzz")));
         json.insert(QStringLiteral("devices"), devices);
 
-        emit outgoing(QJsonDocument(json).toJson(QJsonDocument::Compact));
+        const QByteArray data = QJsonDocument(json).toJson(QJsonDocument::Compact);
+
+        emit outgoing(std::move(data));
     }
 }
 

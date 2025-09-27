@@ -178,7 +178,7 @@ CommMQTT::onConnected()
 void
 CommMQTT::onMessageArrived(QByteArray message)
 {
-    emit outgoing(message);
+    emit outgoing(std::move(message));
 }
 
 COMM_MQTT_END_NAMESPACE

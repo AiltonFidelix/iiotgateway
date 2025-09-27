@@ -22,7 +22,7 @@ void CommMQTTCallback::message_arrived(mqtt::const_message_ptr ptr)
 
     qInfo() << "Message arrived:" << message;
 
-    emit cbMessageArrived(message);
+    emit cbMessageArrived(std::move(message));
 }
 
 void CommMQTTCallback::delivery_complete(mqtt::delivery_token_ptr token)
