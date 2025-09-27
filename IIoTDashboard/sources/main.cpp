@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     const QUrl url(QStringLiteral("qrc:/ui/Main.qml"));
 
     Backend backend;
-    engine.rootContext()->setContextProperty("backend", &backend);
+    engine.rootContext()->setContextProperty(QStringLiteral("backend"), &backend);
 
     QObject::connect(
         &engine,
