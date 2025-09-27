@@ -1,0 +1,9 @@
+[Unit]
+Description=IIoTGateway Service
+
+[Service]
+ExecStart=/usr/bin/iiotgateway
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

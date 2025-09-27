@@ -44,10 +44,14 @@ rm -rf $APP_FOLDER
 mkdir $APP_FOLDER
 mkdir -p $APP_FOLDER/DEBIAN
 mkdir -p $APP_FOLDER/usr/bin
+mkdir -p $APP_FOLDER/usr/lib/systemd/system
 mkdir -p $LIBRARIES_INSTALL_PATH
 
 # Copy scripts and application files
 cp control $APP_FOLDER/DEBIAN
+cp preinst $APP_FOLDER/DEBIAN
+cp postinst $APP_FOLDER/DEBIAN
+cp iiotgateway.service $APP_FOLDER/usr/lib/systemd/system
 cp build-$ARCH/Main/$APP_NAME $APP_FOLDER/usr/bin/$APP_NAME
 cp build-$ARCH/Application/libApplication.so* $LIBRARIES_INSTALL_PATH
 cp build-$ARCH/Communication/libCommunication.so* $LIBRARIES_INSTALL_PATH

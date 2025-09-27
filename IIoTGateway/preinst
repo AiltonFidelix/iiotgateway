@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+systemctl stop iiotgateway.service
+
+if [ $? -eq 0 ]; then
+    systemctl disable iiotgateway.service
+fi
+
+exit 0
