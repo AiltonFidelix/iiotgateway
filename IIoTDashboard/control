@@ -1,0 +1,9 @@
+Package: IIoTDashboard
+Version: 1.0.0
+Section: web
+Priority: optional
+Architecture: all
+Depends: nginx
+Maintainer: Ailton Fidelix
+Homepage: https://github.com/AiltonFidelix
+Description: Dashboard for configuration of IIoTGateway application

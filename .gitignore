@@ -12,3 +12,4 @@ old
 *.env
 *.db
 *.deb
+*.min.*
