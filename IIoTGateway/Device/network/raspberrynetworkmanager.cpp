@@ -1,4 +1,5 @@
 #include "raspberrynetworkmanager.h"
+#include "networkmanagerfactory.h"
 
 #include <QDebug>
 #include <QProcess>
@@ -7,6 +8,8 @@
 // setIPConfig("Wired connection 1", false, "192.168.1.50", "192.168.1.1", "8.8.8.8");
 
 NETWORK_BEGIN_NAMESPACE
+
+int RaspberryNetworkManager::m_id = NetworkManagerFactory::registerNetworkManager(QStringLiteral("raspberry"), RaspberryNetworkManager::create);
 
 QString RaspberryNetworkManager::runCommand(const QString &program, const QStringList &args)
 {
@@ -159,5 +162,29 @@ void RaspberryNetworkManager::setIPConfig(const QString &connectionName,
     });
 }
 
+bool RaspberryNetworkManager::load()
+{
+    return false;
+}
+
+bool RaspberryNetworkManager::save() const
+{
+    return false;
+}
+
+bool RaspberryNetworkManager::setSettings(const QByteArray &settings)
+{
+    return false;
+}
+
+QByteArray RaspberryNetworkManager::settings() const
+{
+    return QByteArray();
+}
+
+NetworkManager *RaspberryNetworkManager::create()
+{
+    return static_cast<NetworkManager*>(new RaspberryNetworkManager());
+}
 
 NETWORK_END_NAMESPACE
