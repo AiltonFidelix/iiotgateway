@@ -1,7 +1,7 @@
 Package: IIoTGateway
 Version: 1.0.0
 Architecture: all
-Depends: sqlite3
+Depends: sqlite3, libqt6sql6-sqlite
 Maintainer: Ailton Fidelix
 Homepage: https://github.com/AiltonFidelix
 Description: IIoTGateway application control

@@ -11,7 +11,8 @@ QT_VERSION="6.8.3"
 QT_LIBRARIES=("libQt6Core" "libQt6HttpServer" "libQt6Sql" "libQt6Network" "libQt6WebSockets" "libQt6SerialBus" "libQt6SerialPort")
 QT_LIBRARIES_PATH="/Qt/$QT_VERSION/arm64/lib"
 
-LIBRARIES_INSTALL_PATH=$APP_FOLDER/usr/lib
+EXECUTABLE_INSTALL_PATH=$APP_FOLDER/opt/iiotgateway
+LIBRARIES_INSTALL_PATH=$APP_FOLDER/opt/iiotgateway/lib
 
 DOCKER_IMAGE="qt-$ARCH:$QT_VERSION"
 DOCKER_CONTAINER="qt-$QT_VERSION-$ARCH"
@@ -22,7 +23,7 @@ options() {
     exit 0
 }
 
-copyDockerLibs() {
+copySharedLibraryFromDocker() {
     path=$1
     file=$2
     docker run --rm $DOCKER_IMAGE bash -c "cd $path && tar czf - $file" > libs.tar.gz
@@ -43,16 +44,18 @@ rm -rf $APP_FOLDER
 # Create the necessary paths to the application deploy
 mkdir $APP_FOLDER
 mkdir -p $APP_FOLDER/DEBIAN
-mkdir -p $APP_FOLDER/usr/bin
+mkdir -p $APP_FOLDER/opt/iiotgateway
+mkdir -p $APP_FOLDER/opt/iiotgateway/plugins/sqldrivers
 mkdir -p $APP_FOLDER/usr/lib/systemd/system
 mkdir -p $LIBRARIES_INSTALL_PATH
 
 # Copy scripts and application files
 cp control $APP_FOLDER/DEBIAN
-cp preinst $APP_FOLDER/DEBIAN
-cp postinst $APP_FOLDER/DEBIAN
+# cp preinst $APP_FOLDER/DEBIAN
+# cp postinst $APP_FOLDER/DEBIAN
 cp iiotgateway.service $APP_FOLDER/usr/lib/systemd/system
-cp build-$ARCH/Main/$APP_NAME $APP_FOLDER/usr/bin/$APP_NAME
+cp runservice.sh $EXECUTABLE_INSTALL_PATH
+cp build-$ARCH/Main/$APP_NAME $EXECUTABLE_INSTALL_PATH/iiotgateway
 cp build-$ARCH/Application/libApplication.so* $LIBRARIES_INSTALL_PATH
 cp build-$ARCH/Communication/libCommunication.so* $LIBRARIES_INSTALL_PATH
 cp build-$ARCH/Device/libDevice.so* $LIBRARIES_INSTALL_PATH
@@ -60,13 +63,17 @@ cp build-$ARCH/Device/libDevice.so* $LIBRARIES_INSTALL_PATH
 # Copy Qt shared libraries
 for qtlib in ${QT_LIBRARIES[@]}
 do
-    copyDockerLibs "$QT_LIBRARIES_PATH" "$qtlib.so*"
+    copySharedLibraryFromDocker "$QT_LIBRARIES_PATH" "$qtlib.so*"
 done
 
+# Copy Qt sqlite plugin
+copySharedLibraryFromDocker "/Qt/$QT_VERSION/arm64/plugins/sqldrivers" "libqsqlite.so"
+mv $LIBRARIES_INSTALL_PATH/libqsqlite.so $EXECUTABLE_INSTALL_PATH/plugins/sqldrivers
+
 # Copy other shared libraries
-copyDockerLibs "/qt/arm64/sysroot/usr/lib" "libwiringPi.so*"
-copyDockerLibs "/qt/arm64/sysroot/usr/local/lib" "libpaho-mqttpp3.so*"
-copyDockerLibs "/qt/arm64/sysroot/usr/local/lib" "libpaho-mqtt3as.so*"
+copySharedLibraryFromDocker "/qt/arm64/sysroot/usr/lib" "libwiringPi.so*"
+copySharedLibraryFromDocker "/qt/arm64/sysroot/usr/local/lib" "libpaho-mqttpp3.so*"
+copySharedLibraryFromDocker "/qt/arm64/sysroot/usr/local/lib" "libpaho-mqtt3as.so*"
 
 # Generate the .deb installer
 dpkg --build $APP_FOLDER
