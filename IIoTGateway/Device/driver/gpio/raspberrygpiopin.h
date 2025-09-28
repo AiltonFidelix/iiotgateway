@@ -15,6 +15,8 @@ class RasbpberryGPIOPin : public GPIOPin
     uint8_t m_pin;
     GPIOState m_state;
 
+    static int registerGPIO();
+
 public:
     RasbpberryGPIOPin();
 
