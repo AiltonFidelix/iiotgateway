@@ -11,7 +11,10 @@
 #include <QProcess>
 
 using device::driver::gpio::GPIOPinFactory;
+using device::driver::gpio::GPIOMode;
 using device::network::NetworkManagerFactory;
+
+constexpr const uint8_t LED_STATUS_PIN = 12;
 
 Control::Control(const QString &platform, QObject *parent)
     : QObject(parent),
@@ -23,9 +26,15 @@ Control::Control(const QString &platform, QObject *parent)
     m_networkManager(NetworkManagerFactory::getNetworkManager(platform)),
     m_reboot(rebootMethod(platform))
 {
-    connect(&m_ledTimer, &QTimer::timeout, this, [this]() -> void {
-        if (m_ledPin != nullptr) m_ledPin->toggle();
-    });
+    if (m_ledPin != nullptr)
+    {
+        m_ledPin->setPin(LED_STATUS_PIN);
+        m_ledPin->setMode(GPIOMode::Output);
+
+        connect(&m_ledTimer, &QTimer::timeout, this, [this]() -> void {
+            if (m_ledPin != nullptr) m_ledPin->toggle();
+        });
+    }
 }
 
 Control::~Control()
