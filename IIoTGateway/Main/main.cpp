@@ -65,9 +65,11 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    Gateway gateway(&dbstorage);
-
     const QString platform = qEnvironmentVariable("PLATFORM", QStringLiteral("host"));
+
+    qDebug() << "PLATFORM:" << platform;
+
+    Gateway gateway(&dbstorage);
 
     control = new Control(platform);
 

@@ -19,6 +19,8 @@ DBStorage::~DBStorage()
 
 bool DBStorage::verify() const
 {
+    qInfo() << "Verifying database scripts...";
+
     if (!m_connection->open())
     {
         qFatal() << "Database connection failed:" << m_connection->lastError();
