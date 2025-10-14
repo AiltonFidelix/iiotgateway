@@ -51,14 +51,16 @@ mkdir -p $LIBRARIES_INSTALL_PATH
 
 # Copy scripts and application files
 cp control $APP_FOLDER/DEBIAN
-# cp preinst $APP_FOLDER/DEBIAN
-# cp postinst $APP_FOLDER/DEBIAN
+cp preinst $APP_FOLDER/DEBIAN
+cp postinst $APP_FOLDER/DEBIAN
 cp iiotgateway.service $APP_FOLDER/usr/lib/systemd/system
-cp runservice.sh $EXECUTABLE_INSTALL_PATH
+cp rungateway.sh $EXECUTABLE_INSTALL_PATH
 cp build-$ARCH/Main/$APP_NAME $EXECUTABLE_INSTALL_PATH/iiotgateway
 cp build-$ARCH/Application/libApplication.so* $LIBRARIES_INSTALL_PATH
 cp build-$ARCH/Communication/libCommunication.so* $LIBRARIES_INSTALL_PATH
 cp build-$ARCH/Device/libDevice.so* $LIBRARIES_INSTALL_PATH
+
+chmod +x $EXECUTABLE_INSTALL_PATH/rungateway.sh
 
 # Copy Qt shared libraries
 for qtlib in ${QT_LIBRARIES[@]}
@@ -74,6 +76,7 @@ mv $LIBRARIES_INSTALL_PATH/libqsqlite.so $EXECUTABLE_INSTALL_PATH/plugins/sqldri
 copySharedLibraryFromDocker "/qt/arm64/sysroot/usr/lib" "libwiringPi.so*"
 copySharedLibraryFromDocker "/qt/arm64/sysroot/usr/local/lib" "libpaho-mqttpp3.so*"
 copySharedLibraryFromDocker "/qt/arm64/sysroot/usr/local/lib" "libpaho-mqtt3as.so*"
+copySharedLibraryFromDocker "/qt/arm64/sysroot/lib/aarch64-linux-gnu" "libicu*.so*"
 
 # Generate the .deb installer
 dpkg --build $APP_FOLDER

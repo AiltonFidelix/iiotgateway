@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 systemctl stop iiotgateway.service
 
 if [ $? -eq 0 ]; then

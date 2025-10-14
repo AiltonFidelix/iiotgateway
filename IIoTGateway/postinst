@@ -6,7 +6,6 @@ systemctl enable iiotgateway.service
 
 if [ $? -eq 0 ]; then
     systemctl start iiotgateway.service
-    systemctl status iiotgateway.service
     exit 0
 fi
 
