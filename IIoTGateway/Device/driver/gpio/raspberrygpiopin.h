@@ -19,6 +19,7 @@ class RasbpberryGPIOPin : public GPIOPin
 
 public:
     RasbpberryGPIOPin();
+    ~RasbpberryGPIOPin();
 
     void setPin(uint8_t pin) override;
     void setMode(GPIOMode mode) override;

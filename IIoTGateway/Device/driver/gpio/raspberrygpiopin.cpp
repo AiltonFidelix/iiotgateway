@@ -23,6 +23,11 @@ RasbpberryGPIOPin::RasbpberryGPIOPin()
     qDebug() << "Creating GPIO...";
 }
 
+RasbpberryGPIOPin::~RasbpberryGPIOPin()
+{
+    write(GPIOState::Low);
+}
+
 void RasbpberryGPIOPin::setPin(uint8_t pin)
 {
     qDebug() << "Setting GPIO pin:" << pin;
