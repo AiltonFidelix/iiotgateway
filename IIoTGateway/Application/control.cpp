@@ -98,7 +98,7 @@ void Control::setStorage(StorageInterface *storage)
 
 Control::Reboot Control::rebootMethod(const QString &platform)
 {
-    if (platform == "rapsberry")
+    if (platform == QStringLiteral("raspberry"))
     {
         return []() -> void
         {
