@@ -5,18 +5,23 @@
 #include "networkmanager.h"
 
 #include <QString>
+#include <QMap>
 
 NETWORK_BEGIN_NAMESPACE
 
 class RaspberryNetworkManager : public NetworkManager
 {
-public:
+    using NetSettings = QMap<QString, QString>;
+
     static int m_id;
 
-    QString runCommand(const QString &program, const QStringList &args);
-    QString nmcliCommand(const QStringList &args);
-    QString activeInterface();
-    QString connectionDetails(const QString &connectionName);
+    QString m_interface;
+    QString m_settings;
+
+    QString runCommand(const QString &program, const QStringList &args, bool *ok = nullptr) const;
+    QString nmcliCommand(const QStringList &args, bool *ok = nullptr) const;
+    QString activeInterface() const;
+    QString connectionDetails(const QString &connectionName) const;
 
     void switchToWiFi();
     void switchToEthernet();
@@ -28,7 +33,13 @@ public:
                      const QString &gateway = QString(),
                      const QString &dns = QString());
 
+
+    NetSettings settingsParser() const;
+
 public:
+
+    RaspberryNetworkManager();
+
     bool load() override;
     bool save() const override;
     bool setSettings(const QByteArray &settings) override;

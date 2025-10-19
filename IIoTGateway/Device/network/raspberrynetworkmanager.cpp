@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QProcess>
 #include <QRegularExpression>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 // setIPConfig("Wired connection 1", false, "192.168.1.50", "192.168.1.1", "8.8.8.8");
 
@@ -11,26 +13,44 @@ NETWORK_BEGIN_NAMESPACE
 
 int RaspberryNetworkManager::m_id = NetworkManagerFactory::registerNetworkManager(QStringLiteral("raspberry"), RaspberryNetworkManager::create);
 
-QString RaspberryNetworkManager::runCommand(const QString &program, const QStringList &args)
+RaspberryNetworkManager::RaspberryNetworkManager()
+    : m_interface(QStringLiteral("wlan0")),
+    m_settings(QStringLiteral(""))
+{
+}
+
+QString RaspberryNetworkManager::runCommand(const QString &program, const QStringList &args, bool *ok) const
 {
     QProcess process;
     process.start(program, args);
     process.waitForFinished();
 
     const QString output = process.readAllStandardOutput();
-    const QString error = process.readAllStandardError();
 
-    return output + error;
+    if (ok)
+    {
+        *ok = !process.errorString().isEmpty();
+    }
+
+    return output;
 }
 
-QString RaspberryNetworkManager::nmcliCommand(const QStringList &args)
+QString RaspberryNetworkManager::nmcliCommand(const QStringList &args, bool *ok) const
 {
-    return runCommand(QStringLiteral("nmcli"), args);
+    return runCommand(QStringLiteral("nmcli"), args, ok);
 }
 
-QString RaspberryNetworkManager::activeInterface()
+QString RaspberryNetworkManager::activeInterface() const
 {
-    const QString output = runCommand(QStringLiteral("ip"), {QStringLiteral("route")});
+    bool ok = false;
+
+    const QString output = runCommand(QStringLiteral("ip"), {QStringLiteral("route")}, &ok);
+
+    if (!ok)
+    {
+        return QStringLiteral("");
+    }
+
     const QStringList lines = output.split('\n');
 
     for (const QString &line : lines)
@@ -50,7 +70,7 @@ QString RaspberryNetworkManager::activeInterface()
     return QStringLiteral("unknown");
 }
 
-QString RaspberryNetworkManager::connectionDetails(const QString &connectionName)
+QString RaspberryNetworkManager::connectionDetails(const QString &connectionName) const
 {
     return nmcliCommand({
         QStringLiteral("connection"),
@@ -162,14 +182,49 @@ void RaspberryNetworkManager::setIPConfig(const QString &connectionName,
     });
 }
 
+RaspberryNetworkManager::NetSettings RaspberryNetworkManager::settingsParser() const
+{
+    const QStringList lines = m_settings.split('\n');
+
+    NetSettings netSettings{};
+
+    for (const QString &line : lines)
+    {
+        const QStringList content = line.split(':');
+
+        if (content.count() != 2)
+            continue;
+
+        const QString property = content.at(0).trimmed();
+        const QString value = content.at(1).trimmed();
+
+        netSettings.insert(property, value);
+    }
+
+    return netSettings;
+}
+
 bool RaspberryNetworkManager::load()
 {
-    return false;
+    bool ok = false;
+
+    m_interface = activeInterface();
+
+    if (m_interface.isEmpty() || m_interface == QStringLiteral("unknown"))
+    {
+        return false;
+    }
+
+    const QString profile = m_interface == QStringLiteral("wlan0") ? QStringLiteral("preconfigured") : QStringLiteral("Wired connection 1");
+
+    m_settings = connectionDetails(profile);
+
+    return !m_settings.isEmpty();
 }
 
 bool RaspberryNetworkManager::save() const
 {
-    return false;
+    return true;
 }
 
 bool RaspberryNetworkManager::setSettings(const QByteArray &settings)
@@ -179,7 +234,27 @@ bool RaspberryNetworkManager::setSettings(const QByteArray &settings)
 
 QByteArray RaspberryNetworkManager::settings() const
 {
-    return QByteArray();
+    const NetSettings netSettings = settingsParser();
+
+    QJsonObject netObject{};
+
+    netObject.insert(QStringLiteral("network"), m_interface);
+    netObject.insert(QStringLiteral("method"), netSettings.value(QStringLiteral("ipv4.method")));
+    netObject.insert(QStringLiteral("ipv4"), netSettings.value(QStringLiteral("IP4.ADDRESS[1]")).remove("/24"));
+    netObject.insert(QStringLiteral("router"), netSettings.value(QStringLiteral("IP4.GATEWAY")));
+    netObject.insert(QStringLiteral("dns"), QStringLiteral("")); // TODO: parse
+
+    if (m_interface == QStringLiteral("wlan0"))
+    {
+        QJsonObject wifiObject{};
+
+        wifiObject.insert(QStringLiteral("ssid"), netSettings.value(QStringLiteral("802-11-wireless.ssid")));
+        wifiObject.insert(QStringLiteral("password"), QStringLiteral("")); // TODO: parse
+
+        netObject.insert(QStringLiteral("wifi"), wifiObject);
+    }
+
+    return QJsonDocument(netObject).toJson(QJsonDocument::Compact);
 }
 
 NetworkManager *RaspberryNetworkManager::create()
