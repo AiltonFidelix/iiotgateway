@@ -165,7 +165,7 @@ void Backend::requestNetworkSettings()
         auto reply = qobject_cast<QNetworkReply*>(sender());
         reply->disconnect();
 
-        auto data = reply->readAll();
+        const QByteArray data = reply->readAll();
         reply->deleteLater();
 
         emit networkSettings(data);

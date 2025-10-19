@@ -43,27 +43,27 @@ GroupBox {
             }
         }
 
-        Text {
-            Layout.minimumWidth: 60
-            text: qsTr("Netmask")
-        }
+        // Text {
+        //     Layout.minimumWidth: 60
+        //     text: qsTr("Netmask")
+        // }
 
-        TextField {
-            id: txtNetMask
+        // TextField {
+        //     id: txtNetMask
 
-            Layout.minimumWidth: 250
-            Layout.preferredHeight: parent.height
+        //     Layout.minimumWidth: 250
+        //     Layout.preferredHeight: parent.height
 
-            text: root.netmask
-            inputMethodHints: Qt.ImhFormattedNumbersOnly
-            validator: RegularExpressionValidator {
-                regularExpression: /^((?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){0,3}(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$/
-            }
+        //     text: root.netmask
+        //     inputMethodHints: Qt.ImhFormattedNumbersOnly
+        //     validator: RegularExpressionValidator {
+        //         regularExpression: /^((?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\.){0,3}(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$/
+        //     }
 
-            onTextChanged: {
-                root.netmask = text
-            }
-        }
+        //     onTextChanged: {
+        //         root.netmask = text
+        //     }
+        // }
 
         Text {
             Layout.minimumWidth: 60

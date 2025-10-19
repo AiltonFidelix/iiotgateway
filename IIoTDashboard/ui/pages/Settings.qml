@@ -9,6 +9,10 @@ Page {
 
     property int itemsHeight: 35
 
+    Component.onCompleted: {
+        backend.requestNetworkSettings();
+    }
+
     function getNetworkSettings() {
         let data = {
             "network": connectionType.currentValue,
@@ -24,7 +28,7 @@ Page {
 
         if (connectionType.currentIndex === 1) {
             data["wifi"] = {
-                "ssdi": gpbWiFi.ssid,
+                "ssid": gpbWiFi.ssid,
                 "password": gpbWiFi.password
             };
         }
@@ -33,8 +37,8 @@ Page {
     }
 
     function setNetworkSettings(data) {
-        connectionType.currentText = connectionType.find(data.network);
-        methodType.currentText = methodType.find(data.method);
+        connectionType.currentIndex = findIndexByValue(connectionType.model, data.network);
+        methodType.currentIndex = findIndexByValue(methodType.model, data.method);
 
         if (methodType.currentIndex === 1) {
             gpbIp.ipv4 = data.ipv4;
@@ -47,6 +51,14 @@ Page {
             gpbWiFi.ssid = data["wifi"].ssid;
             gpbWiFi.password = data["wifi"].password;
         }
+    }
+
+    function findIndexByValue(model, value) {
+        for (let i = 0; i < model.length; i++) {
+            if (model[i].value === value)
+                return i;
+        }
+        return -1
     }
 
     ColumnLayout {
@@ -117,7 +129,7 @@ Page {
                         valueRole: "value"
 
                         model: [
-                            { value: "dhcp", text: "DHCP" },
+                            { value: "auto", text: "Auto" },
                             { value: "manual", text: "Manual" }
                         ]
                     }
@@ -175,8 +187,8 @@ Page {
         target: backend
 
         function onNetworkSettings(settings) {
-            let data = JSON.parse(String(settings));
-            root.setNetworkSettings(settings);
+            let data = JSON.parse(JSON.parse(String(settings)).message);
+            root.setNetworkSettings(data);
         }
     }
 }
