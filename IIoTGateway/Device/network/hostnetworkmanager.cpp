@@ -41,7 +41,7 @@ QByteArray HostNetworkManager::settings() const
                 "router": "192.168.4.1",
                 "dns": "8.8.8.8",
                 "wifi": {
-                    "ssdi": "FakeNet",
+                    "ssid": "FakeNet",
                     "password": "FakePass"
                 }
             }
