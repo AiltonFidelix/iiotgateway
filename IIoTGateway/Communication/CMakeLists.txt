@@ -54,8 +54,9 @@ foreach(component IN LISTS QT_COMPONENTS)
     target_link_libraries(${LIBRARY_NAME} Qt${QT_VERSION_MAJOR}::${component})
 endforeach()
 
+target_include_directories(${LIBRARY_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+
 foreach(library IN LISTS LIBRARIES)
     target_link_libraries(${LIBRARY_NAME} ${library})
 endforeach()
 
-target_include_directories(${LIBRARY_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

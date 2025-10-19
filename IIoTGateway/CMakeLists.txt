@@ -4,6 +4,9 @@ project(IIoTGateway VERSION 1.0.0 LANGUAGES CXX)
 
 add_compile_definitions(APP_NAME="${PROJECT_NAME}")
 
+option(ADD_HOST "Add host implementation" ON)
+option(ADD_TARGET "Add target implementation" OFF)
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

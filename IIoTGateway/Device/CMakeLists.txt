@@ -12,24 +12,28 @@ set(HEADERS
     logging/loghandler.h
     network/network_global.h
     network/networkmanager.h
-    network/raspberrynetworkmanager.h
     network/networkmanagerfactory.h
 )
 
 set(SOURCES
     driver/gpio/gpiopinfactory.cpp
     logging/loghandler.cpp
-    network/raspberrynetworkmanager.cpp
     network/networkmanagerfactory.cpp
 )
 
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
-    message(STATUS "Adding aarch64 implementation to the device library")
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR ADD_TARGET)
+    message(STATUS "Adding raspberry implementation to the device library")
 
-    list(APPEND HEADERS driver/gpio/raspberrygpiopin.h)
-    list(APPEND SOURCES driver/gpio/raspberrygpiopin.cpp)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-    message(STATUS "Adding x86_64 implementation to the device library")
+    list(APPEND HEADERS
+        driver/gpio/raspberrygpiopin.h
+        network/raspberrynetworkmanager.h
+    )
+    list(APPEND SOURCES
+        driver/gpio/raspberrygpiopin.cpp
+        network/raspberrynetworkmanager.cpp
+    )
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR ADD_HOST)
+    message(STATUS "Adding host implementation to the device library")
 
     list(APPEND HEADERS
         driver/gpio/hostgpiopin.h
