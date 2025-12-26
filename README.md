@@ -81,3 +81,5 @@ Dashboard login:
 username: admin
 password gtwAdmin
 ```
+
+journalctl -u iiotgateway.service 
