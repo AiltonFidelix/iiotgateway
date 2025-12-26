@@ -14,7 +14,11 @@ using device::driver::gpio::GPIOPinFactory;
 using device::driver::gpio::GPIOMode;
 using device::network::NetworkManagerFactory;
 
+namespace {
 constexpr const uint8_t LED_STATUS_PIN = 12;
+constexpr const int GATEWAY_RUNNING_TIMER_MS_INTERVAL = 100;
+constexpr const int GATEWAY_STOPPED_TIMER_MS_INTERVAL = 1'000;
+}
 
 Control::Control(const QString &platform, QObject *parent)
     : QObject(parent),
@@ -70,7 +74,7 @@ bool Control::start(int port)
             started = m_gateway->start();
     }
 
-    m_ledTimer.setInterval(started ? 200: 1'000);
+    m_ledTimer.setInterval(started ? GATEWAY_RUNNING_TIMER_MS_INTERVAL : GATEWAY_STOPPED_TIMER_MS_INTERVAL);
     m_ledTimer.start();
 
     return true;
@@ -222,11 +226,22 @@ void Control::registerRoutes()
         if (command == "start")
         {
             ok = m_gateway->start();
-            message = ok ? QStringLiteral("Gateway started successfully!") : QStringLiteral("Failure to start the gateway!");
+
+            if (ok)
+            {
+                m_ledTimer.setInterval(GATEWAY_RUNNING_TIMER_MS_INTERVAL);
+                message = QStringLiteral("Gateway started successfully!");
+            }
+            else
+            {
+                m_ledTimer.setInterval(GATEWAY_STOPPED_TIMER_MS_INTERVAL);
+                message = QStringLiteral("Failure to start the gateway!");
+            }
         }
         else if (command == "stop")
         {
             m_gateway->stop();
+            m_ledTimer.setInterval(GATEWAY_STOPPED_TIMER_MS_INTERVAL);
             message = ok ? QStringLiteral("Gateway stopped successfully!") : QStringLiteral("Failure to stop the gateway!");
         }
         else if (command == "restart")
