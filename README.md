@@ -1,6 +1,44 @@
 # IIotGateway
 
-This is a fake description.
+IIoTGateway is a bridge application that allows reading and writing data via Modbus RTU and transmitting this information using the MQTT protocol, enabling the integration of Modbus devices with modern monitoring and control systems. 
+
+
+### Request JSON
+
+Reading example:
+
+```json
+{
+    "devices": [
+        {
+            "address": 240,
+            "type": "HoldingRegisters",
+            "startRegister": 0,
+            "numberOfEntries": 25
+        }
+    ]
+}
+```
+
+The example above demonstrates how to read registers 0–25 from a Modbus device configured with address 240.
+
+Writing example:
+
+```json
+{
+    "devices": [
+        {
+            "address": 240,
+            "type": "HoldingRegisters",
+            "startRegister": 1,
+            "numberOfEntries": 1,
+            "values": [1]
+        }
+    ]
+}
+```
+
+The example above demonstrates how to write on the register 1 from a Modbus device configured with address 240.
 
 ### Docker commands
 
@@ -18,58 +56,9 @@ allow_anonymous true
 listener 1883 0.0.0.0
 ```
 
-### Request JSON
-
-Reading example:
-
-```bash
-{
-    "devices": [
-        {
-            "address": 240,
-            "type": "HoldingRegisters",
-            "startRegister": 0,
-            "numberOfEntries": 25
-        }
-    ]
-}
-```
-
-Writing example:
-
-```bash
-{
-    "devices": [
-        {
-            "address": 240,
-            "type": "HoldingRegisters",
-            "startRegister": 1,
-            "numberOfEntries": 1,
-            "values": [1]
-        }
-    ]
-}
-```
-
 Env variables:
 
 ```bash
-EDGE_PROTOCOL=MODBUS_RTU
-CLOUD_PROTOCOL=MQTT
-MODBUS_RTU_PORT=/dev/ttyUSB0
-MODBUS_RTU_PARITY=none
-MODBUS_RTU_BAUDRATE=115200
-MODBUS_RTU_DATABITS=8
-MODBUS_RTU_STOPBITS=1
-MODBUS_RTU_POLLING=enabled
-MQTT_PROTOCOL=mqtt
-MQTT_HOST=localhost
-MQTT_SUBSCRIBE=enabled
-MQTT_PORT=1883
-MQTT_CLIENT_ID=iiotgateway
-MQTT_PUB_TOPIC=iiotgateway/modbusrtu
-MQTT_SUB_TOPIC=iiotgateway/mqtt
-MQTT_QOS=0
 DB_TYPE=QSQLITE
 DB_NAME=IIoTGateway.db
 PLATFORM=host | raspberry
