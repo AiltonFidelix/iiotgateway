@@ -6,7 +6,7 @@
 - Created docker images for each one, being able to use with a docker compose
 - Adjust deploy script to be able to deploy as docker image or as .deb installer 
 - Move build/deploy scripts to a specific folder
-- Mode mqtt library install back to cmake
+- Create an option in cmake to install gtest and mqtt paho
 
 ### Protocols
 

@@ -2,6 +2,20 @@
 
 IIoTGateway is a bridge application that allows reading and writing data via Modbus RTU and transmitting this information using the MQTT protocol, enabling the integration of Modbus devices with modern monitoring and control systems. 
 
+### Requirements
+
+- C++ 17
+- Qt >= 6.8.3
+- googletest v1.16.0
+- paho.mqtt.cpp v1.5.1
+
+### Environment variables
+
+| Variable | Description | Value | Supported |
+| --- | --- | --- |
+| DB_TYPE | Database driver | QSQLITE | QSQLITE |
+| DB_NAME | Database name | IIoTGateway.db | anyname.db |
+| PLATFORM | Platform used | raspberry | host, raspberry |
 
 ### Request JSON
 
@@ -54,14 +68,6 @@ mosquitto.conf
 ```
 allow_anonymous true
 listener 1883 0.0.0.0
-```
-
-Env variables:
-
-```bash
-DB_TYPE=QSQLITE
-DB_NAME=IIoTGateway.db
-PLATFORM=host | raspberry
 ```
 
 Dashboard login:
