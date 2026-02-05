@@ -1,0 +1,9 @@
+#ifndef SYSTEM_GLOBAL_H
+#define SYSTEM_GLOBAL_H
+
+#include "device_global.h"
+
+#define SYSTEM_BEGIN_NAMESPACE DEVICE_BEGIN_NAMESPACE namespace system {
+#define SYSTEM_END_NAMESPACE DEVICE_END_NAMESPACE }
+
+#endif // SYSTEM_GLOBAL_H

@@ -13,12 +13,16 @@ set(HEADERS
     network/network_global.h
     network/networkmanager.h
     network/networkmanagerfactory.h
+    system/system_global.h
+    system/reboot.h
+    system/rebootfactory.h
 )
 
 set(SOURCES
     driver/gpio/gpiopinfactory.cpp
     logging/loghandler.cpp
     network/networkmanagerfactory.cpp
+    system/rebootfactory.cpp
 )
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR ADD_TARGET)
@@ -38,10 +42,12 @@ elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR ADD_HOST)
     list(APPEND HEADERS
         driver/gpio/hostgpiopin.h
         network/hostnetworkmanager.h
+        system/hostreboot.h
     )
     list(APPEND SOURCES
         driver/gpio/hostgpiopin.cpp
         network/hostnetworkmanager.cpp
+        system/hostreboot.cpp
     )
 endif()
 
@@ -54,6 +60,7 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 add_library(${LIBRARY_NAME} SHARED ${HEADERS} ${SOURCES})
+
 set_target_properties(${LIBRARY_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 
 foreach(component IN LISTS QT_COMPONENTS)
