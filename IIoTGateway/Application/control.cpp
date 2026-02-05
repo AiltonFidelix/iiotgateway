@@ -16,10 +16,11 @@ using device::driver::gpio::GPIOMode;
 using device::network::NetworkManagerFactory;
 using device::system::RebootFactory;
 
-namespace {
-constexpr const uint8_t LED_STATUS_PIN = 12;
-constexpr const int GATEWAY_RUNNING_TIMER_MS_INTERVAL = 100;
-constexpr const int GATEWAY_STOPPED_TIMER_MS_INTERVAL = 1'000;
+namespace
+{
+    constexpr uint8_t LED_STATUS_PIN = 12;
+    constexpr int GATEWAY_RUNNING_TIMER_MS_INTERVAL = 100;
+    constexpr int GATEWAY_STOPPED_TIMER_MS_INTERVAL = 1'000;
 }
 
 Control::Control(const QString &platform, QObject *parent)
