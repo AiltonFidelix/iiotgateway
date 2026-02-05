@@ -8,18 +8,18 @@
 
 #include "driver/gpio/gpiopin.h"
 #include "network/networkmanager.h"
+#include "system/reboot.h"
 
 class StorageInterface;
 class Gateway;
 
 using device::driver::gpio::GPIOPin;
 using device::network::NetworkManager;
+using device::system::Reboot;
 
 class Control : public QObject
 {
     Q_OBJECT
-
-    using Reboot = std::function<void()>;
 
     QHttpServer m_httpServer;
     QTimer m_ledTimer;
@@ -27,9 +27,8 @@ class Control : public QObject
     StorageInterface *m_storage;
     GPIOPin *m_ledPin;
     NetworkManager *m_networkManager;
-    Reboot m_reboot;
+    Reboot *m_reboot;
 
-    Reboot rebootMethod(const QString &platform);
     void registerRoutes();
     QHttpServerResponse makeResponse(const QByteArray &data) const;
     QHttpServerResponse makeResponse(bool ok, const QString &message) const;

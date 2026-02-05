@@ -4,6 +4,7 @@
 
 #include "driver/gpio/gpiopinfactory.h"
 #include "network/networkmanagerfactory.h"
+#include "system/rebootfactory.h"
 
 #include <QTcpServer>
 #include <QJsonDocument>
@@ -13,6 +14,7 @@
 using device::driver::gpio::GPIOPinFactory;
 using device::driver::gpio::GPIOMode;
 using device::network::NetworkManagerFactory;
+using device::system::RebootFactory;
 
 namespace {
 constexpr const uint8_t LED_STATUS_PIN = 12;
@@ -28,7 +30,7 @@ Control::Control(const QString &platform, QObject *parent)
     m_storage(nullptr),
     m_ledPin(GPIOPinFactory::getGPIOPin(platform)),
     m_networkManager(NetworkManagerFactory::getNetworkManager(platform)),
-    m_reboot(rebootMethod(platform))
+    m_reboot(RebootFactory::create(platform))
 {
     if (m_ledPin != nullptr)
     {
@@ -100,28 +102,28 @@ void Control::setStorage(StorageInterface *storage)
     m_storage = storage;
 }
 
-Control::Reboot Control::rebootMethod(const QString &platform)
-{
-    if (platform == QStringLiteral("raspberry"))
-    {
-        return []() -> void
-        {
-            QProcess process;
-            process.start(QStringLiteral("sudo"), QStringList() << QStringLiteral("reboot"));
+// Control::Reboot Control::rebootMethod(const QString &platform)
+// {
+//     if (platform == QStringLiteral("raspberry"))
+//     {
+//         return []() -> void
+//         {
+//             QProcess process;
+//             process.start(QStringLiteral("sudo"), QStringList() << QStringLiteral("reboot"));
 
-            if (!process.waitForStarted())
-            {
-                qWarning() << "Failed to start reboot process";
-                return;
-            }
+//             if (!process.waitForStarted())
+//             {
+//                 qWarning() << "Failed to start reboot process";
+//                 return;
+//             }
 
-            process.waitForFinished();
-            qDebug() << "Reboot command sent";
-        };
-    }
+//             process.waitForFinished();
+//             qDebug() << "Reboot command sent";
+//         };
+//     }
 
-    return []() -> void { qDebug() << "Host rebooting..."; };
-}
+//     return []() -> void { qDebug() << "Host rebooting..."; };
+// }
 
 void Control::registerRoutes()
 {
@@ -251,8 +253,15 @@ void Control::registerRoutes()
         }
         else if (command == "reboot")
         {
-            m_reboot();
-            message = QStringLiteral("Gateway rebooting...");
+            if (m_reboot)
+            {
+                m_reboot->reboot();
+                message = QStringLiteral("Gateway rebooting...");
+            }
+            else
+            {
+                message = QStringLiteral("Reboot failed!");
+            }
         }
 
         return makeResponse(ok, message);
