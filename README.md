@@ -12,7 +12,7 @@ IIoTGateway is a bridge application that allows reading and writing data via Mod
 ### Environment variables
 
 | Variable | Description | Value | Supported |
-| --- | --- | --- |
+| --- | --- | --- | --- |
 | DB_TYPE | Database driver | QSQLITE | QSQLITE |
 | DB_NAME | Database name | IIoTGateway.db | anyname.db |
 | PLATFORM | Platform used | raspberry | host, raspberry |
@@ -52,29 +52,13 @@ Writing example:
 }
 ```
 
-The example above demonstrates how to write on the register 1 from a Modbus device configured with address 240.
+The example above demonstrates how to write the value 1 on the register 1 from a Modbus device configured with address 240.
 
-### Docker commands
-
-```bash
-docker exec -it mosquitto mosquitto_sub -h localhost -t gateway/topic
-docker exec -it mosquitto mosquitto_pub -h localhost -t gateway/topic -m "Hello from Docker!"
-```
-
-### Mosquitto settings
-
-mosquitto.conf
-
-```
-allow_anonymous true
-listener 1883 0.0.0.0
-```
+### Dashboard
 
 Dashboard login:
 
-```
+```sh
 username: admin
 password gtwAdmin
 ```
-
-journalctl -u iiotgateway.service 
