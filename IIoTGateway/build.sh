@@ -38,7 +38,7 @@ if [ $ARCH == "aarch64" ]; then
         -v $(pwd):/src \
         -w /src/build-$ARCH \
         $DOCKER_IMAGE \
-        qt-cmake ..
+        qt-cmake -DENABLE_GPIO=ON -DENABLE_SYSTEM_REBOOT=ON ..
 
     docker run --rm \
         -v $(pwd):/src \
