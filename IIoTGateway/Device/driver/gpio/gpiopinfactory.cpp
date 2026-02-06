@@ -2,29 +2,23 @@
 
 GPIO_BEGIN_NAMESPACE
 
-GPIOPinFactory::GPIOPinList *GPIOPinFactory::m_gpioPinList = nullptr;
+GPIOPinFactory::Creator GPIOPinFactory::m_creator = nullptr;
 
-GPIOPin *GPIOPinFactory::getGPIOPin(const QString &platform)
+GPIOPin *GPIOPinFactory::create()
 {
-    if (m_gpioPinList->contains(platform))
+    if (m_creator)
     {
-        return m_gpioPinList->value(platform)();
+        return m_creator();
     }
 
     return nullptr;
 }
 
-int GPIOPinFactory::registerGPIOPin(const QString &platform, Creator creator)
+bool GPIOPinFactory::registerCreator(Creator creator)
 {
-    if (m_gpioPinList == nullptr)
-    {
-        m_gpioPinList = new GPIOPinList();
-    }
-
-    m_gpioPinList->insert(platform, creator);
-
-
-    return m_gpioPinList->size();
+    m_creator = creator;
+    return true;
 }
+
 
 GPIO_END_NAMESPACE
