@@ -29,7 +29,7 @@ Control::Control(const QString &platform, QObject *parent)
     m_ledTimer(),
     m_gateway(nullptr),
     m_storage(nullptr),
-    m_ledPin(GPIOPinFactory::getGPIOPin(platform)),
+    m_ledPin(GPIOPinFactory::create()),
     m_networkManager(NetworkManagerFactory::getNetworkManager(platform)),
     m_reboot(RebootFactory::create(platform))
 {
