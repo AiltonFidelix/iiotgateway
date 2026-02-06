@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <memory>
+
 #include "driver/gpio/gpiopin.h"
 #include "driver/gpio/gpiopinfactory.h"
 
@@ -13,9 +15,9 @@ class TestGPIOPin: public testing::Test
 
 TEST_F(TestGPIOPin, TestMethods)
 {
-    GPIOPin *pin = GPIOPinFactory::getGPIOPin(QStringLiteral("host"));
+    std::unique_ptr<GPIOPin> pin(GPIOPinFactory::create());
 
-    ASSERT_TRUE(pin != nullptr);
+    ASSERT_TRUE(pin);
     ASSERT_EQ(GPIOState::Low, pin->read());
 
     pin->write(GPIOState::High);
@@ -25,6 +27,4 @@ TEST_F(TestGPIOPin, TestMethods)
     pin->toggle();
 
     ASSERT_EQ(GPIOState::Low, pin->read());
-
-    delete pin;
 }
