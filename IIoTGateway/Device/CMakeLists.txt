@@ -26,26 +26,29 @@ set(SOURCES
 )
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR ADD_TARGET)
+if(ENABLE_GPIO)
+    list(APPEND HEADERS driver/gpio/raspberrygpiopin.h)
+    list(APPEND SOURCES driver/gpio/raspberrygpiopin.cpp)
+else()
+    list(APPEND HEADERS driver/gpio/fakegpiopin.h)
+    list(APPEND SOURCES driver/gpio/fakegpiopin.cpp)
+endif()
     message(STATUS "Adding raspberry implementation to the device library")
 
     list(APPEND HEADERS
-        driver/gpio/raspberrygpiopin.h
         network/raspberrynetworkmanager.h
     )
     list(APPEND SOURCES
-        driver/gpio/raspberrygpiopin.cpp
         network/raspberrynetworkmanager.cpp
     )
 elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR ADD_HOST)
     message(STATUS "Adding host implementation to the device library")
 
     list(APPEND HEADERS
-        driver/gpio/hostgpiopin.h
         network/hostnetworkmanager.h
         system/hostreboot.h
     )
     list(APPEND SOURCES
-        driver/gpio/hostgpiopin.cpp
         network/hostnetworkmanager.cpp
         system/hostreboot.cpp
     )

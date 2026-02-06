@@ -10,7 +10,7 @@ GPIO_BEGIN_NAMESPACE
 
 class RasbpberryGPIOPin : public GPIOPin
 {
-    static int m_id;
+    static bool m_registered;
 
     uint8_t m_pin;
     GPIOState m_state;

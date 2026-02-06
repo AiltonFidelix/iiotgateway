@@ -1,5 +1,5 @@
-#ifndef HOSTGPIOPIN_H
-#define HOSTGPIOPIN_H
+#ifndef FAKEGPIOPIN_H
+#define FAKEGPIOPIN_H
 
 #include <QString>
 
@@ -8,9 +8,9 @@
 
 GPIO_BEGIN_NAMESPACE
 
-class HostGPIOPin : public GPIOPin
+class FakeGPIOPin : public GPIOPin
 {
-    static int m_id;
+    static bool m_registered;
 
     uint8_t m_pin;
     GPIOMode m_mode;
@@ -19,7 +19,7 @@ class HostGPIOPin : public GPIOPin
     void printState(const QString &method);
 
 public:
-    HostGPIOPin();
+    FakeGPIOPin();
 
     void setPin(uint8_t pin) override;
     void setMode(GPIOMode mode) override;
@@ -32,4 +32,4 @@ public:
 
 GPIO_END_NAMESPACE
 
-#endif // HOSTGPIOPIN_H
+#endif // FAKEGPIOPIN_H

@@ -7,13 +7,13 @@
 
 GPIO_BEGIN_NAMESPACE
 
-int RasbpberryGPIOPin::m_id = RasbpberryGPIOPin::registerGPIO();
+bool RasbpberryGPIOPin::m_registered = RasbpberryGPIOPin::registerGPIO();
 
-int RasbpberryGPIOPin::registerGPIO()
+bool RasbpberryGPIOPin::registerGPIO()
 {
     qDebug() << "Setting up wiring pi...";
     wiringPiSetupGpio();
-    return GPIOPinFactory::registerGPIOPin(QStringLiteral("raspberry"), RasbpberryGPIOPin::create);
+    return GPIOPinFactory::registerCreator(RasbpberryGPIOPin::create);
 }
 
 RasbpberryGPIOPin::RasbpberryGPIOPin()
