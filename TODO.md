@@ -2,9 +2,10 @@
 
 ### Structure
 
-- Create unique deploy as docker image or as deb installer (further yocto) 
-- Move build/deploy scripts to a specific folder
+- Split into dashboard and gateway repositories
+- Create deploy options as docker image, debian installer and buildroot 
 - Create an option in cmake to install gtest and mqtt paho
+- Replace bash scripts for python3
 
 ### Protocols
 
@@ -14,7 +15,6 @@
 ### Code
 
 - Refactor reboot code, creating an interface/factory according the platform
-
 
 ### Documentation
 
