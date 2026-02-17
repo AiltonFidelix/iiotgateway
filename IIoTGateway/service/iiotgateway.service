@@ -2,7 +2,7 @@
 Description=IIoTGateway Service
 
 [Service]
-ExecStart=/opt/iiotgateway/rungateway.sh
+ExecStart=/opt/iiotgateway/rungateway
 Restart=always
 
 [Install]

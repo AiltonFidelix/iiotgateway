@@ -37,7 +37,7 @@ elif [[ ! ${ARCHS[@]} =~ $ARCH ]]; then
     options
 fi
 
-bash build.sh $ARCH -c
+bash scripts/build.sh $ARCH -c
 
 rm -rf $APP_FOLDER
 
@@ -50,17 +50,17 @@ mkdir -p $APP_FOLDER/usr/lib/systemd/system
 mkdir -p $LIBRARIES_INSTALL_PATH
 
 # Copy scripts and application files
-cp control $APP_FOLDER/DEBIAN
-cp preinst $APP_FOLDER/DEBIAN
-cp postinst $APP_FOLDER/DEBIAN
-cp iiotgateway.service $APP_FOLDER/usr/lib/systemd/system
-cp rungateway.sh $EXECUTABLE_INSTALL_PATH
+cp debian/control $APP_FOLDER/DEBIAN
+cp debian/preinst $APP_FOLDER/DEBIAN
+cp debian/postinst $APP_FOLDER/DEBIAN
+cp service/iiotgateway.service $APP_FOLDER/usr/lib/systemd/system
+cp service/rungateway $EXECUTABLE_INSTALL_PATH
 cp build-$ARCH/Main/$APP_NAME $EXECUTABLE_INSTALL_PATH/iiotgateway
 cp build-$ARCH/Application/libApplication.so* $LIBRARIES_INSTALL_PATH
 cp build-$ARCH/Communication/libCommunication.so* $LIBRARIES_INSTALL_PATH
 cp build-$ARCH/Device/libDevice.so* $LIBRARIES_INSTALL_PATH
 
-chmod +x $EXECUTABLE_INSTALL_PATH/rungateway.sh
+chmod +x $EXECUTABLE_INSTALL_PATH/rungateway
 
 # Copy Qt shared libraries
 for qtlib in ${QT_LIBRARIES[@]}
