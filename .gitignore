@@ -1,15 +1,32 @@
-# folders
+# Build
 build
 build-*
-venv
-old
-.vscode
 *-deploy
 
-# files
+# VS Code
+.vscode
+
+# Qt Creator
+.qtcreator
 *.txt.user
+
+# Python
+venv
+.venv
+env
+.env
+
+# Docs
 *.drawio.bkp
+
+# Static
+*.min.*
+
+# Development
 *.env
 *.db
 *.deb
-*.min.*
+
+# Others
+buildroot
+old
