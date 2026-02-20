@@ -31,7 +31,7 @@ Control::Control(const QString &platform, QObject *parent)
     m_storage(nullptr),
     m_ledPin(GPIOPinFactory::create()),
     m_networkManager(NetworkManagerFactory::getNetworkManager(platform)),
-    m_reboot(RebootFactory::create(platform))
+    m_reboot(RebootFactory::create())
 {
     if (m_ledPin != nullptr)
     {
@@ -102,29 +102,6 @@ void Control::setStorage(StorageInterface *storage)
 {
     m_storage = storage;
 }
-
-// Control::Reboot Control::rebootMethod(const QString &platform)
-// {
-//     if (platform == QStringLiteral("raspberry"))
-//     {
-//         return []() -> void
-//         {
-//             QProcess process;
-//             process.start(QStringLiteral("sudo"), QStringList() << QStringLiteral("reboot"));
-
-//             if (!process.waitForStarted())
-//             {
-//                 qWarning() << "Failed to start reboot process";
-//                 return;
-//             }
-
-//             process.waitForFinished();
-//             qDebug() << "Reboot command sent";
-//         };
-//     }
-
-//     return []() -> void { qDebug() << "Host rebooting..."; };
-// }
 
 void Control::registerRoutes()
 {
