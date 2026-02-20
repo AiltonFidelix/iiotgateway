@@ -2,28 +2,23 @@
 
 SYSTEM_BEGIN_NAMESPACE
 
-RebootFactory::RebootList *RebootFactory::m_rebootList = nullptr;
+RebootFactory::Creator RebootFactory::m_creator = nullptr;
 
-Reboot *RebootFactory::create(const QString &platform)
+Reboot *RebootFactory::create()
 {
-    if (m_rebootList->contains(platform))
+    if (m_creator)
     {
-        return m_rebootList->value(platform)();
+        return m_creator();
     }
 
     return nullptr;
 }
 
-int RebootFactory::registerCreator(const QString &platform, Creator creator)
+bool RebootFactory::registerCreator(Creator creator)
 {
-    if (m_rebootList == nullptr)
-    {
-        m_rebootList = new RebootList();
-    }
+    m_creator = creator;
 
-    m_rebootList->insert(platform, creator);
-
-    return m_rebootList->size();
+    return true;
 }
 
 SYSTEM_END_NAMESPACE

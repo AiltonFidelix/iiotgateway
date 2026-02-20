@@ -2,8 +2,6 @@
 #define REBOOTFACTORY_H
 
 #include <functional>
-#include <QByteArray>
-#include <QHash>
 
 #include "system_global.h"
 #include "reboot.h"
@@ -13,15 +11,14 @@ SYSTEM_BEGIN_NAMESPACE
 class RebootFactory
 {
     using Creator = std::function<Reboot*()>;
-    using RebootList = QHash<QString, Creator>;
 
-    static RebootList *m_rebootList;
+    static Creator m_creator;
 
 public:
     RebootFactory() = delete;
 
-    static Reboot *create(const QString &platform);
-    static int registerCreator(const QString &platform, Creator creator);
+    static Reboot *create();
+    static bool registerCreator(Creator creator);
 };
 
 SYSTEM_END_NAMESPACE

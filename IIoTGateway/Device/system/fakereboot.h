@@ -1,14 +1,14 @@
-#ifndef HOSTREBOOT_H
-#define HOSTREBOOT_H
+#ifndef FAKEREBOOT_H
+#define FAKEREBOOT_H
 
 #include "system_global.h"
 #include "reboot.h"
 
 SYSTEM_BEGIN_NAMESPACE
 
-class HostReboot : public Reboot
+class FakeReboot : public Reboot
 {
-    static int m_id;
+    static bool m_registered;
 
 public:
     void reboot() const override;
@@ -18,4 +18,4 @@ public:
 
 SYSTEM_END_NAMESPACE
 
-#endif // HOSTREBOOT_H
+#endif // FAKEREBOOT_H
