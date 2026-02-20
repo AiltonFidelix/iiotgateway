@@ -1,23 +1,23 @@
-#include "hostnetworkmanager.h"
+#include "fakenetworkmanager.h"
 #include "networkmanagerfactory.h"
 
 #include <QDebug>
 
 NETWORK_BEGIN_NAMESPACE
 
-int HostNetworkManager::m_id = NetworkManagerFactory::registerNetworkManager(QStringLiteral("host"), HostNetworkManager::create);
+int FakeNetworkManager::m_id = NetworkManagerFactory::registerNetworkManager(QStringLiteral("host"), FakeNetworkManager::create);
 
-bool HostNetworkManager::load()
+bool FakeNetworkManager::load()
 {
     return true;
 }
 
-bool HostNetworkManager::save() const
+bool FakeNetworkManager::save() const
 {
     return true;
 }
 
-bool HostNetworkManager::setSettings(const QByteArray &settings)
+bool FakeNetworkManager::setSettings(const QByteArray &settings)
 {
     if (!settings.isEmpty())
     {
@@ -29,7 +29,7 @@ bool HostNetworkManager::setSettings(const QByteArray &settings)
     return false;
 }
 
-QByteArray HostNetworkManager::settings() const
+QByteArray FakeNetworkManager::settings() const
 {
     const QByteArray settings{
         R"(
@@ -53,9 +53,9 @@ QByteArray HostNetworkManager::settings() const
     return settings;
 }
 
-NetworkManager *HostNetworkManager::create()
+NetworkManager *FakeNetworkManager::create()
 {
-    return static_cast<NetworkManager*>(new HostNetworkManager());
+    return static_cast<NetworkManager*>(new FakeNetworkManager());
 }
 
 NETWORK_END_NAMESPACE

@@ -1,12 +1,12 @@
-#ifndef HOSTNETWORKMANAGER_H
-#define HOSTNETWORKMANAGER_H
+#ifndef FAKENETWORKMANAGER_H
+#define FAKENETWORKMANAGER_H
 
 #include "network_global.h"
 #include "networkmanager.h"
 
 NETWORK_BEGIN_NAMESPACE
 
-class HostNetworkManager : public NetworkManager
+class FakeNetworkManager : public NetworkManager
 {
     static int m_id;
 
@@ -21,4 +21,4 @@ public:
 
 NETWORK_END_NAMESPACE
 
-#endif // HOSTNETWORKMANAGER_H
+#endif // FAKENETWORKMANAGER_H
