@@ -38,7 +38,7 @@ if [ $ARCH == "aarch64" ]; then
         -v $(pwd):/src \
         -w /src/build-$ARCH \
         $DOCKER_IMAGE \
-        qt-cmake -DENABLE_GPIO=ON -DENABLE_SYSTEM_REBOOT=ON ..
+        qt-cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_RASPBERRY_GPIO=ON -DENABLE_LINUX_REBOOT=ON ..
 
     docker run --rm \
         -v $(pwd):/src \
@@ -52,6 +52,6 @@ elif [ $ARCH == "amd64" ]; then
     verifyBuildfolder
     cd build-$ARCH
 
-    $HOME/Qt/$QT_VERSION/gcc_64/bin/qt-cmake ..
+    $HOME/Qt/$QT_VERSION/gcc_64/bin/qt-cmake -DCMAKE_BUILD_TYPE=Release ..
     cmake --build . --parallel 12
 fi
