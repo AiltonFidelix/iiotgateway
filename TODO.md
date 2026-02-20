@@ -14,7 +14,7 @@
 
 ### Code
 
-- Refactor reboot code, creating an interface/factory according the platform
+- Create linux network manager class and cmake option, add fake class for dev env
 
 ### Documentation
 
