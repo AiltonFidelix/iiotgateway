@@ -25,33 +25,33 @@ set(SOURCES
     system/rebootfactory.cpp
 )
 
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR ADD_TARGET)
-if(ENABLE_GPIO)
+if(ENABLE_RASPBERRY_GPIO)
+    message(STATUS "Using raspberrygpiopin")
     list(APPEND HEADERS driver/gpio/raspberrygpiopin.h)
     list(APPEND SOURCES driver/gpio/raspberrygpiopin.cpp)
 else()
+    message(STATUS "Using fakegpiopin")
     list(APPEND HEADERS driver/gpio/fakegpiopin.h)
     list(APPEND SOURCES driver/gpio/fakegpiopin.cpp)
 endif()
-    message(STATUS "Adding raspberry implementation to the device library")
 
-    list(APPEND HEADERS
-        network/raspberrynetworkmanager.h
-    )
-    list(APPEND SOURCES
-        network/raspberrynetworkmanager.cpp
-    )
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR ADD_HOST)
-    message(STATUS "Adding host implementation to the device library")
+if(ENABLE_LINUX_REBOOT)
+    message(STATUS "Using linuxreboot")
+    list(APPEND HEADERS system/linuxreboot.h)
+    list(APPEND SOURCES system/linuxreboot.cpp)
+else()
+    message(STATUS "Using fakereboot")
+    list(APPEND HEADERS system/fakereboot.h)
+    list(APPEND SOURCES system/fakereboot.cpp)
+endif()
 
-    list(APPEND HEADERS
-        network/hostnetworkmanager.h
-        system/hostreboot.h
-    )
-    list(APPEND SOURCES
-        network/hostnetworkmanager.cpp
-        system/hostreboot.cpp
-    )
+if(ENABLE_LINUX_NETWORK_MANAGER)
+    # list(APPEND HEADERS network/linuxnetworkmanager.h)
+    # list(APPEND SOURCES network/linuxnetworkmanager.cpp)
+else()
+    message(STATUS "Using fakenetworkmanager")
+    list(APPEND HEADERS network/fakenetworkmanager.h)
+    list(APPEND SOURCES network/fakenetworkmanager.cpp)
 endif()
 
 set(QT_COMPONENTS
@@ -72,6 +72,6 @@ endforeach()
 
 target_include_directories(${LIBRARY_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" AND ENABLE_RASPBERRY_GPIO)
     target_link_libraries(${LIBRARY_NAME} wiringPi)
 endif()
