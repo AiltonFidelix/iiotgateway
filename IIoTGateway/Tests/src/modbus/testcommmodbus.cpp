@@ -10,10 +10,16 @@
 #include "modbus/commmodbusrtu.h"
 #include "mockmodbusclient.h"
 
+using testing::_;
+using testing::DoAll;
+using testing::Return;
+using testing::Invoke;
+using testing::Test;
+
 using comm::commmodbus::CommModbus;
 using comm::commmodbus::CommModbusRTU;
 
-class TestCommModbus: public testing::Test
+class TestCommModbus: public Test
 {
 protected:
     MockModbusClient *m_mockModbusClient;
@@ -41,30 +47,30 @@ void TestCommModbus::TearDown()
 
 TEST_F(TestCommModbus, TestConnectionSuccess)
 {
-    EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(testing::Return(QModbusDevice::UnconnectedState));
-    EXPECT_CALL(*m_mockModbusClient, setConnectionParameter(testing::_, testing::_)).Times(5);
-    EXPECT_CALL(*m_mockModbusClient, setTimeout(testing::_)).Times(1);
-    EXPECT_CALL(*m_mockModbusClient, setNumberOfRetries(testing::_)).Times(1);
-    EXPECT_CALL(*m_mockModbusClient, connectDevice()).WillOnce(testing::Return(true));
+    EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(Return(QModbusDevice::UnconnectedState));
+    EXPECT_CALL(*m_mockModbusClient, setConnectionParameter(_, _)).Times(5);
+    EXPECT_CALL(*m_mockModbusClient, setTimeout(_)).Times(1);
+    EXPECT_CALL(*m_mockModbusClient, setNumberOfRetries(_)).Times(1);
+    EXPECT_CALL(*m_mockModbusClient, connectDevice()).WillOnce(Return(true));
 
     m_commModbus->connectComm();
 }
 
 TEST_F(TestCommModbus, TestConnectionFailed)
 {
-    EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(testing::Return(QModbusDevice::UnconnectedState));
-    EXPECT_CALL(*m_mockModbusClient, setConnectionParameter(testing::_, testing::_)).Times(5);
-    EXPECT_CALL(*m_mockModbusClient, setTimeout(testing::_)).Times(1);
-    EXPECT_CALL(*m_mockModbusClient, setNumberOfRetries(testing::_)).Times(1);
-    EXPECT_CALL(*m_mockModbusClient, connectDevice()).WillOnce(testing::Return(false));
-    EXPECT_CALL(*m_mockModbusClient, errorString()).WillOnce(testing::Return("Error from GTEST"));
+    EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(Return(QModbusDevice::UnconnectedState));
+    EXPECT_CALL(*m_mockModbusClient, setConnectionParameter(_, _)).Times(5);
+    EXPECT_CALL(*m_mockModbusClient, setTimeout(_)).Times(1);
+    EXPECT_CALL(*m_mockModbusClient, setNumberOfRetries(_)).Times(1);
+    EXPECT_CALL(*m_mockModbusClient, connectDevice()).WillOnce(Return(false));
+    EXPECT_CALL(*m_mockModbusClient, errorString()).WillOnce(Return("Error from GTEST"));
 
     m_commModbus->connectComm();
 }
 
 TEST_F(TestCommModbus, TestIsConnected)
 {
-    EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(testing::Return(QModbusDevice::ConnectedState));
+    EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(Return(QModbusDevice::ConnectedState));
 
     EXPECT_TRUE(m_commModbus->isconnected());
 }
@@ -84,7 +90,7 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     reply->setResult(QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 0, expectedValues));
 
-    EXPECT_CALL(*m_mockModbusClient, sendReadRequest(testing::_, testing::_)).WillOnce(testing::Return(reply));
+    EXPECT_CALL(*m_mockModbusClient, sendReadRequest(_, _)).WillOnce(Return(reply));
 
     const QByteArray request = TestUtils::readJsonFile(QStringLiteral(":/cases/requests/readone.json"));
 

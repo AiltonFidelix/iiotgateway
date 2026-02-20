@@ -6,13 +6,16 @@
 
 #include "modbus/commmodbussettingsparser.h"
 
+using testing::ValuesIn;
+using testing::TestWithParam;
+
 using comm::commmodbus::CommModbusSettingsParser;
 using comm::commmodbus::Request;
 using comm::commmodbus::Units;
 
 using TestCases = std::tuple<QString, CommModbusSettingsParser*>;
 
-class TestCommModbusSettingsParser : public testing::TestWithParam<TestCases>
+class TestCommModbusSettingsParser : public TestWithParam<TestCases>
 {
 public:
     static std::vector<TestCases> LoadTestCases();
@@ -146,5 +149,5 @@ std::vector<TestCases> TestCommModbusSettingsParser::LoadTestCases()
     return testCases;
 }
 
-INSTANTIATE_TEST_SUITE_P(TestSettingsParser, TestCommModbusSettingsParser, ::testing::ValuesIn(TestCommModbusSettingsParser::LoadTestCases()));
+INSTANTIATE_TEST_SUITE_P(TestSettingsParser, TestCommModbusSettingsParser, ValuesIn(TestCommModbusSettingsParser::LoadTestCases()));
 

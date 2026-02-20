@@ -4,6 +4,9 @@
 
 #include "modbus/commmodbusrequestparser.h"
 
+using testing::ValuesIn;
+using testing::TestWithParam;
+
 using comm::commmodbus::CommModbusRequestParser;
 using comm::commmodbus::Request;
 using comm::commmodbus::RequestType;
@@ -11,7 +14,7 @@ using comm::commmodbus::Units;
 
 using TestCases = std::tuple<QString, Request*>;
 
-class TestCommModbusRequestParser : public testing::TestWithParam<TestCases>
+class TestCommModbusRequestParser : public TestWithParam<TestCases>
 {
 public:
     static std::vector<TestCases> LoadTestCases();
@@ -128,4 +131,4 @@ std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases()
     return testCases;
 }
 
-INSTANTIATE_TEST_SUITE_P(TestRequestParser, TestCommModbusRequestParser, ::testing::ValuesIn(TestCommModbusRequestParser::LoadTestCases()));
+INSTANTIATE_TEST_SUITE_P(TestRequestParser, TestCommModbusRequestParser, ValuesIn(TestCommModbusRequestParser::LoadTestCases()));
