@@ -5,6 +5,7 @@
 - Create buildroot deploy 
 - Create an option in cmake to install gtest and mqtt paho
 - Verify cmake options
+- Add buildroot as submodule and pin the version
 
 ### Protocols
 
