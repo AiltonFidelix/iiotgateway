@@ -15,5 +15,5 @@ elif [ -d ${TARGET_DIR}/etc/systemd ]; then
        "${TARGET_DIR}/etc/systemd/system/getty.target.wants/getty@tty1.service"
 fi
 
-rm -f /etc/nginx/sites-enabled/default
-ln -sf /etc/nginx/sites-available/dashboard /etc/nginx/sites-enabled/dashboard
+rm -f ${TARGET_DIR}/etc/nginx/sites-enabled/default
+ln -sf ${TARGET_DIR}/etc/nginx/sites-available/dashboard ${TARGET_DIR}/etc/nginx/sites-enabled/dashboard
