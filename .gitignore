@@ -32,8 +32,5 @@ env
 *.db
 *.deb
 
-# Projects
-gateway
-
-# Others
-buildroot
+# buildroot
+*bin*
