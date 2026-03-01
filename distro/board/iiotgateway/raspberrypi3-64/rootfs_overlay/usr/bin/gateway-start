@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+export DB_TYPE="QSQLITE"
+export DB_NAME="/opt/iiotgateway/iiotgateway.db"
+
+/opt/iiotgateway/bin/gateway

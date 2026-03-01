@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=0"/>
+
+    <title>IIoTGateway</title>
+    <style>
+      html, body { padding: 0; margin: 0; overflow: hidden; height: 100% }
+      #screen { width: 100%; height: 100%; }
+    </style>
+
+    <script src="qtloader.js" defer></script>
+    <script src="IIoTDashboard.js" defer></script>
+    <script defer>
+      window.addEventListener("DOMContentLoaded", async () => {
+        const spinner = document.querySelector('#qtspinner');
+        const screen = document.querySelector('#screen');
+        const status = document.querySelector('#qtstatus');
+
+        const showUi = (ui) => {
+          [spinner, screen].forEach(el => el.style.display = 'none');
+          ui.style.display = 'block';
+        };
+
+        try {
+          showUi(spinner);
+          status.innerHTML = 'Loading...';
+
+          if (typeof IIoTDashboard_entry !== "function") {
+            throw new Error("IIoTDashboard_entry is not defined or not a function");
+          }
+
+          const instance = await qtLoad({
+            qt: {
+              entryFunction: IIoTDashboard_entry,
+              containerElements: [screen],
+              onLoaded: () => showUi(screen),
+              onExit: (exitData) => {
+                status.innerHTML = 'Application exit';
+                status.innerHTML += exitData.code !== undefined ? ` with code ${exitData.code}` : '';
+                status.innerHTML += exitData.text !== undefined ? ` (${exitData.text})` : '';
+                showUi(spinner);
+              }
+            }
+          });
+
+        } catch (e) {
+          console.error("Error loading Qt WASM app:", e);
+          status.innerHTML = `Failed to load application: ${e.message}`;
+        }
+      });
+    </script>
+  </head>
+
+  <body>
+    <figure id="qtspinner" style="overflow:visible;">
+      <center style="margin-top:1.5em; line-height:150%">
+        <strong>IIoTGateway</strong>
+        <div id="qtstatus"></div>
+        <noscript>JavaScript is disabled. Please enable JavaScript to use this application.</noscript>
+      </center>
+    </figure>
+    <div id="screen"></div>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+[Unit]
+Description=Gateway Service
+
+[Service]
+ExecStart=/usr/bin/gateway-start
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
