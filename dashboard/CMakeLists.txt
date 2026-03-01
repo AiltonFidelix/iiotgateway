@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(IIoTDashboard VERSION 1.0.0 LANGUAGES CXX)
+project(dashboard VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -44,7 +44,7 @@ else()
     )
 endif()
 
-target_link_libraries(IIoTDashboard PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
@@ -66,6 +66,6 @@ install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_import_qml_plugins(IIoTDashboard)
-    qt_finalize_executable(IIoTDashboard)
+    qt_import_qml_plugins(${PROJECT_NAME})
+    qt_finalize_executable(${PROJECT_NAME})
 endif()
