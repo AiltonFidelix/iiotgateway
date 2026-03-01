@@ -3,6 +3,10 @@ build
 build-*
 *-deploy
 
+# C++
+*.so*
+*.wasm
+
 # VS Code
 .vscode
 
@@ -26,6 +30,9 @@ env
 *.env
 *.db
 *.deb
+
+# Projects
+gateway
 
 # Others
 buildroot
