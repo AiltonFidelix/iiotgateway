@@ -2,7 +2,7 @@
 Description=Gateway Service
 
 [Service]
-ExecStart=/usr/bin/gateway-start
+ExecStart=bash /usr/bin/gateway-start
 Restart=always
 
 [Install]
