@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 import shutil
 import subprocess
 from pathlib import Path
 
-ARCHS = ["aarch64"]
-
 APP_VERSION = "1.0.0"
 APP_NAME = "gateway"
+ARCH = "aarch64"
+BUILD_PATH = f"build-{ARCH}"
 QT_VERSION = "6.8.3"
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
@@ -44,12 +45,6 @@ QT_LIBRARIES = [
 QT_LIBRARIES_PATH = f"/Qt/{QT_VERSION}/arm64/lib"
 
 
-def options():
-    print("Usage: ./deploy.py [OPTION]")
-    print(f"  Options: {' '.join(ARCHS)}")
-    sys.exit(0)
-
-
 def run(cmd, cwd=None, stdout=None):
     subprocess.run(cmd, check=True, cwd=cwd, stdout=stdout)
 
@@ -77,26 +72,18 @@ def copy_shared_library_from_docker(docker_image, path, file_pattern, dest_path)
 
 
 def main():
-    args = sys.argv[1:]
+    if not os.path.isdir(BUILD_PATH):
+        print(f"Directory does not exist: {BUILD_PATH}")
+        sys.exit(1)
 
-    if len(args) == 0:
-        options()
+    docker_image = f"qt-{ARCH}:{QT_VERSION}"
 
-    arch = args[0]
-
-    if arch not in ARCHS:
-        options()
-
-    docker_image = f"qt-{arch}:{QT_VERSION}"
-
-    run(["python3", "scripts/build.py", arch, "-c"])
-
-    shutil.copy(f"build-{arch}/Main/{APP_NAME}", EXECUTABLE_INSTALL_PATH)
+    shutil.copy(f"{BUILD_PATH}/Main/{APP_NAME}", EXECUTABLE_INSTALL_PATH)
 
     for pattern in [
-        f"build-{arch}/Application/libApplication.so*",
-        f"build-{arch}/Communication/libCommunication.so*",
-        f"build-{arch}/Device/libDevice.so*",
+        f"{BUILD_PATH}/Application/libApplication.so*",
+        f"{BUILD_PATH}/Communication/libCommunication.so*",
+        f"{BUILD_PATH}/Device/libDevice.so*",
     ]:
         for file in Path().glob(pattern):
             shutil.copy(file, LIBRARIES_INSTALL_PATH)

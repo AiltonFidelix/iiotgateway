@@ -27,8 +27,6 @@ def run(cmd):
 
 
 def main():
-    run(["python3", "scripts/build.py", "-c"])
-
     shutil.copy(BUILD_PATH / f"{APP_NAME}.js", DEPLOY_PATH)
     shutil.copy(BUILD_PATH / f"{APP_NAME}.wasm", DEPLOY_PATH)
     shutil.copy(BUILD_PATH / "qtloader.js", DEPLOY_PATH)
