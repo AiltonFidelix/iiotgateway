@@ -38,6 +38,8 @@ def main():
     arch = args[0]
     flag = args[1] if len(args) == 2 else None
 
+    test = "-t" in args
+
     if arch not in ARCHS:
         options()
 
@@ -91,8 +93,15 @@ def main():
         build_dir = Path(f"build-{arch}")
 
         qt_cmake_path = Path.home() / "Qt" / QT_VERSION / "gcc_64" / "bin" / "qt-cmake"
+        
+        cmake_cmd = [str(qt_cmake_path), "-DCMAKE_BUILD_TYPE=Release", ".."]
 
-        run([str(qt_cmake_path), "-DCMAKE_BUILD_TYPE=Release", ".."], cwd=build_dir)
+        if test:
+            index = len(cmake_cmd) - 1
+            cmake_cmd.insert(index, "-DENABLE_TESTS=ON")
+            cmake_cmd.insert(index + 1, "-DENABLE_GTEST_INSTALL=ON")
+
+        run(cmake_cmd, cwd=build_dir)
 
         run(["cmake", "--build", ".", "--parallel", "12"], cwd=build_dir)
 
