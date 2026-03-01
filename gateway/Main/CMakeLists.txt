@@ -1,4 +1,4 @@
-set(EXECUTABLE_NAME IIoTGateway)
+set(EXECUTABLE_NAME gateway)
 set(SOURCES main.cpp)
 set(QT_COMPONENTS Core)
 set(LIBRARIES Application Device)

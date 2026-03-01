@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(IIoTGateway VERSION 1.0.0 LANGUAGES CXX)
+project(gateway VERSION 1.0.0 LANGUAGES CXX)
 
 option(ENABLE_RASPBERRY_GPIO "Enable raspberry hardware GPIO" OFF)
 option(ENABLE_LINUX_REBOOT "Enable linux system reboot" OFF)
