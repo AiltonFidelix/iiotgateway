@@ -25,6 +25,7 @@ env
 
 # Static
 *.min.*
+*.js
 
 # Development
 *.env
@@ -36,4 +37,3 @@ gateway
 
 # Others
 buildroot
-old
