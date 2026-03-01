@@ -2,19 +2,24 @@
 
 ### Structure
 
-- Split into dashboard and gateway repositories
-- Create deploy options as docker image, debian installer and buildroot 
+- Create buildroot deploy 
 - Create an option in cmake to install gtest and mqtt paho
-- Replace bash scripts for python3
+- Verify cmake options
 
 ### Protocols
 
-- Add Modbus TCP
-- Add HTTP server/client
+- Add Modbus TCP as edge protocol
+- Add HTTP server/client as cloud protocol
 
 ### Code
 
-- Create linux network manager class and cmake option, add fake class for dev env
+- Create linux network manager class with nmap and fake class for dev env
+
+### buildroot
+
+- Install libraries with the correct version
+- Fix nginx use of dashboard
+- Install systemctl
 
 ### Documentation
 
