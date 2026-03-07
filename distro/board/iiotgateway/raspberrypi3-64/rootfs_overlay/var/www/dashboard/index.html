@@ -12,7 +12,7 @@
     </style>
 
     <script src="qtloader.js" defer></script>
-    <script src="IIoTDashboard.js" defer></script>
+    <script src="dashboard.js" defer></script>
     <script defer>
       window.addEventListener("DOMContentLoaded", async () => {
         const spinner = document.querySelector('#qtspinner');
@@ -28,13 +28,13 @@
           showUi(spinner);
           status.innerHTML = 'Loading...';
 
-          if (typeof IIoTDashboard_entry !== "function") {
-            throw new Error("IIoTDashboard_entry is not defined or not a function");
+          if (typeof dashboard_entry !== "function") {
+            throw new Error("dashboard_entry is not defined or not a function");
           }
 
           const instance = await qtLoad({
             qt: {
-              entryFunction: IIoTDashboard_entry,
+              entryFunction: dashboard_entry,
               containerElements: [screen],
               onLoaded: () => showUi(screen),
               onExit: (exitData) => {
