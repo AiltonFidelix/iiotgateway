@@ -1,109 +1,142 @@
 #!/usr/bin/env python3
 
-import sys
+import argparse
 import shutil
 import subprocess
 from pathlib import Path
+import multiprocessing
 
-ARCHS = ["amd64", "aarch64"]
+SUPPORTED_ARCHS = ["amd64", "aarch64"]
 QT_VERSION = "6.8.3"
-
-
-def options():
-    print("Usage: ./build.py [OPTION]")
-    print(f"  Options: {' '.join(ARCHS)}")
-    sys.exit(0)
-
-
-def verify_build_folder(arch, flag):
-    build_dir = Path(f"build-{arch}")
-
-    if flag == "-c":
-        shutil.rmtree(build_dir, ignore_errors=True)
-
-    if not build_dir.exists():
-        build_dir.mkdir()
 
 
 def run(cmd, cwd=None):
     subprocess.run(cmd, check=True, cwd=cwd)
 
 
-def main():
-    args = sys.argv[1:]
+def clean(build_dir: Path):
+    shutil.rmtree(build_dir, ignore_errors=True)
 
-    if len(args) == 0:
-        options()
 
-    arch = args[0]
-    flag = args[1] if len(args) == 2 else None
+def check_build_folder(build_dir: Path):
+    if not build_dir.exists():
+        build_dir.mkdir()
 
-    test = "-t" in args
 
-    if arch not in ARCHS:
-        options()
+def build_amd64(build_dir: Path, qt_version: str, jobs: str, with_test: bool = False):
+    qt_cmake_path = Path.home() / "Qt" / qt_version / "gcc_64" / "bin" / "qt-cmake"
 
-    docker_image = f"qt-{arch}:{QT_VERSION}"
+    cmake_cmd = [str(qt_cmake_path), "-DCMAKE_BUILD_TYPE=Release", ".."]
+
+    if with_test:
+        index = len(cmake_cmd) - 1
+        cmake_cmd.insert(index, "-DENABLE_TESTS=ON")
+        cmake_cmd.insert(index + 1, "-DENABLE_GTEST_INSTALL=ON")
+
+    run(cmake_cmd, cwd=build_dir)
+
+    run(["cmake", "--build", ".", "--parallel", jobs], cwd=build_dir)
+
+
+def build_aarch64(build_dir: Path, qt_version: str, jobs: str, with_test: bool = False):
+    docker_image = f"qt-aarch64:{qt_version}"
+
     project_root = Path.cwd()
+    docker_dir = f"/src/{build_dir}"
 
-    if arch == "aarch64":
-        verify_build_folder(arch, flag)
+    run(
+        [
+            "docker",
+            "run",
+            "--rm",
+            "-v",
+            f"{project_root}:/src",
+            "-w",
+            docker_dir,
+            docker_image,
+            "qt-cmake",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DENABLE_RASPBERRY_GPIO=ON",
+            "-DENABLE_LINUX_REBOOT=ON",
+            "..",
+        ]
+    )
 
-        build_path = f"/src/build-{arch}"
+    run(
+        [
+            "docker",
+            "run",
+            "--rm",
+            "-v",
+            f"{project_root}:/src",
+            "-w",
+            docker_dir,
+            docker_image,
+            "cmake",
+            "--build",
+            ".",
+            "--parallel",
+            jobs,
+        ]
+    )
 
-        run(
-            [
-                "docker",
-                "run",
-                "--rm",
-                "-v",
-                f"{project_root}:/src",
-                "-w",
-                build_path,
-                docker_image,
-                "qt-cmake",
-                "-DCMAKE_BUILD_TYPE=Release",
-                "-DENABLE_RASPBERRY_GPIO=ON",
-                "-DENABLE_LINUX_REBOOT=ON",
-                "..",
-            ]
-        )
 
-        run(
-            [
-                "docker",
-                "run",
-                "--rm",
-                "-v",
-                f"{project_root}:/src",
-                "-w",
-                build_path,
-                docker_image,
-                "cmake",
-                "--build",
-                ".",
-                "--parallel",
-                "12",
-            ]
-        )
+def main():
 
-    elif arch == "amd64":
-        verify_build_folder(arch, flag)
+    parser = argparse.ArgumentParser(description="gateway build script")
 
-        build_dir = Path(f"build-{arch}")
+    parser.add_argument(
+        "-a",
+        "--arch",
+        choices=SUPPORTED_ARCHS,
+        default="amd64",
+        metavar="ARCH",
+        help="Target architecture (default: amd64)",
+    )
 
-        qt_cmake_path = Path.home() / "Qt" / QT_VERSION / "gcc_64" / "bin" / "qt-cmake"
-        
-        cmake_cmd = [str(qt_cmake_path), "-DCMAKE_BUILD_TYPE=Release", ".."]
+    archs_build = {
+        "amd64": build_amd64,
+        "aarch64": build_aarch64,
+    }
 
-        if test:
-            index = len(cmake_cmd) - 1
-            cmake_cmd.insert(index, "-DENABLE_TESTS=ON")
-            cmake_cmd.insert(index + 1, "-DENABLE_GTEST_INSTALL=ON")
+    parser.add_argument(
+        "-q",
+        "--qt-ver",
+        default=QT_VERSION,
+        metavar="VER",
+        help=f"Qt framework version (default: {QT_VERSION})",
+    )
 
-        run(cmake_cmd, cwd=build_dir)
+    default_num_of_jobs = str(multiprocessing.cpu_count() - 4)
 
-        run(["cmake", "--build", ".", "--parallel", "12"], cwd=build_dir)
+    parser.add_argument(
+        "-j",
+        "--jobs",
+        default=default_num_of_jobs,
+        metavar="JOBS",
+        help=f"Number of parallel jobs (default: {default_num_of_jobs})",
+    )
+
+    parser.add_argument(
+        "-c", "--clean", action="store_true", help="Clean previous build artifacts"
+    )
+
+    parser.add_argument(
+        "-t",
+        "--with-tests",
+        action="store_true",
+        help="Include test library in the build",
+    )
+
+    args = parser.parse_args()
+
+    build_dir = Path(f"build-{args.arch}")
+
+    if args.clean:
+        clean(build_dir)
+
+    check_build_folder(build_dir)
+    archs_build[args.arch](build_dir, args.qt_ver, args.jobs, args.with_tests)
 
 
 if __name__ == "__main__":
