@@ -32,6 +32,5 @@ env
 *.db
 *.deb
 
-# buildroot
-buildroot
+# Projects
 *bin*
