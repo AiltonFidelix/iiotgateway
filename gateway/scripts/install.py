@@ -128,6 +128,26 @@ def main():
         LIBRARIES_INSTALL_PATH,
     )
 
+    copy_shared_library_from_docker(
+        docker_image,
+        "/qt/arm64/sysroot/lib/aarch64-linux-gnu",
+        "libcrypt.so*",
+        LIBRARIES_INSTALL_PATH,
+    )
+
+    copy_shared_library_from_docker(
+        docker_image,
+        "/qt/arm64/sysroot/lib/aarch64-linux-gnu",
+        "libbrotlidec.so*",
+        LIBRARIES_INSTALL_PATH,
+    )
+
+    copy_shared_library_from_docker(
+        docker_image,
+        "/qt/arm64/sysroot/lib/aarch64-linux-gnu",
+        "libbrotlicommon.so*",
+        LIBRARIES_INSTALL_PATH,
+    )
 
 if __name__ == "__main__":
     main()
