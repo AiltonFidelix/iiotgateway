@@ -101,14 +101,14 @@ void CommMQTT::connectComm()
 
     try
     {
-        qDebug() << Q_FUNC_INFO << "Connecting...";
+        qDebug() << "Connecting...";
         auto connTok = m_client->connect(connOpts, nullptr, m_listener);
-        qDebug() << Q_FUNC_INFO << "Waiting for the connection...";
+        qDebug() << "Waiting for the connection...";
 
         if (connTok)
         {
             connTok->wait();
-            qDebug() << Q_FUNC_INFO << "Successfully connected";
+            qDebug() << "Successfully connected";
         }
     }
     catch (const mqtt::exception& ex)
@@ -137,13 +137,13 @@ CommMQTT::incoming(QByteArray data)
 {
     if (!isconnected())
     {
-        qWarning() << Q_FUNC_INFO << "MQTT publish failed: Not connected!";
+        qWarning() << "MQTT publish failed: Not connected!";
         return;
     }
 
     if (!m_publish)
     {
-        qWarning() << Q_FUNC_INFO << "MQTT publish failed: Publish is not configured!";
+        qWarning() << "MQTT publish failed: Publish is not configured!";
         return;
     }
 
@@ -171,7 +171,7 @@ CommMQTT::onConnected()
     if (m_subscribe)
     {
         m_client->subscribe(m_subTopic, m_subQos);
-        qDebug() << Q_FUNC_INFO << "MQTT topic subscribed:" << m_subTopic;
+        qDebug() << "MQTT topic subscribed:" << m_subTopic;
     }
 }
 
