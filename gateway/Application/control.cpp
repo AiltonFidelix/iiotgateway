@@ -386,7 +386,7 @@ QHttpServerResponse Control::makeResponse(const QByteArray &data) const
     return response;
 }
 
-QHttpServerResponse Control::makeResponse(bool ok, const QString &message) const
+QHttpServerResponse Control::makeResponse(const bool ok, const QString &message) const
 {
     QJsonObject resObj{};
     resObj.insert(QStringLiteral("status"), ok ? QStringLiteral("ok") : QStringLiteral("error"));

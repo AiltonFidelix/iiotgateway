@@ -30,7 +30,7 @@ class Control : public QObject
 
     void registerRoutes();
     QHttpServerResponse makeResponse(const QByteArray &data) const;
-    QHttpServerResponse makeResponse(bool ok, const QString &message) const;
+    QHttpServerResponse makeResponse(const bool ok, const QString &message) const;
 
 public:
     explicit Control(const QString &platform, QObject *parent = nullptr);
