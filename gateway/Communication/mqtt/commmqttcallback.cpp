@@ -18,7 +18,7 @@ void CommMQTTCallback::connection_lost(const std::string &cause)
 
 void CommMQTTCallback::message_arrived(mqtt::const_message_ptr ptr)
 {
-    const auto message = QByteArray::fromStdString(ptr->to_string());
+    auto message = QByteArray::fromStdString(ptr->to_string());
 
     qInfo() << "Message arrived:" << message;
 

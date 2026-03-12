@@ -40,8 +40,8 @@ bool Gateway::start()
     const QByteArray cloudProtocol = m_storage->cloudProtocol().toUtf8();
     const QByteArray edgeProtocol = m_storage->edgeProtocol().toUtf8();
 
-    const QJsonObject settingsCloudProtocol = m_storage->protocolSettings(cloudProtocol);
-    const QJsonObject settingsEdgeProtocol = m_storage->protocolSettings(edgeProtocol);
+    QJsonObject settingsCloudProtocol = m_storage->protocolSettings(cloudProtocol);
+    QJsonObject settingsEdgeProtocol = m_storage->protocolSettings(edgeProtocol);
 
     if (cloudProtocol.isEmpty() || edgeProtocol.isEmpty())
     {
@@ -54,13 +54,13 @@ bool Gateway::start()
         m_threadCloud = new QThread();
         m_threadCloud->setObjectName(cloudProtocol);
 
-        CommInterface *commCloud = CommFactory::getCommInterface(cloudProtocol, settingsCloudProtocol);
+        CommInterface *commCloud = CommFactory::getCommInterface(cloudProtocol, std::move(settingsCloudProtocol));
         commCloud->moveToThread(m_threadCloud);
 
         m_threadEdge = new QThread();
         m_threadEdge->setObjectName(edgeProtocol);
 
-        CommInterface *commEdge = CommFactory::getCommInterface(edgeProtocol, settingsEdgeProtocol);
+        CommInterface *commEdge = CommFactory::getCommInterface(edgeProtocol, std::move(settingsEdgeProtocol));
         commEdge->moveToThread(m_threadEdge);
 
         connect(commCloud, &CommInterface::outgoing, commEdge, &CommInterface::incoming, Qt::QueuedConnection);

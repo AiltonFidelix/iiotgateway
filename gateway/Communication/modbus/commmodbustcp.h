@@ -16,8 +16,8 @@ class CommModbusTCP : public CommModbus
     static int m_typeId;
 
 public:
-    Q_INVOKABLE explicit CommModbusTCP(const QJsonObject &settings = QJsonObject());
     ~CommModbusTCP() = default;
+    Q_INVOKABLE explicit CommModbusTCP(QJsonObject settings = QJsonObject());
 
 public slots:
     void connectComm() override;

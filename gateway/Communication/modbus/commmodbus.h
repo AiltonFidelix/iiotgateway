@@ -30,7 +30,7 @@ class CommModbus : public CommInterface
     QJsonArray registersToJsonArray(const Registers &registers);
 
 public:
-    explicit CommModbus(const QJsonObject &settings = QJsonObject());
+    explicit CommModbus(QJsonObject settings = QJsonObject());
     ~CommModbus();
 
     bool isconnected() const override;

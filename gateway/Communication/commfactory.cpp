@@ -9,7 +9,7 @@ QSet<QByteArray> *CommFactory::commInterfaces()
     return m_commInterfaces;
 }
 
-CommInterface *CommFactory::getCommInterface(const QByteArray &commInterface, const QJsonObject &settings)
+CommInterface *CommFactory::getCommInterface(const QByteArray &commInterface, QJsonObject settings)
 {
     const QMetaType type = QMetaType::fromName(commInterface.toUpper());
 
@@ -18,7 +18,7 @@ CommInterface *CommFactory::getCommInterface(const QByteArray &commInterface, co
         throw std::runtime_error("Comm Interface not found");
     }
 
-    QObject *interfaceObject = type.metaObject()->newInstance(settings);
+    QObject *interfaceObject = type.metaObject()->newInstance(std::move(settings));
 
     if (interfaceObject == nullptr)
     {

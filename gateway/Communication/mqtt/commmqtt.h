@@ -36,7 +36,7 @@ class CommMQTT : public CommInterface
     CommMQTTSettingsParser m_settingsParser;
 
 public:
-    Q_INVOKABLE explicit CommMQTT(const QJsonObject &settings = QJsonObject());
+    Q_INVOKABLE explicit CommMQTT(QJsonObject settings = QJsonObject());
     ~CommMQTT();
 
     bool isconnected() const override;

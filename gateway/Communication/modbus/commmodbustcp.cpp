@@ -6,7 +6,7 @@ COMM_MODBUS_BEGIN_NAMESPACE
 
 int CommModbusTCP::m_typeId = comm::CommFactory::registerInterface<CommModbusTCP*>("MODBUS_TCP");
 
-CommModbusTCP::CommModbusTCP(const QJsonObject &settings)
+CommModbusTCP::CommModbusTCP(QJsonObject settings)
     : CommModbus(std::move(settings))
 {
 }

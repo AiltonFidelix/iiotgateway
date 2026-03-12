@@ -13,7 +13,7 @@ COMM_MQTT_BEGIN_NAMESPACE
 
 int CommMQTT::m_typeId = comm::CommFactory::registerInterface<CommMQTT*>("MQTT");
 
-CommMQTT::CommMQTT(const QJsonObject &settings) :
+CommMQTT::CommMQTT(QJsonObject settings) :
     m_pubQos(defaultQos),
     m_subQos(defaultQos),
     m_retries(0),
