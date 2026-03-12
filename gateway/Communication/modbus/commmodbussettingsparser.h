@@ -14,7 +14,6 @@ class CommModbusSettingsParser
 
 public:
     explicit CommModbusSettingsParser(const QJsonObject &settings = QJsonObject());
-    ~CommModbusSettingsParser() = default;
 
     QVariant host() const;
     QVariant port() const;

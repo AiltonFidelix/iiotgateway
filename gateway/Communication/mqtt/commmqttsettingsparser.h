@@ -13,7 +13,6 @@ class CommMQTTSettingsParser
 
 public:
     explicit CommMQTTSettingsParser(const QJsonObject &settings = QJsonObject());
-    ~CommMQTTSettingsParser() = default;
 
     std::string protocol() const;
     std::string host() const;
