@@ -2,18 +2,16 @@
 
 ### Structure
 
-- Create buildroot deploy 
-- Create an option in cmake to install gtest and mqtt paho
-- Verify cmake options
+- Finish buildroot distro deploy 
+- Verify cmake adapters options and factories on C++ side
+- Move the configuration http server to a separated application
+- Move the led blink status to a separated application
+- Start/stop gateway and led from other applications using systemctl
 
 ### Protocols
 
 - Add Modbus TCP as edge protocol
 - Add HTTP server/client as cloud protocol
-
-### Code
-
-- Create linux network manager class with nmap and fake class for dev env
 
 ### Documentation
 
