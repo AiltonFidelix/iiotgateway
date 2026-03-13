@@ -7,9 +7,9 @@ GPIO_BEGIN_NAMESPACE
 bool FakeGPIOPin::m_registered = GPIOPinFactory::registerCreator(FakeGPIOPin::create);
 
 FakeGPIOPin::FakeGPIOPin()
-    : m_pin(0),
-    m_mode(GPIOMode::Output),
-    m_state(GPIOState::Low)
+    : m_pin{0},
+    m_mode{GPIOMode::Output},
+    m_state{GPIOState::Low}
 {
 }
 

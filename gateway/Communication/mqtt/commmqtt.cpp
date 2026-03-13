@@ -4,25 +4,25 @@
 #include <QDebug>
 #include <QJsonDocument>
 
-constexpr const int defaultQos = 0;
-constexpr const int defaultConnectionTimeout = 10;
-constexpr const int defaultKeepAliveInterval = 60;
-constexpr const int maxRetries = 5;
+constexpr int defaultQos = 0;
+constexpr int defaultConnectionTimeout = 10;
+constexpr int defaultKeepAliveInterval = 60;
+constexpr int maxRetries = 5;
 
 COMM_MQTT_BEGIN_NAMESPACE
 
 int CommMQTT::m_typeId = comm::CommFactory::registerInterface<CommMQTT*>("MQTT");
 
 CommMQTT::CommMQTT(QJsonObject settings) :
-    m_pubQos(defaultQos),
-    m_subQos(defaultQos),
-    m_retries(0),
-    m_publish(false),
-    m_subscribe(false),
-    m_client(nullptr),
-    m_pubTopic(""),
-    m_subTopic(""),
-    m_settingsParser(std::move(settings))
+    m_pubQos{defaultQos},
+    m_subQos{defaultQos},
+    m_retries{0},
+    m_publish{false},
+    m_subscribe{false},
+    m_client{nullptr},
+    m_pubTopic{},
+    m_subTopic{},
+    m_settingsParser{std::move(settings)}
 {
     m_publish = m_settingsParser.publish();
     m_subscribe = m_settingsParser.subscribe();

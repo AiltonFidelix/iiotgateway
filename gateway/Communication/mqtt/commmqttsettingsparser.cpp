@@ -5,7 +5,7 @@
 COMM_MQTT_BEGIN_NAMESPACE
 
 CommMQTTSettingsParser::CommMQTTSettingsParser(const QJsonObject &settings)
-    : m_settings(settings)
+    : m_settings{settings}
 {
 }
 

@@ -7,11 +7,11 @@
 using comm::CommFactory;
 
 Gateway::Gateway(StorageInterface *storage, QObject *parent)
-    : QObject(parent),
-    m_isRunning(false),
-    m_threadEdge(nullptr),
-    m_threadCloud(nullptr),
-    m_storage(storage)
+    : QObject{parent},
+    m_isRunning{false},
+    m_threadEdge{nullptr},
+    m_threadCloud{nullptr},
+    m_storage{storage}
 {
     qInfo() << "Creating gateway instance...";
 }

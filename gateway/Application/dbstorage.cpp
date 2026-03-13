@@ -8,7 +8,7 @@
 #include <QJsonDocument>
 
 DBStorage::DBStorage()
-    : m_connection(DBConnection::instance())
+    : m_connection{DBConnection::instance()}
 {
 }
 

@@ -5,12 +5,12 @@
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
-CommModbusRequestParser::CommModbusRequestParser(const QByteArray &data, quint16 maxEntries)
-    : m_maxEntries(maxEntries),
-    m_request({}),
-    m_type(RequestType::Unknown)
+CommModbusRequestParser::CommModbusRequestParser(QByteArray data, quint16 maxEntries)
+    : m_maxEntries{maxEntries},
+    m_request{},
+    m_type{RequestType::Unknown}
 {
-    parser(std::move(QJsonDocument::fromJson(data)));
+    parser(QJsonDocument::fromJson(std::move(data)));
 }
 
 Request CommModbusRequestParser::request() const

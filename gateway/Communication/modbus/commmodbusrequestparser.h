@@ -31,7 +31,7 @@ class CommModbusRequestParser : public QObject
     QModbusDataUnit::RegisterType getType(const QString &type) const;
 
 public:
-    explicit CommModbusRequestParser(const QByteArray &data, quint16 maxEntries = 10);
+    explicit CommModbusRequestParser(QByteArray data, quint16 maxEntries = 10);
 
     Request request() const;
     RequestType type() const;

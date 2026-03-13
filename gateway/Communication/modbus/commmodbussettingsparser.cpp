@@ -4,8 +4,8 @@
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
-CommModbusSettingsParser::CommModbusSettingsParser(const QJsonObject &settings)
-    : m_settings(settings)
+CommModbusSettingsParser::CommModbusSettingsParser(QJsonObject settings)
+    : m_settings{std::move(settings)}
 {
 }
 

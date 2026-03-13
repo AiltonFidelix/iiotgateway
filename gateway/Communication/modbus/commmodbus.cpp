@@ -9,10 +9,10 @@
 COMM_MODBUS_BEGIN_NAMESPACE
 
 CommModbus::CommModbus(QJsonObject settings)
-    : m_modbusClient(nullptr),
-    m_polling(nullptr),
-    m_readRequest({}),
-    m_settingsParser(std::move(settings))
+    : m_modbusClient{nullptr},
+    m_polling{nullptr},
+    m_readRequest{},
+    m_settingsParser{std::move(settings)}
 {
 }
 
@@ -61,7 +61,7 @@ void CommModbus::setModbusClient(CommModbusClientInterface *client)
 
 void CommModbus::incoming(QByteArray data)
 {
-    CommModbusRequestParser parser(data);
+    CommModbusRequestParser parser(std::move(data));
 
     const Request request = parser.request();
     const RequestType type = parser.type();
@@ -157,7 +157,7 @@ void CommModbus::readRegisters(const Request &request)
         json.insert(QStringLiteral("datetime"), QDateTime::currentDateTime().toString(QStringLiteral("dd/MM/yyyy hh:mm:ss.zzz")));
         json.insert(QStringLiteral("devices"), devices);
 
-        QByteArray data = QJsonDocument(json).toJson(QJsonDocument::Compact);
+        QByteArray data{QJsonDocument(json).toJson(QJsonDocument::Compact)};
 
         emit outgoing(std::move(data));
     }

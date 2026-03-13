@@ -24,14 +24,14 @@ namespace
 }
 
 Control::Control(const QString &platform, QObject *parent)
-    : QObject(parent),
-    m_httpServer(),
-    m_ledTimer(),
-    m_gateway(nullptr),
-    m_storage(nullptr),
-    m_ledPin(GPIOPinFactory::create()),
-    m_networkManager(NetworkManagerFactory::getNetworkManager(platform)),
-    m_reboot(RebootFactory::create())
+    : QObject{parent},
+    m_httpServer{},
+    m_ledTimer{},
+    m_gateway{nullptr},
+    m_storage{nullptr},
+    m_ledPin{GPIOPinFactory::create()},
+    m_networkManager{NetworkManagerFactory::getNetworkManager(platform)},
+    m_reboot{RebootFactory::create()}
 {
     if (m_ledPin != nullptr)
     {
