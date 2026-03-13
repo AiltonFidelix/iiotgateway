@@ -44,7 +44,7 @@ LogHandler::LogHandler()
         {"fat", LOG_ERR},
     };
 
-    const std::string logLevelConfig = qgetenv("LOG_LEVEL").toLower().toStdString();
+    const std::string logLevelConfig{qgetenv("LOG_LEVEL").toLower().toStdString()};
 
     auto it = logLevelMap.find(logLevelConfig);
 
@@ -79,14 +79,14 @@ void LogHandler::syslogHandler(QtMsgType type, const QMessageLogContext &context
 
     auto itT = logTagMap.find(logPriority);
 
-    const QString logTag = QString::fromStdString(itT->second);
+    const QString logTag{QString::fromStdString(itT->second)};
 
-    QString identifier = context.function;
+    QString identifier{context.function};
     identifier.remove('*');
     identifier.remove('&');
 
-    static QRegularExpression regexp(QStringLiteral("\\w+.?(?=::)"));
-    QRegularExpressionMatch className = regexp.match(identifier);
+    static QRegularExpression regexp{QStringLiteral("\\w+.?(?=::)")};
+    QRegularExpressionMatch className{regexp.match(identifier)};
 
     if (className.hasMatch())
     {
@@ -99,8 +99,8 @@ void LogHandler::syslogHandler(QtMsgType type, const QMessageLogContext &context
         identifier = QStringLiteral("Unknown");
     }
 
-    const QString fmtMessage = QString("%0 - %1 - %2").arg(logTag, identifier, message);
-    const QByteArray outputMessage = fmtMessage.toUtf8();
+    const QString fmtMessage{QString("%0 - %1 - %2").arg(logTag, identifier, message)};
+    const QByteArray outputMessage{fmtMessage.toUtf8()};
 
     syslog(logPriority, "%s", outputMessage.data());
     std::cout << outputMessage.data() << std::endl;
