@@ -2,54 +2,55 @@
 
 #include <syslog.h>
 #include <iostream>
-#include <QDateTime>
-#include <QMetaEnum>
-#include <QThread>
+#include <map>
+#include <unordered_map>
 
 LOGGING_BEGIN_NAMESPACE
 
-LogHandler *LogHandler::m_instance = nullptr;
-LogHandler::PriorityMap LogHandler::m_priorityMap = LogHandler::PriorityMap();
-int LogHandler::m_logLevel = LOG_DEBUG;
-int LogHandler::m_syslogLevel = LOG_DEBUG;
+#ifdef QT_DEBUG
+static int logLevel = LOG_DEBUG;
+#else
+static int logLevel = LOG_INFO;
+#endif
+
+static const std::unordered_map<QtMsgType, int> logPriorityMap {
+    {QtDebugMsg, LOG_DEBUG},
+    {QtInfoMsg, LOG_INFO},
+    {QtWarningMsg, LOG_WARNING},
+    {QtCriticalMsg, LOG_ERR},
+    {QtFatalMsg, LOG_ERR},
+};
+
+static const std::unordered_map<int, std::string> logTagMap {
+    {LOG_DEBUG, "[DEBUG]"},
+    {LOG_INFO, "[INFO]"},
+    {LOG_WARNING, "[WARNING]"},
+    {LOG_ERR, "[ERROR]"},
+};
 
 LogHandler *LogHandler::instance()
 {
-    if (m_instance == nullptr)
-        m_instance = new LogHandler();
-
-    return m_instance;
+    static LogHandler instance;
+    return &instance;
 }
 
 LogHandler::LogHandler()
 {
-#ifdef QT_DEBUG
-    m_logLevel = LOG_DEBUG;
-#else
-    m_logLevel = LOG_INFO;
-#endif
-
-    m_priorityMap = {
-        { QtDebugMsg, qMakePair(LOG_DEBUG, QStringLiteral("[DEBUG]")) },
-        { QtInfoMsg, qMakePair(LOG_INFO, QStringLiteral("[INFO]")) },
-        { QtWarningMsg, qMakePair(LOG_WARNING, QStringLiteral("[WARNING]")) },
-        { QtCriticalMsg, qMakePair(LOG_ERR, QStringLiteral("[ERROR]")) },
-        { QtFatalMsg, qMakePair(LOG_ERR, QStringLiteral("[ERROR]")) }
+    const std::map<std::string, uint8_t> logLevelMap {
+        {"deb", LOG_DEBUG},
+        {"inf", LOG_INFO},
+        {"war", LOG_WARNING},
+        {"cri", LOG_ERR},
+        {"fat", LOG_ERR},
     };
 
-    QString logLevel = qgetenv("LOG_LEVEL").toLower();
-    QString syslogLevel = qgetenv("LOG_LEVEL_FOR_SYSLOG_FILES").toLower();
-    PriorityMapIterator iPriorityMap(m_priorityMap);
+    const std::string logLevelConfig = qgetenv("LOG_LEVEL").toLower().toStdString();
 
-    while (iPriorityMap.hasNext())
+    auto it = logLevelMap.find(logLevelConfig);
+
+    if (it != logLevelMap.end())
     {
-        iPriorityMap.next();
-
-        if (logLevel.contains(iPriorityMap.value().second.toLower()))
-            m_logLevel = iPriorityMap.value().first;
-
-        if (syslogLevel.contains(iPriorityMap.value().second.toLower()))
-            m_syslogLevel = iPriorityMap.value().first;
+        logLevel = it->second;
     }
 
     openlog(APP_NAME, LOG_CONS | LOG_NDELAY, LOG_LOCAL0);
@@ -60,59 +61,49 @@ LogHandler::~LogHandler()
     closelog();
 }
 
-void
-LogHandler::syslogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+void LogHandler::syslogHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)
 {
-    QStringList messageInfo;
-    QString messagType = QStringLiteral("DEB");
-    QString identificador = context.function;
-    identificador.remove('*');
-    identificador.remove('&');
+    auto itP = logPriorityMap.find(type);
+
+    if (itP == logPriorityMap.end())
+    {
+        return;
+    }
+
+    const int logPriority = itP->second;
+
+    if (logPriority > logLevel)
+    {
+        return;
+    }
+
+    auto itT = logTagMap.find(logPriority);
+
+    const QString logTag = QString::fromStdString(itT->second);
+
+    QString identifier = context.function;
+    identifier.remove('*');
+    identifier.remove('&');
 
     static QRegularExpression regexp(QStringLiteral("\\w+.?(?=::)"));
-    QRegularExpressionMatch className = regexp.match(identificador);
+    QRegularExpressionMatch className = regexp.match(identifier);
 
     if (className.hasMatch())
     {
-        identificador = className.captured(0);
+        identifier = className.captured(0);
+        identifier.remove(')');
     }
 
-    if (m_priorityMap.contains(type))
+    if (identifier.isEmpty())
     {
-        messagType = m_priorityMap.value(type).second;
+        identifier = QStringLiteral("Unknown");
     }
 
-    const QVariant messageContext = QThread::currentThread()->property("context");
+    const QString fmtMessage = QString("%0 - %1 - %2").arg(logTag, identifier, message);
+    const QByteArray outputMessage = fmtMessage.toUtf8();
 
-    if (messageContext.isValid())
-    {
-        identificador = messageContext.toString();
-    }
-    else if (identificador.isEmpty())
-    {
-        identificador = QStringLiteral("Unknown");
-    }
-
-    messageInfo.append(QDateTime::currentDateTime().toString(QStringLiteral("dd-MM-yyyy hh:mm:ss")));
-    messageInfo.append(identificador);
-    messageInfo.append(msg);
-
-    const QByteArray separator(" - ");
-    const QString outputMessage1 = messageInfo.join(separator);
-    QByteArray outputMessage = outputMessage1.toUtf8();
-
-    if (m_priorityMap.value(type).first <= m_syslogLevel)
-    {
-        syslog(m_priorityMap.value(type).first, "%s", outputMessage.data());
-    }
-
-    messageInfo.prepend(messagType);
-    outputMessage = messageInfo.join(separator).toUtf8();
-
-    if (m_priorityMap.value(type).first <= m_logLevel)
-    {
-        std::cout << outputMessage.data() << std::endl;
-    }
+    syslog(logPriority, "%s", outputMessage.data());
+    std::cout << outputMessage.data() << std::endl;
 }
 
 LOGGING_END_NAMESPACE
