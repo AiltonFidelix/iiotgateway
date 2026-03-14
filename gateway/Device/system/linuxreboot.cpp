@@ -13,7 +13,7 @@ void LinuxReboot::reboot() const
     qDebug() << "Rebooting...";
 
     QProcess process;
-    process.start(QStringLiteral("sudo"), QStringList() << QStringLiteral("reboot"));
+    process.start(QStringLiteral("reboot"), QStringList());
 
     if (!process.waitForStarted())
     {
