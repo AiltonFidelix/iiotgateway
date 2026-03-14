@@ -27,7 +27,7 @@ Addresses CommModbusRequestParser::sortedAddress(const Request &request)
 {
     auto keys = request.keys();
 
-    std::sort(keys.begin(), keys.end());
+    std::ranges::sort(keys);
 
     return keys;
 }
@@ -39,7 +39,7 @@ void CommModbusRequestParser::sortRequestUnits(Units &units)
         return a.startAddress() < b.startAddress();
     };
 
-    std::sort(units.begin(), units.end(), sort);
+    std::ranges::sort(units, sort);
 }
 
 void CommModbusRequestParser::parser(const QJsonDocument &document)

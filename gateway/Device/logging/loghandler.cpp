@@ -46,9 +46,7 @@ LogHandler::LogHandler()
 
     const std::string logLevelConfig{qgetenv("LOG_LEVEL").toLower().toStdString()};
 
-    auto it = logLevelMap.find(logLevelConfig);
-
-    if (it != logLevelMap.end())
+    if (auto it = logLevelMap.find(logLevelConfig); it != logLevelMap.end())
     {
         logLevel = it->second;
     }
@@ -63,23 +61,21 @@ LogHandler::~LogHandler()
 
 void LogHandler::syslogHandler(QtMsgType type, const QMessageLogContext &context, const QString &message)
 {
-    auto itP = logPriorityMap.find(type);
+    auto it = logPriorityMap.find(type);
 
-    if (itP == logPriorityMap.end())
+    if (it == logPriorityMap.end())
     {
         return;
     }
 
-    const int logPriority = itP->second;
+    const int logPriority = it->second;
 
     if (logPriority > logLevel)
     {
         return;
     }
 
-    auto itT = logTagMap.find(logPriority);
-
-    const QString logTag{QString::fromStdString(itT->second)};
+    const QString logTag{QString::fromStdString(logTagMap.at(logPriority))};
 
     QString identifier{context.function};
     identifier.remove('*');
