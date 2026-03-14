@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 
     const QUrl url(QStringLiteral("qrc:/ui/Main.qml"));
 
+    // TODO: Create a control class for each page
     Backend backend;
     engine.rootContext()->setContextProperty(QStringLiteral("backend"), &backend);
 
