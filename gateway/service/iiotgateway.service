@@ -1,9 +1,0 @@
-[Unit]
-Description=IIoTGateway Service
-
-[Service]
-ExecStart=/opt/iiotgateway/rungateway
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
