@@ -13,6 +13,14 @@
 - Add Modbus TCP as edge protocol
 - Add HTTP server/client as cloud protocol
 
+### Dashboard
+
+- Create a control class for each page
+- Improve error handlers
+- Finish network settings page
+- Add an option to change user password
+- Display date/time and add an option to update
+
 ### Documentation
 
 - Update README and diagrams
