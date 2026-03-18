@@ -1,64 +1,67 @@
 # IIotGateway
 
-IIoTGateway is a bridge application that allows reading and writing data via Modbus RTU and transmitting this information using the MQTT protocol, enabling the integration of Modbus devices with modern monitoring and control systems. 
+IIoTGateway is a protocol bridge platform that allows reading and writing data via Modbus RTU and transmitting this information using the MQTT protocol, enabling the integration of Modbus devices with modern monitoring and control systems. 
 
-### Requirements
+The platform combines a protocol gateway, a web-based management interface, and a custom Buildroot-based Linux distribution.
 
-- C++ 17
-- Qt >= 6.8.3
-- googletest v1.16.0
-- paho.mqtt.cpp v1.5.1
+## Features
 
-### Environment variables
+- Modbus RTU read and write support
+- MQTT-based data publishing and control
+- Web-based dashboard for configuration and monitoring
+- Embedded Linux distribution built with buildroot
+- Targeted for Raspberry Pi hardware
 
-| Variable | Description | Value | Supported |
-| --- | --- | --- | --- |
-| DB_TYPE | Database driver | QSQLITE | QSQLITE |
-| DB_NAME | Database name | IIoTGateway.db | anyname.db |
-| PLATFORM | Platform used | raspberry | host, raspberry |
+## Requirements
 
-### Request JSON
+These requirements apply only to the **development environment**, not to the target Raspberry Pi system.
 
-Reading example:
+### Toolchain
 
-```json
-{
-    "devices": [
-        {
-            "address": 240,
-            "type": "HoldingRegisters",
-            "startRegister": 0,
-            "numberOfEntries": 25
-        }
-    ]
-}
-```
+- GCC ≥ 11.4.0
+- CMake ≥ 3.20
+- Python ≥ 3.10.12
 
-The example above demonstrates how to read registers 0–25 from a Modbus device configured with address 240.
+### Dependencies
 
-Writing example:
+- Emscripten 3.1.56
+- Qt 6.8.3
+    - Desktop
+    - WebAssembly (single-threaded)
+    - Modules:
+        - Qt HTTP Server
+        - Qt Serial Bus
+        - Qt Serial Port
 
-```json
-{
-    "devices": [
-        {
-            "address": 240,
-            "type": "HoldingRegisters",
-            "startRegister": 1,
-            "numberOfEntries": 1,
-            "values": [1]
-        }
-    ]
-}
-```
+### Libraries
 
-The example above demonstrates how to write the value 1 on the register 1 from a Modbus device configured with address 240.
+- googletest v1.16.0 (via CMake FetchContent)
+- paho.mqtt.cpp v1.5.1 (via CMake FetchContent)
 
-### Dashboard
+#TODO Provide `docker` images for cross-compilation and WebAssembly builds.
 
-Dashboard login:
+## Project Structure
 
 ```sh
-username: admin
-password gtwAdmin
+.
+├── dashboard   # Web-based UI for configuration and monitoring
+├── distro      # Buildroot-based embedded Linux distribution
+└── gateway     # Core service (Modbus ↔ MQTT bridge
 ```
+
+- **dashboard:** Browser-based interface for system configuration and operation
+- **gateway:** Core application responsible for protocol translation and device communication
+- **distro:** Custom Linux image for Raspberry Pi, bundling the gateway and dashboard
+
+Architecture diagram:
+
+[diagram](./docs/diagram.png)
+
+## Documentation
+
+- [Modbus Request Structure](./docs/MODBUS.md)
+- [Dashboard Default Settings](./docs/DASHBOARD.md)
+
+## Building
+
+#TODO Build example using `python` script.
