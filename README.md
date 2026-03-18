@@ -4,6 +4,8 @@ IIoTGateway is a protocol bridge platform that allows reading and writing data v
 
 The platform combines a protocol gateway, a web-based management interface, and a custom Buildroot-based Linux distribution.
 
+---
+
 ## Features
 
 - Modbus RTU read and write support
@@ -11,6 +13,8 @@ The platform combines a protocol gateway, a web-based management interface, and 
 - Web-based dashboard for configuration and monitoring
 - Embedded Linux distribution built with buildroot
 - Targeted for Raspberry Pi hardware
+
+---
 
 ## Requirements
 
@@ -40,6 +44,8 @@ These requirements apply only to the **development environment**, not to the tar
 
 **#TODO** Provide `docker` images for cross-compilation and WebAssembly builds.
 
+---
+
 ## Project Structure
 
 ```sh
@@ -57,10 +63,14 @@ Architecture diagram:
 
 ![diagram](/docs/diagram.png)
 
+---
+
 ## Documentation
 
 - [Modbus Request Structure](./docs/MODBUS.md)
 - [Dashboard Default Settings](./docs/DASHBOARD.md)
+
+---
 
 ## Building
 
