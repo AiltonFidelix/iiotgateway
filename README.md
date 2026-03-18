@@ -55,7 +55,7 @@ These requirements apply only to the **development environment**, not to the tar
 
 Architecture diagram:
 
-[diagram](./docs/diagram.png)
+![diagram](/docs/diagram.png)
 
 ## Documentation
 
