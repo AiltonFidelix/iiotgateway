@@ -1,4 +1,4 @@
-# IIotGateway
+# IIoTGateway
 
 IIoTGateway is a protocol bridge platform that allows reading and writing data via Modbus RTU and transmitting this information using the MQTT protocol, enabling the integration of Modbus devices with modern monitoring and control systems. 
 
@@ -38,7 +38,7 @@ These requirements apply only to the **development environment**, not to the tar
 - googletest v1.16.0 (via CMake FetchContent)
 - paho.mqtt.cpp v1.5.1 (via CMake FetchContent)
 
-#TODO Provide `docker` images for cross-compilation and WebAssembly builds.
+**#TODO** Provide `docker` images for cross-compilation and WebAssembly builds.
 
 ## Project Structure
 
@@ -64,4 +64,4 @@ Architecture diagram:
 
 ## Building
 
-#TODO Build example using `python` script.
+**#TODO** Build example using `python` script.
