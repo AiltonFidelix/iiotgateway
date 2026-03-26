@@ -1,8 +1,8 @@
 # IIoTGateway
 
-IIoTGateway is a protocol bridge platform that allows reading and writing data via Modbus RTU and transmitting this information using the MQTT protocol, enabling the integration of Modbus devices with modern monitoring and control systems. 
+**IIoTGateway** is a protocol bridge platform that enables reading from and writing to `Modbus RTU` devices through the `MQTT` protocol, allowing Modbus networks to be seamlessly integrated into modern monitoring and control systems.
 
-The platform combines a protocol gateway, a web-based management interface, and a custom Buildroot-based Linux distribution.
+The platform is delivered as a custom Linux distribution built with `Buildroot` for `Raspberry Pi` devices, where all required applications are pre-integrated and ready to run. It combines the protocol gateway, a web-based management interface, and the underlying operating system into a single solution, making deployment straightforward and consistent.
 
 ---
 
