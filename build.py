@@ -7,8 +7,8 @@ import multiprocessing
 from functools import wraps
 from pathlib import Path
 
-BUILDROOT_PATH = (Path(__file__).resolve().parent.parent / "buildroot").resolve()
-DISTRO_PATH = (Path(__file__).resolve().parent).resolve()
+BUILDROOT_PATH = (Path(__file__).resolve().parent / "buildroot").resolve()
+DISTRO_PATH = (Path(__file__).resolve().parent / "distro").resolve()
 DEF_CONFIG_FILE = "raspberrypi3_64_defconfig"
 
 
@@ -42,7 +42,7 @@ def build_and_install(application: str):
 
 @build_and_install("dashboard")
 def build_and_install_dashboard(jobs: str, clean: bool = False):
-    command = ["python3", "scripts/build.py", f"--jobs {jobs}"]
+    command = ["python3", "scripts/build.py", "--jobs", jobs]
 
     if clean:
         command.append("--clean")
@@ -51,8 +51,8 @@ def build_and_install_dashboard(jobs: str, clean: bool = False):
 
 
 @build_and_install("gateway")
-def build_and_install_gateway(jobs: str, clean: bool = False):
-    command = ["python3", "scripts/build.py", "--arch aarch64", f"--jobs {jobs}"]
+def build_and_install_gateway(jobs: str, clean: bool = False, arch: str = "aarch64"):
+    command = ["python3", "scripts/build.py", "--arch", arch, "--jobs", jobs]
 
     if clean:
         command.append("--clean")

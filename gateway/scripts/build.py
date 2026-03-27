@@ -86,7 +86,6 @@ def main():
     parser = argparse.ArgumentParser(description="gateway build script")
 
     parser.add_argument(
-        "-a",
         "--arch",
         choices=SUPPORTED_ARCHS,
         default="amd64",
@@ -100,8 +99,7 @@ def main():
     }
 
     parser.add_argument(
-        "-q",
-        "--qt-ver",
+        "--qt-version",
         default=QT_VERSION,
         metavar="VER",
         help=f"Qt framework version (default: {QT_VERSION})",
@@ -110,7 +108,6 @@ def main():
     default_num_of_jobs = str(multiprocessing.cpu_count() - 4)
 
     parser.add_argument(
-        "-j",
         "--jobs",
         default=default_num_of_jobs,
         metavar="JOBS",
@@ -118,11 +115,10 @@ def main():
     )
 
     parser.add_argument(
-        "-c", "--clean", action="store_true", help="Clean previous build artifacts"
+        "--clean", action="store_true", help="Clean previous build artifacts"
     )
 
     parser.add_argument(
-        "-t",
         "--with-tests",
         action="store_true",
         help="Include test library in the build",
@@ -136,7 +132,7 @@ def main():
         clean(build_dir)
 
     check_build_folder(build_dir)
-    archs_build[args.arch](build_dir, args.qt_ver, args.jobs, args.with_tests)
+    archs_build[args.arch](build_dir, args.qt_version, args.jobs, args.with_tests)
 
 
 if __name__ == "__main__":

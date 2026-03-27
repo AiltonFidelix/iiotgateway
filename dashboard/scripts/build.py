@@ -45,7 +45,6 @@ def main():
     parser = argparse.ArgumentParser(description="dasboard build script")
 
     parser.add_argument(
-        "-w",
         "--wasm-cc",
         default=COMPILER,
         metavar="WC",
@@ -53,8 +52,7 @@ def main():
     )
 
     parser.add_argument(
-        "-q",
-        "--qt-ver",
+        "--qt-version",
         default=QT_VERSION,
         metavar="VER",
         help=f"Qt framework version (default: {QT_VERSION})",
@@ -63,7 +61,6 @@ def main():
     default_num_of_jobs = str(multiprocessing.cpu_count() - 4)
 
     parser.add_argument(
-        "-j",
         "--jobs",
         default=default_num_of_jobs,
         metavar="JOBS",
@@ -71,7 +68,7 @@ def main():
     )
 
     parser.add_argument(
-        "-c", "--clean", action="store_true", help="Clean previous build artifacts"
+        "--clean", action="store_true", help="Clean previous build artifacts"
     )
 
     args = parser.parse_args()
@@ -79,7 +76,7 @@ def main():
     if args.clean:
         clean()
 
-    build(args.qt_ver, args.wasm_cc, args.jobs)
+    build(args.qt_version, args.wasm_cc, args.jobs)
 
 
 if __name__ == "__main__":

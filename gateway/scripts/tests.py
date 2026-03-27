@@ -28,8 +28,8 @@ def main():
         [
             "python3",
             "scripts/build.py",
-            "-t",
-            "-a",
+            "--with-tests",
+            "--arch",
             ARCH,
         ]
     )
