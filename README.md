@@ -74,4 +74,18 @@ Architecture diagram:
 
 ## Building
 
-**#TODO** Build example using `python` script.
+The default build targets a **Raspberry Pi 3**.
+
+To run a default build of the **IIoTGateway** platform:
+
+```sh
+python3 build.py --default
+```
+
+This will execute the full build using the default configuration for the Raspberry Pi 3.
+
+Additional command-line options are available to customize the build process (e.g., cleaning artifacts, adjusting parallel jobs, or skipping components). Use `--help` to see all available options:
+
+```sh
+python3 build.py --help
+```
