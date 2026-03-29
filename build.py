@@ -61,7 +61,7 @@ def build_and_install_gateway(jobs: str, clean: bool = False, arch: str = "aarch
 
 
 def main():
-    parser = argparse.ArgumentParser(description="IIoTGateway platform build")
+    parser = argparse.ArgumentParser(description="IIoTGateway platform build", usage="%(prog)s [options]")
 
     parser.add_argument(
         "--default", action="store_true", help="Use all default options"
