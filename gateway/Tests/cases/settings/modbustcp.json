@@ -1,0 +1,8 @@
+{
+    "host": "192.68.50.94",
+    "port": 502,
+    "retries": 5,
+    "timeout": 500,
+    "pollingInterval": 1000,
+    "pollingEnabled": false
+}

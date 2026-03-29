@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>cases/network/networkmanager.json</file>
+        <file>cases/requests/readone.json</file>
+        <file>cases/requests/readmultiple.json</file>
+        <file>cases/requests/writeone.json</file>
+        <file>cases/requests/writemultiple.json</file>
+        <file>cases/settings/modbusrtu.json</file>
+        <file>cases/settings/modbustcp.json</file>
+        <file>cases/settings/mqtt.json</file>
+    </qresource>
+</RCC>

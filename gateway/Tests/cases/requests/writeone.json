@@ -1,0 +1,22 @@
+{
+    "devices": [
+        {
+            "address": 55,
+            "registerType": "HoldingRegisters",
+            "startRegister": 3,
+            "numberOfEntries": 10,
+            "values": [
+                88,
+                2,
+                65533,
+                4,
+                5,
+                0,
+                7,
+                8,
+                255,
+                10
+            ]
+        }
+    ]
+}

@@ -1,0 +1,8 @@
+CREATE TABLE settings (
+    id INTEGER PRIMARY KEY,
+    active VARCHAR(1) DEFAULT 'N',
+    cloud_protocol VARCHAR(30),
+    edge_protocol VARCHAR(30),
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

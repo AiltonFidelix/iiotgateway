@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+export QT_PLUGIN_PATH="/usr/lib/qt6/plugins"
+export DB_TYPE="QSQLITE"
+export DB_NAME="/opt/iiotgateway/iiotgateway.db"
+
+/opt/iiotgateway/bin/gateway

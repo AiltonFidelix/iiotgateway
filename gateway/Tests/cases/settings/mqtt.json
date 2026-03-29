@@ -1,0 +1,19 @@
+{
+    "protocol": "mqtt://",
+    "host": "localhost",
+    "username": "testeruser",
+    "password": "testerpass",
+    "clientId": "iiotgateway",
+    "publishTopic": "iiotgateway/edge",
+    "subscribeTopic": "iiotgateway/cloud",
+    "connectionTimeout": 10,
+    "keepAlive": 60,
+    "port": 1883,
+    "version": "3.1",
+    "publishQos": 0,
+    "subscribeQos": 0,
+    "autoReconnect": true,
+    "cleanStart": true,
+    "publish": true,
+    "subscribe": true
+}

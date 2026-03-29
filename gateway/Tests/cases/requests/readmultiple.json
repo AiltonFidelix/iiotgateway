@@ -1,0 +1,22 @@
+{
+    "devices": [
+        {
+            "address": 1,
+            "registerType": "HoldingRegisters",
+            "startRegister": 0,
+            "numberOfEntries": 10
+        },
+        {
+            "address": 1,
+            "registerType": "HoldingRegisters",
+            "startRegister": 10,
+            "numberOfEntries": 10
+        },
+        {
+            "address": 2,
+            "registerType": "HoldingRegisters",
+            "startRegister": 0,
+            "numberOfEntries": 40
+        }
+    ]
+}

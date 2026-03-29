@@ -1,0 +1,10 @@
+{
+    "devices": [
+        {
+            "address": 240,
+            "registerType": "HoldingRegisters",
+            "startRegister": 0,
+            "numberOfEntries": 10
+        }
+    ]
+}

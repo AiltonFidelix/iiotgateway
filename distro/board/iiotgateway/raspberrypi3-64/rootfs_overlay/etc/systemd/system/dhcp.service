@@ -1,0 +1,10 @@
+[Unit]
+Description=DHCP Client
+After=network-pre.target
+
+[Service]
+ExecStart=/sbin/udhcpc -i enu1u1u1 -f
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

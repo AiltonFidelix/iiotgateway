@@ -1,0 +1,36 @@
+# Build
+build
+build-*
+*-deploy
+
+# C++
+*.so*
+*.wasm
+
+# VS Code
+.vscode
+
+# Qt Creator
+.qtcreator
+*.txt.user
+
+# Python
+venv
+.venv
+env
+.env
+
+# Docs
+*.drawio.bkp
+
+# Static
+*.min.*
+*.js
+
+# Development
+*.env
+*.db
+*.deb
+
+# Projects
+*bin*
