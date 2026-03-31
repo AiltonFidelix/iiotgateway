@@ -2,9 +2,9 @@
 
 COMM_BEGIN_NAMESPACE
 
-QSet<QByteArray> *CommFactory::m_commInterfaces = nullptr;
+std::set<QByteArray> CommFactory::m_commInterfaces{};
 
-QSet<QByteArray> *CommFactory::commInterfaces()
+std::set<QByteArray> &CommFactory::commInterfaces()
 {
     return m_commInterfaces;
 }
@@ -13,7 +13,7 @@ CommInterface *CommFactory::getCommInterface(const QByteArray &commInterface, QJ
 {
     const QMetaType type = QMetaType::fromName(commInterface.toUpper());
 
-    if (!m_commInterfaces->contains(commInterface) || !type.isRegistered())
+    if (!m_commInterfaces.contains(commInterface) || !type.isRegistered())
     {
         throw std::runtime_error("Comm Interface not found");
     }
