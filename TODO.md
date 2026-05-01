@@ -2,6 +2,7 @@
 
 ### Structure
 
+- Split applications into different repositories
 - Create an init-environment script installing all dependencies
 - Verify cmake adapters options and factories on C++ side
 - Move the configuration http server to a separated application
