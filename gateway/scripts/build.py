@@ -31,7 +31,6 @@ def build_amd64(build_dir: Path, qt_version: str, jobs: str, with_test: bool = F
     if with_test:
         index = len(cmake_cmd) - 1
         cmake_cmd.insert(index, "-DENABLE_TESTS=ON")
-        cmake_cmd.insert(index + 1, "-DENABLE_GTEST_INSTALL=ON")
 
     run(cmake_cmd, cwd=build_dir)
 
