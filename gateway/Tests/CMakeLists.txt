@@ -26,6 +26,8 @@ set(LIBRARIES
     Application
     Communication
     Device
+    gtest
+    gmock
     gtest_main
     gmock_main
     paho-mqtt3a
