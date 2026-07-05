@@ -3,11 +3,14 @@
 ### Structure
 
 - Split applications into different repositories
-- Create an init-environment script installing all dependencies
 - Verify cmake adapters options and factories on C++ side
 - Move the configuration http server to a separated application
 - Move the led blink status to a separated application
 - Start/stop gateway and led from other applications using systemctl
+
+### Distro
+
+- Install applications as packages, following buildroot approach
 
 ### Gateway
 
