@@ -5,12 +5,16 @@ import shutil
 import subprocess
 
 TMP_PATH = "/tmp"
+OPT_PATH = "/opt"
 
 GTEST_REPOSITORY = "https://github.com/google/googletest"
 GTEST_VERSION = "v1.16.0"
 
 PAHO_MQTT_CPP_REPOSITORY = "https://github.com/eclipse-paho/paho.mqtt.cpp.git"
 PAHO_MQTT_CPP_VERSION = "v1.5.1"
+
+EMSCRIPTEM_REPOSITORY = "https://github.com/emscripten-core/emsdk.git"
+EMSCRIPTEM_VERSION = "3.1.56"
 
 
 def run(cmd, cwd=None):
@@ -105,6 +109,24 @@ def install_paho_mqtt():
         print(f"---> Error installing Paho Mqtt Cpp: {e}")
 
 
+def install_emscripten():
+    EMSDK_PATH = f"{OPT_PATH}/emsdk"
+
+    if os.path.exists(EMSDK_PATH):
+        print("---> Emscripten is already installed")
+        return
+
+    print("---> Installing Emscripten")
+
+    try:
+        run(["git", "clone", EMSCRIPTEM_REPOSITORY], OPT_PATH)
+        run(["./emsdk", "install", EMSCRIPTEM_VERSION], EMSDK_PATH)
+        run(["./emsdk", "activate", EMSCRIPTEM_VERSION], EMSDK_PATH)
+        print("---> Emscripten installed successfully")
+    except Exception as e:
+        print(f"---> Error installing Emscripten: {e}")
+
+
 def verify_tool(tool: str):
     tool_path = shutil.which(tool)
 
@@ -126,6 +148,7 @@ def main():
     verify_tools()
     install_gtest()
     install_paho_mqtt()
+    install_emscripten()
 
 
 if __name__ == "__main__":
