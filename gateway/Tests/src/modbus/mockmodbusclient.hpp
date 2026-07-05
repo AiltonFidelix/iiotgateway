@@ -1,9 +1,10 @@
+#include "modbus/commmodbusclientinterface.hpp"
+
 #include <gmock/gmock.h>
-#include "modbus/commmodbusclientinterface.h"
 
 using comm::commmodbus::CommModbusClientInterface;
 
-class MockModbusClient : public CommModbusClientInterface
+class MockModbusClient final : public CommModbusClientInterface
 {
 public:
     MockModbusClient() = default;

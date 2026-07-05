@@ -1,8 +1,9 @@
+#include "modbus/commmodbusrequestparser.hpp"
+#include "testutils.hpp"
+
 #include <gtest/gtest.h>
 
-#include "testutils.h"
-
-#include "modbus/commmodbusrequestparser.h"
+#include <memory>
 
 using testing::ValuesIn;
 using testing::TestWithParam;
@@ -42,7 +43,7 @@ TEST_P(TestCommModbusRequestParser, TestRequestParser)
     const auto param = GetParam();
 
     const auto filePath = std::get<QString>(param);
-    auto expectedRequest = std::get<Request*>(param);
+    std::unique_ptr<Request> expectedRequest{std::get<Request *>(param)};
 
     ASSERT_TRUE(expectedRequest != nullptr);
 
@@ -69,8 +70,6 @@ TEST_P(TestCommModbusRequestParser, TestRequestParser)
 
         ASSERT_TRUE(result) << "Units are not equal";
     }
-
-    delete expectedRequest;
 }
 
 std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases()

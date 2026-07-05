@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <memory>
-
 #include "driver/gpio/gpiopin.h"
 #include "driver/gpio/gpiopinfactory.h"
+
+#include <memory>
 
 using device::driver::gpio::GPIOPin;
 using device::driver::gpio::GPIOPinFactory;

@@ -1,4 +1,4 @@
-#include "testutils.h"
+#include "testutils.hpp"
 
 #include <QFile>
 

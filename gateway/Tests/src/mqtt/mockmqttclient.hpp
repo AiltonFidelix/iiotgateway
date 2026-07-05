@@ -2,18 +2,20 @@
 #define MOCKMQTTCLIENT_H
 
 #include <gmock/gmock.h>
+
 #include <mqtt/iasync_client.h>
 
 using namespace mqtt;
 
 using qos_collection = std::vector<int>;
 
-class TestableMQTTClientInterface : public mqtt::iasync_client {
+class TestableMQTTClientInterface : public mqtt::iasync_client
+{
 protected:
     void remove_token(token* tok) override = 0;
 };
 
-class MockMQTTClient : public TestableMQTTClientInterface
+class MockMQTTClient final : public TestableMQTTClientInterface
 {
 public:
     MockMQTTClient() = default;

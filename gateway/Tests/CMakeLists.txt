@@ -1,9 +1,9 @@
 set(EXECUTABLE_NAME Runner)
 
 set(HEADERS
-    src/utils/testutils.h
-    src/modbus/mockmodbusclient.h
-    src/mqtt/mockmqttclient.h
+    src/utils/testutils.hpp
+    src/modbus/mockmodbusclient.hpp
+    src/mqtt/mockmqttclient.hpp
 )
 
 set(SOURCES

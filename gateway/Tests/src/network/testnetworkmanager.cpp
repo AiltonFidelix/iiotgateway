@@ -1,11 +1,13 @@
+#include "testutils.hpp"
+
 #include <gtest/gtest.h>
-
-#include <QJsonDocument>
-
-#include "testutils.h"
 
 #include "network/networkmanager.h"
 #include "network/networkmanagerfactory.h"
+
+#include <QJsonDocument>
+
+#include <memory>
 
 using device::network::NetworkManager;
 using device::network::NetworkManagerFactory;
@@ -19,7 +21,7 @@ TEST_F(TestNetworkManager, TestMethods)
     const QByteArray expectedData = TestUtils::readJsonFile(QStringLiteral(":/cases/network/networkmanager.json"));
     const auto expectedJson = QJsonDocument::fromJson(expectedData);
 
-    NetworkManager *manager = NetworkManagerFactory::getNetworkManager(QStringLiteral("host"));
+    std::unique_ptr<NetworkManager> manager{NetworkManagerFactory::getNetworkManager(QStringLiteral("host"))};
 
     ASSERT_TRUE(manager != nullptr);
     ASSERT_TRUE(manager->load());
@@ -28,7 +30,5 @@ TEST_F(TestNetworkManager, TestMethods)
     const auto actualJson = QJsonDocument::fromJson(actualData);
 
     ASSERT_EQ(expectedJson.toJson(QJsonDocument::Compact), actualJson.toJson(QJsonDocument::Compact));
-
-    delete manager;
 }
 

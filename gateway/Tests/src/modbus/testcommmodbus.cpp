@@ -1,14 +1,13 @@
+#include "mockmodbusclient.hpp"
+#include "modbus/commmodbusrtu.hpp"
+#include "testutils.hpp"
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <QModbusReply>
 #include <QJsonArray>
 #include <QJsonObject>
-
-#include "testutils.h"
-
-#include "modbus/commmodbusrtu.h"
-#include "mockmodbusclient.h"
+#include <QModbusReply>
 
 using testing::_;
 using testing::DoAll;

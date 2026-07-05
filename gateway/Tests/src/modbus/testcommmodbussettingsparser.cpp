@@ -1,10 +1,12 @@
+#include "modbus/commmodbussettingsparser.hpp"
+#include "testutils.hpp"
+
 #include <gtest/gtest.h>
+
 #include <QJsonArray>
 #include <QJsonDocument>
 
-#include "testutils.h"
-
-#include "modbus/commmodbussettingsparser.h"
+#include <memory>
 
 using testing::ValuesIn;
 using testing::TestWithParam;
@@ -43,7 +45,7 @@ TEST_P(TestCommModbusSettingsParser, TestSettingsParser)
     const auto param = GetParam();
 
     const auto filePath = std::get<QString>(param);
-    auto expectedParser = std::get<CommModbusSettingsParser*>(param);
+    std::unique_ptr<CommModbusSettingsParser> expectedParser{std::get<CommModbusSettingsParser *>(param)};
 
     ASSERT_TRUE(expectedParser != nullptr);
 
@@ -85,9 +87,6 @@ TEST_P(TestCommModbusSettingsParser, TestSettingsParser)
 
         ASSERT_TRUE(result) << "Units are not equal";
     }
-
-
-    delete expectedParser;
 }
 
 std::vector<TestCases> TestCommModbusSettingsParser::LoadTestCases()

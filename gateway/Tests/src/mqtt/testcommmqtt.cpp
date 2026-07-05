@@ -1,11 +1,10 @@
+#include "mockmqttclient.hpp"
+#include "mqtt/commmqtt.hpp"
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
 #include <mqtt/token.h>
-
-#include "testutils.h"
-
-#include "mqtt/commmqtt.h"
-#include "mockmqttclient.h"
 
 using comm::commmqtt::CommMQTT;
 
