@@ -36,7 +36,7 @@ LogHandler *LogHandler::instance()
 
 LogHandler::LogHandler()
 {
-    const std::map<std::string, uint8_t> logLevelMap {
+    static const std::map<std::string, uint8_t> logLevelMap {
         {"deb", LOG_DEBUG},
         {"inf", LOG_INFO},
         {"war", LOG_WARNING},
