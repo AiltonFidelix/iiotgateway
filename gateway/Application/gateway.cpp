@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-#include "commfactory.h"
+#include "commfactory.hpp"
 
 using comm::CommFactory;
 
