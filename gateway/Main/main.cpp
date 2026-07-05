@@ -1,29 +1,33 @@
-#include <QCoreApplication>
-#include <signal.h>
-
-#include "logging/loghandler.h"
 #include "control.h"
 #include "dbstorage.h"
 #include "gateway.h"
+#include "logging/loghandler.h"
+
+#include <QCoreApplication>
+
+#include <array>
+#include <map>
+
+#include <signal.h>
 
 using device::logging::LogHandler;
 
 static Control *control = nullptr;
 
-Q_NORETURN void quit(int sig)
+[[noreturn]] void quit(int sig)
 {
-    const QHash<int, QByteArray> sigNames{
+    static const std::map<int, std::string> sigNames{
         {SIGINT, "SIGINT"},
         {SIGTERM, "SIGTERM"},
         {SIGKILL, "SIGKILL"},
         {SIGQUIT, "SIGQUIT"},
         {SIGHUP, "SIGHUP"},
-        {SIGINT, "SIGINT"}
+        {SIGINT, "SIGINT"},
     };
 
-    if (sigNames.contains(sig))
+    if (auto it = sigNames.find(sig); it != sigNames.end())
     {
-        qCritical() << "Received:" << sigNames.value(sig);
+        qCritical() << "Received:" << *it;
     }
 
     qDebug() << "Closing all connections and exiting the process...";
@@ -39,9 +43,9 @@ Q_NORETURN void quit(int sig)
 
 void setup_unix_signal_handlers()
 {
-    const QSet<int> sigs{SIGINT, SIGABRT, SIGTERM, SIGKILL, SIGQUIT, SIGHUP, SIGINT};
+    constexpr std::array<int, 7> sigs{SIGINT, SIGABRT, SIGTERM, SIGKILL, SIGQUIT, SIGHUP, SIGINT};
 
-    for (int sig : sigs)
+    for (const int &sig : sigs)
     {
         signal(sig, quit);
     }
