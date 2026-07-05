@@ -1,11 +1,10 @@
 #ifndef COMMMODBUSREQUESTPARSER_H
 #define COMMMODBUSREQUESTPARSER_H
 
-#include <QObject>
+#include "commmodbus_global.hpp"
+
 #include <QJsonDocument>
 #include <QModbusDataUnit>
-
-#include "commmodbus_global.h"
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
@@ -19,17 +18,8 @@ enum class RequestType : quint8 {
     Write
 };
 
-class CommModbusRequestParser : public QObject
+class CommModbusRequestParser
 {
-    Q_OBJECT
-
-    quint16 m_maxEntries;
-    Request m_request;
-    RequestType m_type;
-
-    void parser(const QJsonDocument &document);
-    QModbusDataUnit::RegisterType getType(const QString &type) const;
-
 public:
     explicit CommModbusRequestParser(QByteArray data, quint16 maxEntries = 10);
 
@@ -38,6 +28,14 @@ public:
 
     static Addresses sortedAddress(const Request &request);
     static void sortRequestUnits(Units &units);
+
+private:
+    void parser(const QJsonDocument &document);
+    QModbusDataUnit::RegisterType getType(const QString &type) const;
+
+    quint16 m_maxEntries;
+    Request m_request;
+    RequestType m_type;
 };
 
 COMM_MODBUS_END_NAMESPACE

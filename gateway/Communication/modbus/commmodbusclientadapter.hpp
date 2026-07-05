@@ -1,17 +1,15 @@
 #ifndef COMMMODBUSCLIENTADAPTER_H
 #define COMMMODBUSCLIENTADAPTER_H
 
-#include <QModbusClient>
+#include "commmodbus_global.hpp"
+#include "commmodbusclientinterface.hpp"
 
-#include "commmodbus_global.h"
-#include "commmodbusclientinterface.h"
+#include <QModbusClient>
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
-class CommModbusClientAdapter : public CommModbusClientInterface
+class CommModbusClientAdapter final : public CommModbusClientInterface
 {
-    QModbusClient *m_modbusClient;
-
 public:
     CommModbusClientAdapter();
     ~CommModbusClientAdapter();
@@ -31,6 +29,9 @@ public:
 
 private slots:
     void emitStateChanged(QModbusDevice::State state);
+
+private:
+    QModbusClient *m_modbusClient;
 };
 
 COMM_MODBUS_END_NAMESPACE

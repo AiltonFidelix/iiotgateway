@@ -1,6 +1,6 @@
-#include "commmodbusrtu.h"
-#include "commmodbusclientadapter.h"
-#include "commfactory.h"
+#include "commfactory.hpp"
+#include "commmodbusclientadapter.hpp"
+#include "commmodbusrtu.hpp"
 
 COMM_MODBUS_BEGIN_NAMESPACE
 

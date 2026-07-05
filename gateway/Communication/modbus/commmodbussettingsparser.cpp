@@ -1,4 +1,4 @@
-#include "commmodbussettingsparser.h"
+#include "commmodbussettingsparser.hpp"
 
 #include <QJsonArray>
 
@@ -71,7 +71,7 @@ Request CommModbusSettingsParser::requests() const
     QJsonObject devices{};
     devices.insert(QStringLiteral("devices"), value.toArray());
 
-    CommModbusRequestParser parser(QJsonDocument(devices).toJson(QJsonDocument::Compact));
+    const CommModbusRequestParser parser(QJsonDocument(devices).toJson(QJsonDocument::Compact));
 
     return parser.request();
 }

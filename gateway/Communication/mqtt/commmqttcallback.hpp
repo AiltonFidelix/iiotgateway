@@ -1,14 +1,15 @@
 #ifndef COMMMQTTCALLBACK_H
 #define COMMMQTTCALLBACK_H
 
-#include <QObject>
-#include <mqtt/callback.h>
+#include "commmqtt_global.hpp"
 
-#include "commmqtt_global.h"
+#include <QObject>
+
+#include <mqtt/callback.h>
 
 COMM_MQTT_BEGIN_NAMESPACE
 
-class CommMQTTCallback : public QObject, public virtual mqtt::callback
+class CommMQTTCallback final : public QObject, public virtual mqtt::callback
 {
     Q_OBJECT
 public:

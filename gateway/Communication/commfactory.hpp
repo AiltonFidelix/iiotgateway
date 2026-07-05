@@ -1,25 +1,19 @@
 #ifndef COMMFACTORY_H
 #define COMMFACTORY_H
 
-#include <QObject>
-#include <QJsonObject>
-#include <set>
+#include "comm_global.hpp"
+#include "comminterface.hpp"
 
-#include "comm_global.h"
-#include "comminterface.h"
+#include <QJsonObject>
+
+#include <set>
 
 COMM_BEGIN_NAMESPACE
 
-class CommFactory : public QObject
+class CommFactory
 {
-    Q_OBJECT
-
-    static std::set<QByteArray> m_commInterfaces;
-
 public:
     CommFactory() = delete;
-
-    static std::set<QByteArray> &commInterfaces();
 
     static CommInterface *getCommInterface(const QByteArray &commInterface, QJsonObject settings = QJsonObject());
 
@@ -30,6 +24,9 @@ public:
 
         return qRegisterMetaType<T>(commInterface);
     }
+
+private:
+    static std::set<QByteArray> m_commInterfaces;
 };
 
 COMM_END_NAMESPACE

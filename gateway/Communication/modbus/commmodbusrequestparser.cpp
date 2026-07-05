@@ -1,4 +1,4 @@
-#include "commmodbusrequestparser.h"
+#include "commmodbusrequestparser.hpp"
 
 #include <QJsonArray>
 #include <QJsonObject>
@@ -44,14 +44,14 @@ void CommModbusRequestParser::sortRequestUnits(Units &units)
 
 void CommModbusRequestParser::parser(const QJsonDocument &document)
 {
-    auto setValues = [](auto &current, const QJsonArray &values, QModbusDataUnit &unit) -> void
+    auto setValues = [](QJsonArray::Iterator &current, const QJsonArray &values, QModbusDataUnit &unit) -> void
     {
-        for (int j = 0, total = int(unit.valueCount()); j < total; ++j)
+        for (qsizetype i = 0, total = unit.valueCount(); i < total; ++i)
         {
             if (current == values.end())
                 break;
 
-            unit.setValue(j, current->toInt());
+            unit.setValue(i, current->toInt());
             current++;
         }
     };
@@ -86,7 +86,7 @@ void CommModbusRequestParser::parser(const QJsonDocument &document)
 
         for (int i = 0, r = startRegister; i < numberOfEntries; i += m_maxEntries, r += m_maxEntries)
         {
-            const quint16 entries = qMin(m_maxEntries, quint16(numberOfEntries - i));
+            const quint16 entries = std::min(m_maxEntries, quint16(numberOfEntries - i));
 
             QModbusDataUnit unit(registertype, r, entries);
 
@@ -102,19 +102,21 @@ void CommModbusRequestParser::parser(const QJsonDocument &document)
 
 QModbusDataUnit::RegisterType CommModbusRequestParser::getType(const QString &type) const
 {
-    if (type.toLower() == "coils")
+    const QString typeLower = type.toLower();
+
+    if (typeLower == "coils")
     {
         return QModbusDataUnit::Coils;
     }
-    else if (type.toLower() == "discreteinputs")
+    else if (typeLower == "discreteinputs")
     {
         return QModbusDataUnit::DiscreteInputs;
     }
-    else if (type.toLower() == "holdingregisters")
+    else if (typeLower == "holdingregisters")
     {
         return QModbusDataUnit::HoldingRegisters;
     }
-    else if (type.toLower() == "inputregisters")
+    else if (typeLower == "inputregisters")
     {
         return QModbusDataUnit::InputRegisters;
     }

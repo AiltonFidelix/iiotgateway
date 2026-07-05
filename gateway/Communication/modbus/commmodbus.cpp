@@ -1,4 +1,4 @@
-#include "commmodbus.h"
+#include "commmodbus.hpp"
 
 #include <QCoreApplication>
 #include <QEventLoop>
@@ -69,11 +69,11 @@ void CommModbus::incoming(QByteArray data)
     switch (type)
     {
         case RequestType::Write:
-            qDebug() << "Received a write request";
+            qInfo() << "Received a write request";
             writeRegisters(request);
             break;
         case RequestType::Read:
-            qDebug() << "Received a read request";
+            qInfo() << "Received a read request";
             readRegisters(request);
         default:
             qWarning() << "Received an unknown request";
@@ -86,19 +86,19 @@ void CommModbus::stateChanged(QModbusDevice::State state)
     switch (state)
     {
         case QModbusDevice::UnconnectedState:
-            qDebug() << "Modbus received unconnected state";
+            qInfo() << "Modbus received unconnected state";
             emit disconnected();
             break;
         case QModbusDevice::ConnectedState:
-            qDebug() << "Modbus received connected state";
+            qInfo() << "Modbus received connected state";
             emit connected();
             break;
         case QModbusDevice::ConnectingState:
-            qDebug() << "Modbus received connecting state";
+            qInfo() << "Modbus received connecting state";
             emit connected();
             break;
         case QModbusDevice::ClosingState:
-            qDebug() << "Modbus received closing state";
+            qInfo() << "Modbus received closing state";
             emit connected();
             break;
         default:
@@ -110,7 +110,7 @@ void CommModbus::readRegisters(const Request &request)
 {
     QJsonArray devices{};
 
-    const auto addresses = CommModbusRequestParser::sortedAddress(request);
+    const Addresses addresses = CommModbusRequestParser::sortedAddress(request);
 
     for (const auto &address : addresses)
     {
@@ -118,12 +118,12 @@ void CommModbus::readRegisters(const Request &request)
         QJsonArray errors{};
 
         Registers registers{};
-        auto units = request.value(address);
+        Units units = request.value(address);
         CommModbusRequestParser::sortRequestUnits(units);
 
         for (const auto &unit : std::as_const(units))
         {
-            if (auto *reply = m_modbusClient->sendReadRequest(unit, address))
+            if (QModbusReply *reply = m_modbusClient->sendReadRequest(unit, address))
             {
                 QEventLoop loop;
                 connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
@@ -165,19 +165,21 @@ void CommModbus::readRegisters(const Request &request)
 
 void CommModbus::writeRegisters(const Request &request)
 {
-    const auto addresses = CommModbusRequestParser::sortedAddress(request);
+    const Addresses addresses = CommModbusRequestParser::sortedAddress(request);
 
     for (const auto &address : addresses)
     {
-        const auto units = request.value(address);
+        const Units units = request.value(address);
 
         for (const auto &unit : units)
         {
-            if (const QModbusReply *reply = m_modbusClient->sendWriteRequest(unit, address))
+            if (QModbusReply *reply = m_modbusClient->sendWriteRequest(unit, address))
             {
                 QEventLoop loop;
                 connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
                 loop.exec();
+
+                reply->deleteLater();
             }
             else
             {
@@ -199,8 +201,9 @@ Registers CommModbus::readReady(QModbusReply *reply)
     if (reply->error() == QModbusDevice::NoError)
     {
         const auto unit = reply->result();
+        const qsizetype valueCount = unit.valueCount();
 
-        for (int i = 0, total = static_cast<int>(unit.valueCount()); i < total; ++i)
+        for (qsizetype i = 0, total = valueCount; i < total; ++i)
         {
             registers.insert(unit.startAddress() + i, unit.value(i));
         }
@@ -253,7 +256,7 @@ QJsonArray CommModbus::registersToJsonArray(const Registers &registers)
 {
     QJsonArray regs{};
 
-    const auto keys = registers.keys();
+    const QList<quint16> keys = registers.keys();
 
     for (const auto &key : keys)
     {

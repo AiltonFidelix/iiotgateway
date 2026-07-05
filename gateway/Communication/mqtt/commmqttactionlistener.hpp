@@ -1,14 +1,15 @@
 #ifndef COMMMQTTACTIONLISTENER_H
 #define COMMMQTTACTIONLISTENER_H
 
-#include <QObject>
-#include <mqtt/iaction_listener.h>
+#include "commmqtt_global.hpp"
 
-#include "commmqtt_global.h"
+#include <QObject>
+
+#include <mqtt/iaction_listener.h>
 
 COMM_MQTT_BEGIN_NAMESPACE
 
-class CommMQTTActionListener : public QObject, public virtual mqtt::iaction_listener
+class CommMQTTActionListener final : public QObject, public virtual mqtt::iaction_listener
 {
     Q_OBJECT
 public:

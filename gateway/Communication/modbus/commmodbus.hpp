@@ -1,17 +1,17 @@
 #ifndef COMMMODBUS_H
 #define COMMMODBUS_H
 
+#include "comminterface.hpp"
+#include "commmodbus_global.hpp"
+
+#include "commmodbusclientinterface.hpp"
+#include "commmodbusrequestparser.hpp"
+#include "commmodbussettingsparser.hpp"
+
+#include <QJsonObject>
 #include <QModbusClient>
 #include <QModbusDataUnit>
-#include <QModbusClient>
 #include <QTimer>
-#include <QJsonObject>
-
-#include "comminterface.h"
-#include "commmodbus_global.h"
-#include "commmodbusclientinterface.h"
-#include "commmodbusrequestparser.h"
-#include "commmodbussettingsparser.h"
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
@@ -20,15 +20,6 @@ using Registers = QMap<quint16, quint16>;
 class CommModbus : public CommInterface
 {
     Q_OBJECT
-
-    bool ispolling();
-    void readRegisters(const Request &request);
-    void writeRegisters(const Request &request);
-
-    Registers readReady(QModbusReply *reply);
-
-    QJsonArray registersToJsonArray(const Registers &registers);
-
 public:
     explicit CommModbus(QJsonObject settings = QJsonObject());
     ~CommModbus();
@@ -52,6 +43,15 @@ protected:
     QTimer *m_polling;
     Request m_readRequest;
     CommModbusSettingsParser m_settingsParser;
+
+private:
+    bool ispolling();
+
+    void readRegisters(const Request &request);
+    void writeRegisters(const Request &request);
+
+    Registers readReady(QModbusReply *reply);
+    QJsonArray registersToJsonArray(const Registers &registers);
 };
 
 COMM_MODBUS_END_NAMESPACE

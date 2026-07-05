@@ -1,13 +1,16 @@
-#include "commmqtt.h"
-#include "commfactory.h"
+#include "commfactory.hpp"
+#include "commmqtt.hpp"
 
 #include <QDebug>
 #include <QJsonDocument>
 
-constexpr int defaultQos = 0;
-constexpr int defaultConnectionTimeout = 10;
-constexpr int defaultKeepAliveInterval = 60;
-constexpr int maxRetries = 5;
+namespace
+{
+    constexpr int defaultQos = 0;
+    constexpr int defaultConnectionTimeout = 10;
+    constexpr int defaultKeepAliveInterval = 60;
+    constexpr int maxRetries = 5;
+}
 
 COMM_MQTT_BEGIN_NAMESPACE
 
@@ -101,14 +104,14 @@ void CommMQTT::connectComm()
 
     try
     {
-        qDebug() << "Connecting...";
+        qInfo() << "Connecting...";
         auto connTok = m_client->connect(connOpts, nullptr, m_listener);
-        qDebug() << "Waiting for the connection...";
+        qInfo() << "Waiting for the connection...";
 
         if (connTok)
         {
             connTok->wait();
-            qDebug() << "Successfully connected";
+            qInfo() << "Successfully connected";
         }
     }
     catch (const mqtt::exception& ex)
@@ -132,8 +135,7 @@ void CommMQTT::disconnectComm()
     emit disconnected();
 }
 
-void
-CommMQTT::incoming(QByteArray data)
+void CommMQTT::incoming(QByteArray data)
 {
     if (!isconnected())
     {
@@ -165,8 +167,7 @@ CommMQTT::incoming(QByteArray data)
     }
 }
 
-void
-CommMQTT::onConnected()
+void CommMQTT::onConnected()
 {
     if (m_subscribe)
     {
@@ -175,8 +176,7 @@ CommMQTT::onConnected()
     }
 }
 
-void
-CommMQTT::onMessageArrived(QByteArray message)
+void CommMQTT::onMessageArrived(QByteArray message)
 {
     emit outgoing(std::move(message));
 }

@@ -3,14 +3,12 @@
 
 #include <QJsonObject>
 
-#include "commmqtt_global.h"
+#include "commmqtt_global.hpp"
 
 COMM_MQTT_BEGIN_NAMESPACE
 
 class CommMQTTSettingsParser
 {
-    QJsonObject m_settings;
-
 public:
     explicit CommMQTTSettingsParser(const QJsonObject &settings = QJsonObject());
 
@@ -33,6 +31,9 @@ public:
     bool cleanStart() const;
     bool publish() const;
     bool subscribe() const;
+
+private:
+    QJsonObject m_settings;
 };
 
 COMM_MQTT_END_NAMESPACE

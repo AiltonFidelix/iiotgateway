@@ -1,25 +1,25 @@
 #ifndef COMMMODBUSRTU_H
 #define COMMMODBUSRTU_H
 
-#include <QModbusRtuSerialClient>
-#include <QJsonObject>
+#include "commmodbus.hpp"
+#include "commmodbus_global.hpp"
 
-#include "commmodbus_global.h"
-#include "commmodbus.h"
+#include <QJsonObject>
+#include <QModbusRtuSerialClient>
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
-class CommModbusRTU : public CommModbus
+class CommModbusRTU final : public CommModbus
 {
     Q_OBJECT
-
-    static int m_typeId;
-
 public:
     Q_INVOKABLE explicit CommModbusRTU(QJsonObject settings = QJsonObject());
 
 public slots:
     void connectComm() override;
+
+private:
+    static int m_typeId;
 };
 
 COMM_MODBUS_END_NAMESPACE

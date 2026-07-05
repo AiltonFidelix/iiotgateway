@@ -1,4 +1,4 @@
-#include "commmodbusclientadapter.h"
+#include "commmodbusclientadapter.hpp"
 
 COMM_MODBUS_BEGIN_NAMESPACE
 

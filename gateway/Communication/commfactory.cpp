@@ -1,13 +1,8 @@
-#include "commfactory.h"
+#include "commfactory.hpp"
 
 COMM_BEGIN_NAMESPACE
 
 std::set<QByteArray> CommFactory::m_commInterfaces{};
-
-std::set<QByteArray> &CommFactory::commInterfaces()
-{
-    return m_commInterfaces;
-}
 
 CommInterface *CommFactory::getCommInterface(const QByteArray &commInterface, QJsonObject settings)
 {

@@ -1,23 +1,23 @@
 set(LIBRARY_NAME Communication)
 
 set(HEADERS
-    comm_global.h
-    comminterface.h
-    commfactory.h
+    comm_global.hpp
+    comminterface.hpp
+    commfactory.hpp
 
-    modbus/commmodbus_global.h
-    modbus/commmodbusclientadapter.h
-    modbus/commmodbusclientinterface.h
-    modbus/commmodbusrequestparser.h
-    modbus/commmodbussettingsparser.h
-    modbus/commmodbus.h
-    modbus/commmodbusrtu.h
-    modbus/commmodbustcp.h
+    modbus/commmodbus_global.hpp
+    modbus/commmodbusclientadapter.hpp
+    modbus/commmodbusclientinterface.hpp
+    modbus/commmodbusrequestparser.hpp
+    modbus/commmodbussettingsparser.hpp
+    modbus/commmodbus.hpp
+    modbus/commmodbusrtu.hpp
+    modbus/commmodbustcp.hpp
 
-    mqtt/commmqtt.h
-    mqtt/commmqttcallback.h
-    mqtt/commmqttactionlistener.h
-    mqtt/commmqttsettingsparser.h
+    mqtt/commmqtt.hpp
+    mqtt/commmqttcallback.hpp
+    mqtt/commmqttactionlistener.hpp
+    mqtt/commmqttsettingsparser.hpp
 )
 
 set(SOURCES
@@ -29,7 +29,7 @@ set(SOURCES
     modbus/commmodbusrtu.cpp
     modbus/commmodbustcp.cpp
 
-    mqtt/commmqtt_global.h
+    mqtt/commmqtt_global.hpp
     mqtt/commmqtt.cpp
     mqtt/commmqttcallback.cpp
     mqtt/commmqttactionlistener.cpp

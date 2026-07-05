@@ -1,11 +1,11 @@
 #ifndef COMMMODBUSCLIENTINTERFACE_H
 #define COMMMODBUSCLIENTINTERFACE_H
 
-#include <QObject>
+#include "commmodbus_global.hpp"
+
 #include <QModbusDevice>
 #include <QModbusReply>
-
-#include "commmodbus_global.h"
+#include <QObject>
 
 COMM_MODBUS_BEGIN_NAMESPACE
 

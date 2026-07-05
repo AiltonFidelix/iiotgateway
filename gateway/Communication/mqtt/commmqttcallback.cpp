@@ -1,4 +1,4 @@
-#include "commmqttcallback.h"
+#include "commmqttcallback.hpp"
 
 #include <QDebug>
 
@@ -20,7 +20,7 @@ void CommMQTTCallback::message_arrived(mqtt::const_message_ptr ptr)
 {
     auto message = QByteArray::fromStdString(ptr->to_string());
 
-    qInfo() << "Message arrived:" << message;
+    qDebug() << "Message arrived:" << message;
 
     emit cbMessageArrived(std::move(message));
 }
