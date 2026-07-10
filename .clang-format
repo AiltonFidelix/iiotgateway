@@ -1,0 +1,20 @@
+BasedOnStyle: Google
+
+# Classes
+AccessModifierOffset: -4
+PackConstructorInitializers: Never
+
+# Lines
+IndentWidth: 4
+ColumnLimit: 0
+
+# Pointers and references
+PointerAlignment: Right
+ReferenceAlignment: Right
+
+# Namespaces
+NamespaceIndentation: All
+FixNamespaceComments: false
+
+# Swtich
+IndentCaseLabels: true
