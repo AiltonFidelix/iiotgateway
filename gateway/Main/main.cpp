@@ -1,21 +1,19 @@
-#include "control.h"
-#include "dbstorage.h"
-#include "gateway.h"
-#include "logging/loghandler.h"
+#include <signal.h>
 
 #include <QCoreApplication>
-
 #include <array>
 #include <map>
 
-#include <signal.h>
+#include "control.h"
+#include "dbstorage.h"
+#include "gateway.hpp"
+#include "logging/loghandler.h"
 
 using device::logging::LogHandler;
 
 static Control *control = nullptr;
 
-[[noreturn]] void quit(int sig)
-{
+[[noreturn]] void quit(int sig) {
     static const std::map<int, std::string> sigNames{
         {SIGINT, "SIGINT"},
         {SIGTERM, "SIGTERM"},
@@ -25,15 +23,13 @@ static Control *control = nullptr;
         {SIGINT, "SIGINT"},
     };
 
-    if (auto it = sigNames.find(sig); it != sigNames.end())
-    {
+    if (auto it = sigNames.find(sig); it != sigNames.end()) {
         qCritical() << "Received:" << *it;
     }
 
     qDebug() << "Closing all connections and exiting the process...";
 
-    if (control)
-    {
+    if (control) {
         control->stop();
         delete control;
     }
@@ -41,18 +37,15 @@ static Control *control = nullptr;
     exit(EXIT_FAILURE);
 }
 
-void setup_unix_signal_handlers()
-{
+void setup_unix_signal_handlers() {
     constexpr std::array<int, 7> sigs{SIGINT, SIGABRT, SIGTERM, SIGKILL, SIGQUIT, SIGHUP, SIGINT};
 
-    for (const int &sig : sigs)
-    {
+    for (const int &sig : sigs) {
         signal(sig, quit);
     }
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QCoreApplication app(argc, argv);
     app.setApplicationName(APP_NAME);
 
@@ -63,8 +56,7 @@ int main(int argc, char *argv[])
 
     DBStorage dbstorage;
 
-    if (!dbstorage.verify())
-    {
+    if (!dbstorage.verify()) {
         qFatal() << "Failed to verify storage!";
         return -1;
     }
