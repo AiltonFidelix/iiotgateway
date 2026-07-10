@@ -1,10 +1,10 @@
 #ifndef COMMMODBUSREQUESTPARSER_H
 #define COMMMODBUSREQUESTPARSER_H
 
-#include "commmodbus_global.hpp"
-
 #include <QJsonDocument>
 #include <QModbusDataUnit>
+
+#include "commmodbus_global.hpp"
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
@@ -18,8 +18,7 @@ enum class RequestType : quint8 {
     Write
 };
 
-class CommModbusRequestParser
-{
+class CommModbusRequestParser {
 public:
     explicit CommModbusRequestParser(QByteArray data, quint16 maxEntries = 10);
 
@@ -40,4 +39,4 @@ private:
 
 COMM_MODBUS_END_NAMESPACE
 
-#endif // COMMMODBUSREQUESTPARSER_H
+#endif  // COMMMODBUSREQUESTPARSER_H

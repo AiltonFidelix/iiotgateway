@@ -1,15 +1,14 @@
 #ifndef COMMMODBUSSETTINGSPARSER_H
 #define COMMMODBUSSETTINGSPARSER_H
 
+#include <QJsonObject>
+
 #include "commmodbus_global.hpp"
 #include "commmodbusrequestparser.hpp"
 
-#include <QJsonObject>
-
 COMM_MODBUS_BEGIN_NAMESPACE
 
-class CommModbusSettingsParser
-{
+class CommModbusSettingsParser {
 public:
     explicit CommModbusSettingsParser(QJsonObject settings = QJsonObject());
 
@@ -36,4 +35,4 @@ private:
 
 COMM_MODBUS_END_NAMESPACE
 
-#endif // COMMMODBUSSETTINGSPARSER_H
+#endif  // COMMMODBUSSETTINGSPARSER_H

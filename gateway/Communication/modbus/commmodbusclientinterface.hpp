@@ -1,16 +1,15 @@
 #ifndef COMMMODBUSCLIENTINTERFACE_H
 #define COMMMODBUSCLIENTINTERFACE_H
 
-#include "commmodbus_global.hpp"
-
 #include <QModbusDevice>
 #include <QModbusReply>
 #include <QObject>
 
+#include "commmodbus_global.hpp"
+
 COMM_MODBUS_BEGIN_NAMESPACE
 
-class CommModbusClientInterface : public QObject
-{
+class CommModbusClientInterface : public QObject {
     Q_OBJECT
 public:
     virtual ~CommModbusClientInterface() = default;
@@ -31,4 +30,4 @@ signals:
 
 COMM_MODBUS_END_NAMESPACE
 
-#endif // COMMMODBUSCLIENTINTERFACE_H
+#endif  // COMMMODBUSCLIENTINTERFACE_H

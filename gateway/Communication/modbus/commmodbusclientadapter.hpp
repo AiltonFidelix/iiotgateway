@@ -1,15 +1,14 @@
 #ifndef COMMMODBUSCLIENTADAPTER_H
 #define COMMMODBUSCLIENTADAPTER_H
 
+#include <QModbusClient>
+
 #include "commmodbus_global.hpp"
 #include "commmodbusclientinterface.hpp"
 
-#include <QModbusClient>
-
 COMM_MODBUS_BEGIN_NAMESPACE
 
-class CommModbusClientAdapter final : public CommModbusClientInterface
-{
+class CommModbusClientAdapter final : public CommModbusClientInterface {
 public:
     CommModbusClientAdapter();
     ~CommModbusClientAdapter();
@@ -36,4 +35,4 @@ private:
 
 COMM_MODBUS_END_NAMESPACE
 
-#endif // COMMMODBUSCLIENTADAPTER_H
+#endif  // COMMMODBUSCLIENTADAPTER_H

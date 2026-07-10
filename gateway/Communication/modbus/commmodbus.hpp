@@ -1,24 +1,22 @@
 #ifndef COMMMODBUS_H
 #define COMMMODBUS_H
 
-#include "comminterface.hpp"
-#include "commmodbus_global.hpp"
-
-#include "commmodbusclientinterface.hpp"
-#include "commmodbusrequestparser.hpp"
-#include "commmodbussettingsparser.hpp"
-
 #include <QJsonObject>
 #include <QModbusClient>
 #include <QModbusDataUnit>
 #include <QTimer>
 
+#include "comminterface.hpp"
+#include "commmodbus_global.hpp"
+#include "commmodbusclientinterface.hpp"
+#include "commmodbusrequestparser.hpp"
+#include "commmodbussettingsparser.hpp"
+
 COMM_MODBUS_BEGIN_NAMESPACE
 
 using Registers = QMap<quint16, quint16>;
 
-class CommModbus : public CommInterface
-{
+class CommModbus : public CommInterface {
     Q_OBJECT
 public:
     explicit CommModbus(QJsonObject settings = QJsonObject());
@@ -56,4 +54,4 @@ private:
 
 COMM_MODBUS_END_NAMESPACE
 
-#endif // COMMMODBUS_H
+#endif  // COMMMODBUS_H

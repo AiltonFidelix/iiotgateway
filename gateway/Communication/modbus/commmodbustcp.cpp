@@ -1,31 +1,27 @@
 #include "commmodbustcp.hpp"
-#include "commmodbusclientadapter.hpp"
+
 #include "commfactory.hpp"
+#include "commmodbusclientadapter.hpp"
 
 COMM_MODBUS_BEGIN_NAMESPACE
 
-int CommModbusTCP::m_typeId = comm::CommFactory::registerInterface<CommModbusTCP*>("MODBUS_TCP");
+int CommModbusTCP::m_typeId = comm::CommFactory::registerInterface<CommModbusTCP *>("MODBUS_TCP");
 
 CommModbusTCP::CommModbusTCP(QJsonObject settings)
-    : CommModbus{std::move(settings)}
-{
+    : CommModbus{std::move(settings)} {
 }
 
-void CommModbusTCP::connectComm()
-{
-    if (!m_modbusClient)
-    {
+void CommModbusTCP::connectComm() {
+    if (!m_modbusClient) {
         auto adapter = new CommModbusClientAdapter();
         auto client = new QModbusTcpClient();
         adapter->setModbusClient(client);
 
-        m_modbusClient = static_cast<CommModbusClientInterface*>(adapter);
+        m_modbusClient = static_cast<CommModbusClientInterface *>(adapter);
     }
 
-    if (m_modbusClient->state() != QModbusDevice::ConnectedState)
-    {
-        if (m_settingsParser.pollingEnabled())
-        {
+    if (m_modbusClient->state() != QModbusDevice::ConnectedState) {
+        if (m_settingsParser.pollingEnabled()) {
             m_polling = new QTimer();
             m_polling->setInterval(m_settingsParser.pollingInterval());
 
@@ -40,13 +36,10 @@ void CommModbusTCP::connectComm()
 
         connect(m_modbusClient, &CommModbusClientInterface::stateChanged, this, &CommModbusTCP::stateChanged);
 
-        if (!m_modbusClient->connectDevice())
-        {
+        if (!m_modbusClient->connectDevice()) {
             emit error(QString("Connection failed: %1").arg(m_modbusClient->errorString()).toUtf8());
             emit connectionFailed();
-        }
-        else
-        {
+        } else {
             emit connected();
         }
     }

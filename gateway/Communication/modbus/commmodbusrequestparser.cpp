@@ -7,24 +7,20 @@ COMM_MODBUS_BEGIN_NAMESPACE
 
 CommModbusRequestParser::CommModbusRequestParser(QByteArray data, quint16 maxEntries)
     : m_maxEntries{maxEntries},
-    m_request{},
-    m_type{RequestType::Unknown}
-{
+      m_request{},
+      m_type{RequestType::Unknown} {
     parser(QJsonDocument::fromJson(std::move(data)));
 }
 
-Request CommModbusRequestParser::request() const
-{
+Request CommModbusRequestParser::request() const {
     return m_request;
 }
 
-RequestType CommModbusRequestParser::type() const
-{
+RequestType CommModbusRequestParser::type() const {
     return m_type;
 }
 
-Addresses CommModbusRequestParser::sortedAddress(const Request &request)
-{
+Addresses CommModbusRequestParser::sortedAddress(const Request &request) {
     auto keys = request.keys();
 
     std::ranges::sort(keys);
@@ -32,22 +28,17 @@ Addresses CommModbusRequestParser::sortedAddress(const Request &request)
     return keys;
 }
 
-void CommModbusRequestParser::sortRequestUnits(Units &units)
-{
-    auto sort = [](const QModbusDataUnit &a, const QModbusDataUnit &b) -> bool
-    {
+void CommModbusRequestParser::sortRequestUnits(Units &units) {
+    auto sort = [](const QModbusDataUnit &a, const QModbusDataUnit &b) -> bool {
         return a.startAddress() < b.startAddress();
     };
 
     std::ranges::sort(units, sort);
 }
 
-void CommModbusRequestParser::parser(const QJsonDocument &document)
-{
-    auto setValues = [](QJsonArray::Iterator &current, const QJsonArray &values, QModbusDataUnit &unit) -> void
-    {
-        for (qsizetype i = 0, total = unit.valueCount(); i < total; ++i)
-        {
+void CommModbusRequestParser::parser(const QJsonDocument &document) {
+    auto setValues = [](QJsonArray::Iterator &current, const QJsonArray &values, QModbusDataUnit &unit) -> void {
+        for (qsizetype i = 0, total = unit.valueCount(); i < total; ++i) {
             if (current == values.end())
                 break;
 
@@ -59,8 +50,7 @@ void CommModbusRequestParser::parser(const QJsonDocument &document)
     const QJsonObject jsonObj = document.object();
     const QJsonArray devices = jsonObj.value(QStringLiteral("devices")).toArray();
 
-    for (const auto &device : devices)
-    {
+    for (const auto &device : devices) {
         const QJsonObject deviceObj = device.toObject();
         const auto address = static_cast<quint8>(deviceObj.value(QStringLiteral("address")).toInt(0));
 
@@ -73,25 +63,20 @@ void CommModbusRequestParser::parser(const QJsonDocument &document)
         QJsonArray values{};
         QJsonArray::Iterator current{};
 
-        if (hasValues)
-        {
+        if (hasValues) {
             values = deviceObj.value(QStringLiteral("values")).toArray();
             current = values.begin();
             m_type = RequestType::Write;
-        }
-        else
-        {
+        } else {
             m_type = RequestType::Read;
         }
 
-        for (int i = 0, r = startRegister; i < numberOfEntries; i += m_maxEntries, r += m_maxEntries)
-        {
+        for (int i = 0, r = startRegister; i < numberOfEntries; i += m_maxEntries, r += m_maxEntries) {
             const quint16 entries = std::min(m_maxEntries, quint16(numberOfEntries - i));
 
             QModbusDataUnit unit(registertype, r, entries);
 
-            if (hasValues)
-            {
+            if (hasValues) {
                 setValues(current, values, unit);
             }
 
@@ -100,24 +85,16 @@ void CommModbusRequestParser::parser(const QJsonDocument &document)
     }
 }
 
-QModbusDataUnit::RegisterType CommModbusRequestParser::getType(const QString &type) const
-{
+QModbusDataUnit::RegisterType CommModbusRequestParser::getType(const QString &type) const {
     const QString typeLower = type.toLower();
 
-    if (typeLower == "coils")
-    {
+    if (typeLower == "coils") {
         return QModbusDataUnit::Coils;
-    }
-    else if (typeLower == "discreteinputs")
-    {
+    } else if (typeLower == "discreteinputs") {
         return QModbusDataUnit::DiscreteInputs;
-    }
-    else if (typeLower == "holdingregisters")
-    {
+    } else if (typeLower == "holdingregisters") {
         return QModbusDataUnit::HoldingRegisters;
-    }
-    else if (typeLower == "inputregisters")
-    {
+    } else if (typeLower == "inputregisters") {
         return QModbusDataUnit::InputRegisters;
     }
 

@@ -1,16 +1,15 @@
 #ifndef COMMMODBUSRTU_H
 #define COMMMODBUSRTU_H
 
-#include "commmodbus.hpp"
-#include "commmodbus_global.hpp"
-
 #include <QJsonObject>
 #include <QModbusRtuSerialClient>
 
+#include "commmodbus.hpp"
+#include "commmodbus_global.hpp"
+
 COMM_MODBUS_BEGIN_NAMESPACE
 
-class CommModbusRTU final : public CommModbus
-{
+class CommModbusRTU final : public CommModbus {
     Q_OBJECT
 public:
     Q_INVOKABLE explicit CommModbusRTU(QJsonObject settings = QJsonObject());
@@ -24,4 +23,4 @@ private:
 
 COMM_MODBUS_END_NAMESPACE
 
-#endif // COMMMODBUSRTU_H
+#endif  // COMMMODBUSRTU_H

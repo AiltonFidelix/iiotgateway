@@ -1,17 +1,15 @@
 #ifndef COMMMODBUSTCP_H
 #define COMMMODBUSTCP_H
 
-#include "commmodbus.hpp"
-
-#include "commmodbus_global.hpp"
-
 #include <QJsonObject>
 #include <QModbusTcpClient>
 
+#include "commmodbus.hpp"
+#include "commmodbus_global.hpp"
+
 COMM_MODBUS_BEGIN_NAMESPACE
 
-class CommModbusTCP final : public CommModbus
-{
+class CommModbusTCP final : public CommModbus {
     Q_OBJECT
 public:
     Q_INVOKABLE explicit CommModbusTCP(QJsonObject settings = QJsonObject());
@@ -25,4 +23,4 @@ private:
 
 COMM_MODBUS_END_NAMESPACE
 
-#endif // COMMMODBUSTCP_H
+#endif  // COMMMODBUSTCP_H

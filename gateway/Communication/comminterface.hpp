@@ -3,8 +3,7 @@
 
 #include <QObject>
 
-class CommInterface : public QObject
-{
+class CommInterface : public QObject {
     Q_OBJECT
 public:
     virtual ~CommInterface() = default;
@@ -24,4 +23,4 @@ public slots:
     virtual void incoming(QByteArray data) = 0;
 };
 
-#endif // COMMINTERFACE_H
+#endif  // COMMINTERFACE_H
