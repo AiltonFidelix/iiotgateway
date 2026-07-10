@@ -1,32 +1,28 @@
-#include "modbus/commmodbussettingsparser.hpp"
-#include "testutils.hpp"
-
 #include <gtest/gtest.h>
 
 #include <QJsonArray>
 #include <QJsonDocument>
-
 #include <memory>
 
-using testing::ValuesIn;
+#include "modbus/commmodbussettingsparser.hpp"
+#include "testutils.hpp"
+
 using testing::TestWithParam;
+using testing::ValuesIn;
 
 using comm::commmodbus::CommModbusSettingsParser;
 using comm::commmodbus::Request;
 using comm::commmodbus::Units;
 
-using TestCases = std::tuple<QString, CommModbusSettingsParser*>;
+using TestCases = std::tuple<QString, CommModbusSettingsParser *>;
 
-class TestCommModbusSettingsParser : public TestWithParam<TestCases>
-{
+class TestCommModbusSettingsParser : public TestWithParam<TestCases> {
 public:
     static std::vector<TestCases> LoadTestCases();
 };
 
-TEST_P(TestCommModbusSettingsParser, TestSettingsParser)
-{
-    auto testUnit = [] (const QModbusDataUnit &expected, const QModbusDataUnit &actual) -> bool
-    {
+TEST_P(TestCommModbusSettingsParser, TestSettingsParser) {
+    auto testUnit = [](const QModbusDataUnit &expected, const QModbusDataUnit &actual) -> bool {
         bool result = (expected.registerType() == actual.registerType());
         result &= (expected.startAddress() == actual.startAddress());
 
@@ -74,8 +70,7 @@ TEST_P(TestCommModbusSettingsParser, TestSettingsParser)
 
     const auto keys = actualRequest.keys();
 
-    for (const quint8 &key : keys)
-    {
+    for (const quint8 &key : keys) {
         ASSERT_TRUE(expectedRequest.contains(key));
 
         const Units expectedUnits = expectedRequest.value(key);
@@ -89,8 +84,7 @@ TEST_P(TestCommModbusSettingsParser, TestSettingsParser)
     }
 }
 
-std::vector<TestCases> TestCommModbusSettingsParser::LoadTestCases()
-{
+std::vector<TestCases> TestCommModbusSettingsParser::LoadTestCases() {
     std::vector<TestCases> testCases{};
 
     {
@@ -149,4 +143,3 @@ std::vector<TestCases> TestCommModbusSettingsParser::LoadTestCases()
 }
 
 INSTANTIATE_TEST_SUITE_P(TestSettingsParser, TestCommModbusSettingsParser, ValuesIn(TestCommModbusSettingsParser::LoadTestCases()));
-

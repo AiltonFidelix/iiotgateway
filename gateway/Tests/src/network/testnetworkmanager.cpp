@@ -1,23 +1,19 @@
-#include "testutils.hpp"
-
 #include <gtest/gtest.h>
+
+#include <QJsonDocument>
+#include <memory>
 
 #include "network/networkmanager.h"
 #include "network/networkmanagerfactory.h"
-
-#include <QJsonDocument>
-
-#include <memory>
+#include "testutils.hpp"
 
 using device::network::NetworkManager;
 using device::network::NetworkManagerFactory;
 
-class TestNetworkManager: public testing::Test
-{
+class TestNetworkManager : public testing::Test {
 };
 
-TEST_F(TestNetworkManager, TestMethods)
-{
+TEST_F(TestNetworkManager, TestMethods) {
     const QByteArray expectedData = TestUtils::readJsonFile(QStringLiteral(":/cases/network/networkmanager.json"));
     const auto expectedJson = QJsonDocument::fromJson(expectedData);
 
@@ -31,4 +27,3 @@ TEST_F(TestNetworkManager, TestMethods)
 
     ASSERT_EQ(expectedJson.toJson(QJsonDocument::Compact), actualJson.toJson(QJsonDocument::Compact));
 }
-

@@ -1,24 +1,21 @@
-#include "mqtt/commmqttsettingsparser.hpp"
-#include "testutils.hpp"
-
 #include <gtest/gtest.h>
 
 #include <QJsonDocument>
-
 #include <memory>
+
+#include "mqtt/commmqttsettingsparser.hpp"
+#include "testutils.hpp"
 
 using comm::commmqtt::CommMQTTSettingsParser;
 
-using TestCases = std::tuple<QString, CommMQTTSettingsParser*>;
+using TestCases = std::tuple<QString, CommMQTTSettingsParser *>;
 
-class TestCommMQTTSettingsParser : public testing::TestWithParam<TestCases>
-{
+class TestCommMQTTSettingsParser : public testing::TestWithParam<TestCases> {
 public:
     static std::vector<TestCases> LoadTestCases();
 };
 
-TEST_P(TestCommMQTTSettingsParser, TestSettingsParser)
-{
+TEST_P(TestCommMQTTSettingsParser, TestSettingsParser) {
     const auto param = GetParam();
 
     const auto filePath = std::get<QString>(param);
@@ -52,8 +49,7 @@ TEST_P(TestCommMQTTSettingsParser, TestSettingsParser)
     ASSERT_EQ(expectedParser->subscribe(), actualParser.subscribe());
 }
 
-std::vector<TestCases> TestCommMQTTSettingsParser::LoadTestCases()
-{
+std::vector<TestCases> TestCommMQTTSettingsParser::LoadTestCases() {
     std::vector<TestCases> testCases{};
 
     {

@@ -1,7 +1,3 @@
-#include "mockmodbusclient.hpp"
-#include "modbus/commmodbusrtu.hpp"
-#include "testutils.hpp"
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -9,17 +5,20 @@
 #include <QJsonObject>
 #include <QModbusReply>
 
+#include "mockmodbusclient.hpp"
+#include "modbus/commmodbusrtu.hpp"
+#include "testutils.hpp"
+
 using testing::_;
 using testing::DoAll;
-using testing::Return;
 using testing::Invoke;
+using testing::Return;
 using testing::Test;
 
 using comm::commmodbus::CommModbus;
 using comm::commmodbus::CommModbusRTU;
 
-class TestCommModbus: public Test
-{
+class TestCommModbus : public Test {
 protected:
     MockModbusClient *m_mockModbusClient;
     CommModbusRTU *m_commModbus;
@@ -28,24 +27,20 @@ protected:
     void TearDown() override;
 };
 
-void TestCommModbus::SetUp()
-{
+void TestCommModbus::SetUp() {
     m_mockModbusClient = new MockModbusClient();
     m_commModbus = new CommModbusRTU();
 
     m_commModbus->setModbusClient(m_mockModbusClient);
 }
 
-void TestCommModbus::TearDown()
-{
-    if (m_commModbus)
-    {
+void TestCommModbus::TearDown() {
+    if (m_commModbus) {
         delete m_commModbus;
     }
 }
 
-TEST_F(TestCommModbus, TestConnectionSuccess)
-{
+TEST_F(TestCommModbus, TestConnectionSuccess) {
     EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(Return(QModbusDevice::UnconnectedState));
     EXPECT_CALL(*m_mockModbusClient, setConnectionParameter(_, _)).Times(5);
     EXPECT_CALL(*m_mockModbusClient, setTimeout(_)).Times(1);
@@ -55,8 +50,7 @@ TEST_F(TestCommModbus, TestConnectionSuccess)
     m_commModbus->connectComm();
 }
 
-TEST_F(TestCommModbus, TestConnectionFailed)
-{
+TEST_F(TestCommModbus, TestConnectionFailed) {
     EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(Return(QModbusDevice::UnconnectedState));
     EXPECT_CALL(*m_mockModbusClient, setConnectionParameter(_, _)).Times(5);
     EXPECT_CALL(*m_mockModbusClient, setTimeout(_)).Times(1);
@@ -67,23 +61,20 @@ TEST_F(TestCommModbus, TestConnectionFailed)
     m_commModbus->connectComm();
 }
 
-TEST_F(TestCommModbus, TestIsConnected)
-{
+TEST_F(TestCommModbus, TestIsConnected) {
     EXPECT_CALL(*m_mockModbusClient, state()).WillOnce(Return(QModbusDevice::ConnectedState));
 
     EXPECT_TRUE(m_commModbus->isconnected());
 }
 
-TEST_F(TestCommModbus, TestReadRequest)
-{
+TEST_F(TestCommModbus, TestReadRequest) {
     const quint8 expectedAddress = 240;
     const quint8 maxRegisters = 10;
-    const QList<quint16> expectedValues{ 1, 50, 58, 100, 6528, 2048, 0, 65535, 35, 88 };
+    const QList<quint16> expectedValues{1, 50, 58, 100, 6528, 2048, 0, 65535, 35, 88};
 
     auto reply = new QModbusReply(QModbusReply::Common, expectedAddress);
 
-    auto emitFinished = [&reply]() -> void
-    {
+    auto emitFinished = [&reply]() -> void {
         emit reply->finished();
     };
 
@@ -97,8 +88,7 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     QByteArray result{};
 
-    auto handleResult = [&result](const QByteArray &data) -> void
-    {
+    auto handleResult = [&result](const QByteArray &data) -> void {
         result = data;
     };
 
@@ -120,8 +110,7 @@ TEST_F(TestCommModbus, TestReadRequest)
 
     ASSERT_EQ(maxRegisters, registers.count());
 
-    for (const auto &reg : registers)
-    {
+    for (const auto &reg : registers) {
         const QJsonObject obj = reg.toObject();
         const int regAddress = obj.value(QStringLiteral("register")).toInt();
         const int regValue = obj.value(QStringLiteral("value")).toInt();
@@ -130,8 +119,7 @@ TEST_F(TestCommModbus, TestReadRequest)
     }
 }
 
-TEST_F(TestCommModbus, TestDisconnect)
-{
+TEST_F(TestCommModbus, TestDisconnect) {
     EXPECT_CALL(*m_mockModbusClient, disconnectDevice()).Times(1);
 
     m_commModbus->disconnectComm();

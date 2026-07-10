@@ -2,12 +2,10 @@
 
 #include <QFile>
 
-QByteArray TestUtils::readJsonFile(const QString &filename)
-{
+QByteArray TestUtils::readJsonFile(const QString &filename) {
     QFile file(filename);
 
-    if (!file.open(QIODevice::ReadOnly))
-    {
+    if (!file.open(QIODevice::ReadOnly)) {
         return QByteArray();
     }
 

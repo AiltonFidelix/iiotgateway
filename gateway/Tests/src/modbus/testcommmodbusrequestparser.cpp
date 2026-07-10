@@ -1,30 +1,27 @@
-#include "modbus/commmodbusrequestparser.hpp"
-#include "testutils.hpp"
-
 #include <gtest/gtest.h>
 
 #include <memory>
 
-using testing::ValuesIn;
+#include "modbus/commmodbusrequestparser.hpp"
+#include "testutils.hpp"
+
 using testing::TestWithParam;
+using testing::ValuesIn;
 
 using comm::commmodbus::CommModbusRequestParser;
 using comm::commmodbus::Request;
 using comm::commmodbus::RequestType;
 using comm::commmodbus::Units;
 
-using TestCases = std::tuple<QString, Request*>;
+using TestCases = std::tuple<QString, Request *>;
 
-class TestCommModbusRequestParser : public TestWithParam<TestCases>
-{
+class TestCommModbusRequestParser : public TestWithParam<TestCases> {
 public:
     static std::vector<TestCases> LoadTestCases();
 };
 
-TEST_P(TestCommModbusRequestParser, TestRequestParser)
-{
-    auto testUnit = [] (const QModbusDataUnit &expected, const QModbusDataUnit &actual) -> bool
-    {
+TEST_P(TestCommModbusRequestParser, TestRequestParser) {
+    auto testUnit = [](const QModbusDataUnit &expected, const QModbusDataUnit &actual) -> bool {
         bool result = (expected.registerType() == actual.registerType());
         result &= (expected.startAddress() == actual.startAddress());
 
@@ -57,8 +54,7 @@ TEST_P(TestCommModbusRequestParser, TestRequestParser)
 
     const auto keys = actualRequest.keys();
 
-    for (const quint8 &key : keys)
-    {
+    for (const quint8 &key : keys) {
         ASSERT_TRUE(expectedRequest->contains(key));
 
         const Units expectedUnits = expectedRequest->value(key);
@@ -72,8 +68,7 @@ TEST_P(TestCommModbusRequestParser, TestRequestParser)
     }
 }
 
-std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases()
-{
+std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases() {
     std::vector<TestCases> testCases{};
 
     {
@@ -110,7 +105,7 @@ std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases()
         // Test write one
         auto request = new Request();
 
-        request->insert(55, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 3, { 88, 2, 65533, 4, 5, 0, 7, 8, 255, 10 })}));
+        request->insert(55, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 3, {88, 2, 65533, 4, 5, 0, 7, 8, 255, 10})}));
 
         testCases.push_back(std::make_tuple(QStringLiteral(":/cases/requests/writeone.json"), request));
     }
@@ -119,10 +114,10 @@ std::vector<TestCases> TestCommModbusRequestParser::LoadTestCases()
         // Test write multiple
         auto request = new Request();
 
-        request->insert(55, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 3, { 88, 2, 65533, 4, 5, 0, 7, 8, 255, 10 })}));
+        request->insert(55, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 3, {88, 2, 65533, 4, 5, 0, 7, 8, 255, 10})}));
 
-        request->insert(60, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 0, { 88, 2, 65533, 4, 55, 0, 7, 8, 255, 1080 }),
-                                   QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 10, { 68, 72, 780, 2556, 101, 99, 0, 23 })}));
+        request->insert(60, Units({QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 0, {88, 2, 65533, 4, 55, 0, 7, 8, 255, 1080}),
+                                   QModbusDataUnit(QModbusDataUnit::HoldingRegisters, 10, {68, 72, 780, 2556, 101, 99, 0, 23})}));
 
         testCases.push_back(std::make_tuple(QStringLiteral(":/cases/requests/writemultiple.json"), request));
     }

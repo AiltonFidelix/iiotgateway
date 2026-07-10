@@ -3,12 +3,11 @@
 
 #include <QObject>
 
-class TestUtils
-{
+class TestUtils {
 public:
     TestUtils() = delete;
 
     static QByteArray readJsonFile(const QString &filename);
 };
 
-#endif // TESTUTILS_H
+#endif  // TESTUTILS_H
