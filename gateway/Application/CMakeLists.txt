@@ -4,7 +4,7 @@ set(HEADERS
     dbconnection.h
     dbstorage.h
     control.h
-    gateway.h
+    gateway.hpp
     storageinterface.h
 )
 

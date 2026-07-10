@@ -1,5 +1,5 @@
 #include "control.h"
-#include "gateway.h"
+#include "gateway.hpp"
 #include "storageinterface.h"
 
 #include "driver/gpio/gpiopinfactory.h"

@@ -1,4 +1,4 @@
-#include "gateway.h"
+#include "gateway.hpp"
 
 #include <QDebug>
 
@@ -8,31 +8,27 @@ using comm::CommFactory;
 
 Gateway::Gateway(StorageInterface *storage, QObject *parent)
     : QObject{parent},
-    m_isRunning{false},
-    m_threadEdge{nullptr},
-    m_threadCloud{nullptr},
-    m_storage{storage}
-{
+      m_isRunning{false},
+      m_threadEdge{nullptr},
+      m_threadCloud{nullptr},
+      m_storage{storage} {
     qInfo() << "Creating gateway instance...";
 }
 
-Gateway::~Gateway()
-{
-    if (m_isRunning)
+Gateway::~Gateway() {
+    if (m_isRunning) {
         stop();
+    }
 }
 
-bool Gateway::isRunning() const
-{
+bool Gateway::isRunning() const {
     return m_isRunning;
 }
 
-bool Gateway::start()
-{
-    qDebug() << "Starting gateway...";
+bool Gateway::start() {
+    qInfo() << "Starting gateway...";
 
-    if (m_storage == nullptr)
-    {
+    if (m_storage == nullptr) {
         qWarning() << "Failed to start: No settings storage!";
         return false;
     }
@@ -43,14 +39,12 @@ bool Gateway::start()
     QJsonObject settingsCloudProtocol = m_storage->protocolSettings(cloudProtocol);
     QJsonObject settingsEdgeProtocol = m_storage->protocolSettings(edgeProtocol);
 
-    if (cloudProtocol.isEmpty() || edgeProtocol.isEmpty())
-    {
+    if (cloudProtocol.isEmpty() || edgeProtocol.isEmpty()) {
         qWarning() << "Failed to start: Missing Protocol configuration!";
         return false;
     }
 
-    try
-    {
+    try {
         m_threadCloud = new QThread();
         m_threadCloud->setObjectName(cloudProtocol);
 
@@ -84,9 +78,7 @@ bool Gateway::start()
 
         m_isRunning = true;
         m_storage->setActive(m_isRunning);
-    }
-    catch (std::exception &e)
-    {
+    } catch (std::exception &e) {
         notifyError(e.what());
         return false;
     }
@@ -94,14 +86,10 @@ bool Gateway::start()
     return true;
 }
 
-void Gateway::stop()
-{
-    auto quitThread = [](QThread *thread) -> QThread*
-    {
-        if (thread != nullptr)
-        {
-            if (thread->isRunning())
-            {
+void Gateway::stop() {
+    auto quitThread = [](QThread *thread) -> QThread * {
+        if (thread != nullptr) {
+            if (thread->isRunning()) {
                 thread->quit();
                 thread->wait();
             }
@@ -119,17 +107,15 @@ void Gateway::stop()
     m_isRunning = false;
     m_storage->setActive(m_isRunning);
 
-    qDebug() << "Stoping gateway...";
+    qInfo() << "Stoping gateway...";
 }
 
-bool Gateway::restart()
-{
-    qDebug() << "Restarting gateway...";
+bool Gateway::restart() {
+    qInfo() << "Restarting gateway...";
     stop();
     return start();
 }
 
-void Gateway::notifyError(const QByteArray &error)
-{
+void Gateway::notifyError(const QByteArray &error) {
     qWarning() << "Error notification:" << error;
 }
