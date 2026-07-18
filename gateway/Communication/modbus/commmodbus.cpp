@@ -9,45 +9,45 @@
 COMM_MODBUS_BEGIN_NAMESPACE
 
 CommModbus::CommModbus(QJsonObject settings)
-    : m_modbusClient{nullptr},
-      m_polling{nullptr},
-      m_readRequest{},
-      m_settingsParser{std::move(settings)} {
+    : _modbusClient{nullptr},
+      _polling{nullptr},
+      _readRequest{},
+      _settingsParser{std::move(settings)} {
 }
 
 CommModbus::~CommModbus() {
-    if (m_modbusClient) {
-        m_modbusClient->disconnect();
+    if (_modbusClient) {
+        _modbusClient->disconnect();
 
-        delete m_modbusClient;
+        delete _modbusClient;
     }
 
     if (ispolling()) {
-        m_polling->disconnect();
-        m_polling->stop();
+        _polling->disconnect();
+        _polling->stop();
 
-        delete m_polling;
+        delete _polling;
     }
 }
 
 void CommModbus::disconnectComm() {
     if (!isconnected()) {
-        m_modbusClient->disconnectDevice();
+        _modbusClient->disconnectDevice();
     }
 
     emit disconnected();
 }
 
 bool CommModbus::isconnected() const {
-    return (m_modbusClient->state() == QModbusDevice::ConnectedState);
+    return (_modbusClient->state() == QModbusDevice::ConnectedState);
 }
 
 CommModbusClientInterface *CommModbus::modbusClient() {
-    return m_modbusClient;
+    return _modbusClient;
 }
 
 void CommModbus::setModbusClient(CommModbusClientInterface *client) {
-    m_modbusClient = client;
+    _modbusClient = client;
 }
 
 void CommModbus::incoming(QByteArray data) {
@@ -107,14 +107,14 @@ void CommModbus::readRegisters(const Request &request) {
         CommModbusRequestParser::sortRequestUnits(units);
 
         for (const auto &unit : std::as_const(units)) {
-            if (QModbusReply *reply = m_modbusClient->sendReadRequest(unit, address)) {
+            if (QModbusReply *reply = _modbusClient->sendReadRequest(unit, address)) {
                 QEventLoop loop;
                 connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
 
                 loop.exec();
                 registers.insert(readReady(reply));
             } else {
-                const auto errorMessage = QString("Read error: %1").arg(m_modbusClient->errorString());
+                const auto errorMessage = QString("Read error: %1").arg(_modbusClient->errorString());
                 errors.append(errorMessage);
                 emit error(errorMessage.toUtf8());
             }
@@ -149,14 +149,14 @@ void CommModbus::writeRegisters(const Request &request) {
         const Units units = request.value(address);
 
         for (const auto &unit : units) {
-            if (QModbusReply *reply = m_modbusClient->sendWriteRequest(unit, address)) {
+            if (QModbusReply *reply = _modbusClient->sendWriteRequest(unit, address)) {
                 QEventLoop loop;
                 connect(reply, &QModbusReply::finished, &loop, &QEventLoop::quit);
                 loop.exec();
 
                 reply->deleteLater();
             } else {
-                emit error(QString("Write error: %1").arg(m_modbusClient->errorString()).toUtf8());
+                emit error(QString("Write error: %1").arg(_modbusClient->errorString()).toUtf8());
             }
         }
     }
@@ -188,25 +188,25 @@ Registers CommModbus::readReady(QModbusReply *reply) {
 }
 
 bool CommModbus::ispolling() {
-    return (m_polling != nullptr);
+    return (_polling != nullptr);
 }
 
 void CommModbus::initPolling() {
     if (ispolling()) {
-        m_readRequest = m_settingsParser.requests();
+        _readRequest = _settingsParser.requests();
 
-        connect(m_polling, &QTimer::timeout, this, &CommModbus::pollingCallback);
+        connect(_polling, &QTimer::timeout, this, &CommModbus::pollingCallback);
 
-        m_polling->start();
+        _polling->start();
     }
 }
 
 void CommModbus::pollingCallback() {
-    m_polling->stop();
+    _polling->stop();
 
-    readRegisters(m_readRequest);
+    readRegisters(_readRequest);
 
-    m_polling->start();
+    _polling->start();
 }
 
 QJsonArray CommModbus::registersToJsonArray(const Registers &registers) {

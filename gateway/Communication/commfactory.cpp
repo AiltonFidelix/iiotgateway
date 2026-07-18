@@ -2,12 +2,12 @@
 
 COMM_BEGIN_NAMESPACE
 
-std::set<QByteArray> CommFactory::m_commInterfaces{};
+std::set<QByteArray> CommFactory::_commInterfaces{};
 
 CommInterface *CommFactory::getCommInterface(const QByteArray &commInterface, QJsonObject settings) {
     const QMetaType type = QMetaType::fromName(commInterface.toUpper());
 
-    if (!m_commInterfaces.contains(commInterface) || !type.isRegistered()) {
+    if (!_commInterfaces.contains(commInterface) || !type.isRegistered()) {
         throw std::runtime_error("Comm Interface not found");
     }
 

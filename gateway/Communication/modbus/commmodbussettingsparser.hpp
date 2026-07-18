@@ -30,7 +30,7 @@ public:
     friend QDebug &operator<<(QDebug &debug, const CommModbusSettingsParser &parser);
 
 private:
-    QJsonObject m_settings;
+    QJsonObject _settings;
 };
 
 COMM_MODBUS_END_NAMESPACE

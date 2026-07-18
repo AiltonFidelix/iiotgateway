@@ -37,10 +37,10 @@ protected slots:
     void pollingCallback();
 
 protected:
-    CommModbusClientInterface *m_modbusClient;
-    QTimer *m_polling;
-    Request m_readRequest;
-    CommModbusSettingsParser m_settingsParser;
+    CommModbusClientInterface *_modbusClient;
+    QTimer *_polling;
+    Request _readRequest;
+    CommModbusSettingsParser _settingsParser;
 
 private:
     bool ispolling();

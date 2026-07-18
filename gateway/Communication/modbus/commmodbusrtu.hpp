@@ -18,7 +18,7 @@ public slots:
     void connectComm() override;
 
 private:
-    static int m_typeId;
+    static int _typeId;
 };
 
 COMM_MODBUS_END_NAMESPACE

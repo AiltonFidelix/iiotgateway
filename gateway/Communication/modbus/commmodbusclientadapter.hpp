@@ -30,7 +30,7 @@ private slots:
     void emitStateChanged(QModbusDevice::State state);
 
 private:
-    QModbusClient *m_modbusClient;
+    QModbusClient *_modbusClient;
 };
 
 COMM_MODBUS_END_NAMESPACE

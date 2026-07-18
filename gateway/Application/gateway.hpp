@@ -23,10 +23,10 @@ private slots:
     void notifyError(const QByteArray &error);
 
 private:
-    bool m_isRunning;
-    QThread *m_threadEdge;
-    QThread *m_threadCloud;
-    StorageInterface *m_storage;
+    bool _isRunning;
+    QThread *_threadEdge;
+    QThread *_threadCloud;
+    StorageInterface *_storage;
 };
 
 #endif  // GATEWAY_H

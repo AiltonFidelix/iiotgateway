@@ -6,18 +6,18 @@
 COMM_MODBUS_BEGIN_NAMESPACE
 
 CommModbusRequestParser::CommModbusRequestParser(QByteArray data, quint16 maxEntries)
-    : m_maxEntries{maxEntries},
-      m_request{},
-      m_type{RequestType::Unknown} {
+    : _maxEntries{maxEntries},
+      _request{},
+      _type{RequestType::Unknown} {
     parser(QJsonDocument::fromJson(std::move(data)));
 }
 
 Request CommModbusRequestParser::request() const {
-    return m_request;
+    return _request;
 }
 
 RequestType CommModbusRequestParser::type() const {
-    return m_type;
+    return _type;
 }
 
 Addresses CommModbusRequestParser::sortedAddress(const Request &request) {
@@ -66,13 +66,13 @@ void CommModbusRequestParser::parser(const QJsonDocument &document) {
         if (hasValues) {
             values = deviceObj.value(QStringLiteral("values")).toArray();
             current = values.begin();
-            m_type = RequestType::Write;
+            _type = RequestType::Write;
         } else {
-            m_type = RequestType::Read;
+            _type = RequestType::Read;
         }
 
-        for (int i = 0, r = startRegister; i < numberOfEntries; i += m_maxEntries, r += m_maxEntries) {
-            const quint16 entries = std::min(m_maxEntries, quint16(numberOfEntries - i));
+        for (int i = 0, r = startRegister; i < numberOfEntries; i += _maxEntries, r += _maxEntries) {
+            const quint16 entries = std::min(_maxEntries, quint16(numberOfEntries - i));
 
             QModbusDataUnit unit(registertype, r, entries);
 
@@ -80,7 +80,7 @@ void CommModbusRequestParser::parser(const QJsonDocument &document) {
                 setValues(current, values, unit);
             }
 
-            m_request[address].append(unit);
+            _request[address].append(unit);
         }
     }
 }

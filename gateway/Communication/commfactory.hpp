@@ -17,13 +17,13 @@ public:
 
     template <typename T>
     static int registerInterface(QByteArray commInterface) {
-        m_commInterfaces.insert(commInterface);
+        _commInterfaces.insert(commInterface);
 
         return qRegisterMetaType<T>(commInterface);
     }
 
 private:
-    static std::set<QByteArray> m_commInterfaces;
+    static std::set<QByteArray> _commInterfaces;
 };
 
 COMM_END_NAMESPACE

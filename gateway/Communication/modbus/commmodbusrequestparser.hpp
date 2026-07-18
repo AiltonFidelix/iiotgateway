@@ -32,9 +32,9 @@ private:
     void parser(const QJsonDocument &document);
     QModbusDataUnit::RegisterType getType(const QString &type) const;
 
-    quint16 m_maxEntries;
-    Request m_request;
-    RequestType m_type;
+    quint16 _maxEntries;
+    Request _request;
+    RequestType _type;
 };
 
 COMM_MODBUS_END_NAMESPACE
