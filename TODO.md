@@ -11,7 +11,6 @@
 ### Distro
 
 - Install applications as packages, following buildroot approach
-- Remove buildroot as submodule and add installation in init-environment script
 
 ### Gateway
 
