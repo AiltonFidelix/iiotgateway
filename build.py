@@ -7,13 +7,18 @@ import multiprocessing
 from functools import wraps
 from pathlib import Path
 
-BUILDROOT_PATH = (Path(__file__).resolve().parent / "buildroot").resolve()
+BUILDROOT_PATH = (Path("/opt") / "buildroot").resolve()
 DISTRO_PATH = (Path(__file__).resolve().parent / "distro").resolve()
 DEF_CONFIG_FILE = "raspberrypi3_64_defconfig"
 
 
 def run(cmd, cwd=None):
-    subprocess.run(cmd, check=True, cwd=cwd)
+    try:
+        subprocess.run(cmd, check=True, cwd=cwd)
+    except Exception as e:
+        print(e)
+        print(f"\033[31m---> Failed running command: '{" ".join(cmd)}'")
+        exit(1)
 
 
 def clean_gateway_artifacts():
@@ -61,7 +66,9 @@ def build_and_install_gateway(jobs: str, clean: bool = False, arch: str = "aarch
 
 
 def main():
-    parser = argparse.ArgumentParser(description="IIoTGateway platform build", usage="%(prog)s [options]")
+    parser = argparse.ArgumentParser(
+        description="IIoTGateway platform build", usage="%(prog)s [options]"
+    )
 
     parser.add_argument(
         "--default", action="store_true", help="Use all default options"
