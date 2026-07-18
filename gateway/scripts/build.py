@@ -9,9 +9,16 @@ import multiprocessing
 SUPPORTED_ARCHS = ["amd64", "aarch64"]
 QT_VERSION = "6.8.3"
 
+CONTAINER_ENGINE = ""
+
 
 def run(cmd, cwd=None):
-    subprocess.run(cmd, check=True, cwd=cwd)
+    try:
+        subprocess.run(cmd, check=True, cwd=cwd)
+    except Exception as e:
+        print(e)
+        print(f"\033[31m---> Failed running command: '{" ".join(cmd)}'")
+        exit(1)
 
 
 def clean(build_dir: Path):
@@ -38,21 +45,21 @@ def build_amd64(build_dir: Path, qt_version: str, jobs: str, with_test: bool = F
 
 
 def build_aarch64(build_dir: Path, qt_version: str, jobs: str, with_test: bool = False):
-    docker_image = f"qt-aarch64:{qt_version}"
+    qt_image = f"qt-aarch64:{qt_version}"
 
     project_root = Path.cwd()
-    docker_dir = f"/src/{build_dir}"
+    container_dir = f"/src/{build_dir}"
 
     run(
         [
-            "docker",
+            CONTAINER_ENGINE,
             "run",
             "--rm",
             "-v",
-            f"{project_root}:/src",
+            f"{project_root}:/src:z",
             "-w",
-            docker_dir,
-            docker_image,
+            container_dir,
+            qt_image,
             "qt-cmake",
             "-DCMAKE_BUILD_TYPE=Release",
             "-DENABLE_RASPBERRY_GPIO=ON",
@@ -63,14 +70,14 @@ def build_aarch64(build_dir: Path, qt_version: str, jobs: str, with_test: bool =
 
     run(
         [
-            "docker",
+            CONTAINER_ENGINE,
             "run",
             "--rm",
             "-v",
-            f"{project_root}:/src",
+            f"{project_root}:/src:z",
             "-w",
-            docker_dir,
-            docker_image,
+            container_dir,
+            qt_image,
             "cmake",
             "--build",
             ".",
@@ -80,7 +87,30 @@ def build_aarch64(build_dir: Path, qt_version: str, jobs: str, with_test: bool =
     )
 
 
+def get_container_engine():
+    tool_path = shutil.which("docker")
+
+    global CONTAINER_ENGINE
+
+    if tool_path:
+        print(f"---> Using [docker] as container engine")
+        CONTAINER_ENGINE = "docker"
+        return
+
+    tool_path = shutil.which("podman")
+
+    if tool_path:
+        print(f"---> Using [podman] as container engine")
+        CONTAINER_ENGINE = "podman"
+        return
+
+    print("\033[31m---> No container engine found, please install [docker] or [podman]")
+    exit(0)
+
+
 def main():
+
+    get_container_engine()
 
     parser = argparse.ArgumentParser(description="gateway build script")
 
