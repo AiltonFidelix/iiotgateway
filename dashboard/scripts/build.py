@@ -20,7 +20,7 @@ def clean():
 
 
 def build(qt_version: str, asm_cc: str, jobs: str):
-    emsdk_env = os.path.expanduser("~/.emsdk/emsdk_env.sh")
+    emsdk_env = os.path.expanduser("/opt/emsdk/emsdk_env.sh")
 
     toolchain_path = os.path.expanduser(
         f"~/Qt/{qt_version}/{asm_cc}/lib/cmake/Qt6/qt.toolchain.cmake"
