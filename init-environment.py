@@ -8,13 +8,16 @@ TMP_PATH = "/tmp"
 OPT_PATH = "/opt"
 
 GTEST_REPOSITORY = "https://github.com/google/googletest"
-GTEST_VERSION = "v1.16.0"
+GTEST_BRANCH = "v1.16.0"
 
 PAHO_MQTT_CPP_REPOSITORY = "https://github.com/eclipse-paho/paho.mqtt.cpp.git"
-PAHO_MQTT_CPP_VERSION = "v1.5.1"
+PAHO_MQTT_CPP_BRANCH = "v1.5.1"
 
 EMSCRIPTEM_REPOSITORY = "https://github.com/emscripten-core/emsdk.git"
-EMSCRIPTEM_VERSION = "3.1.56"
+EMSCRIPTEM_BRANCH = "3.1.56"
+
+BUILDROOT_REPOSITORY = "https://gitlab.com/buildroot.org/buildroot.git"
+BUILDROOT_BRANCH = "2025.02.x"
 
 
 def run(cmd, cwd=None):
@@ -44,7 +47,7 @@ def install_gtest():
     GTEST_PATH = f"{TMP_PATH}/googletest"
 
     try:
-        run(["git", "clone", "--branch", GTEST_VERSION, GTEST_REPOSITORY], TMP_PATH)
+        run(["git", "clone", "--branch", GTEST_BRANCH, GTEST_REPOSITORY], TMP_PATH)
         run(["cmake", "-B", "build"], GTEST_PATH)
         run(["cmake", "--build", "build", "--target", "install"], GTEST_PATH)
         print("---> Google Test installed successfully")
@@ -81,7 +84,7 @@ def install_paho_mqtt():
                 "git",
                 "clone",
                 "--branch",
-                PAHO_MQTT_CPP_VERSION,
+                PAHO_MQTT_CPP_BRANCH,
                 PAHO_MQTT_CPP_REPOSITORY,
             ],
             TMP_PATH,
@@ -120,11 +123,30 @@ def install_emscripten():
 
     try:
         run(["git", "clone", EMSCRIPTEM_REPOSITORY], OPT_PATH)
-        run(["./emsdk", "install", EMSCRIPTEM_VERSION], EMSDK_PATH)
-        run(["./emsdk", "activate", EMSCRIPTEM_VERSION], EMSDK_PATH)
+        run(["./emsdk", "install", EMSCRIPTEM_BRANCH], EMSDK_PATH)
+        run(["./emsdk", "activate", EMSCRIPTEM_BRANCH], EMSDK_PATH)
         print("---> Emscripten installed successfully")
     except Exception as e:
         print(f"---> Error installing Emscripten: {e}")
+
+
+def install_buildroot():
+    BUILDROOT_PATH = f"{OPT_PATH}/buildroot"
+
+    if os.path.exists(BUILDROOT_PATH):
+        print("---> Buildroot is already installed")
+        return
+
+    print("---> Installing Buildroot")
+
+    try:
+        run(
+            ["git", "clone", "--branch", BUILDROOT_BRANCH, BUILDROOT_REPOSITORY],
+            OPT_PATH,
+        )
+        print("---> Buildroot installed successfully")
+    except Exception as e:
+        print(f"---> Error installing Buildroot: {e}")
 
 
 def verify_tool(tool: str):
@@ -149,6 +171,7 @@ def main():
     install_gtest()
     install_paho_mqtt()
     install_emscripten()
+    install_buildroot()
 
 
 if __name__ == "__main__":
