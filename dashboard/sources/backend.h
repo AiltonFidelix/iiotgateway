@@ -1,21 +1,12 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
-#include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QObject>
 
-class Backend : public QObject
-{
+class Backend : public QObject {
     Q_OBJECT
-
-    QNetworkAccessManager m_manager;
-    QString m_serverUrl;
-
-    QPair<bool, QString> parserReply(QNetworkReply *reply) const;
-    void sendCommand(const QString &command);
-    QString errorHandler(QNetworkReply::NetworkError e);
-
 public:
     explicit Backend(QObject *parent = nullptr);
 
@@ -37,6 +28,14 @@ public slots:
     void stop();
     void restart();
     void reboot();
+
+private:
+    QPair<bool, QString> parserReply(QNetworkReply *reply) const;
+    void sendCommand(const QString &command);
+    QString errorHandler(QNetworkReply::NetworkError e);
+
+    QNetworkAccessManager _manager;
+    QString _serverUrl;
 };
 
-#endif // BACKEND_H
+#endif  // BACKEND_H
