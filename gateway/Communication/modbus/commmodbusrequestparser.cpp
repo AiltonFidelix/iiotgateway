@@ -50,6 +50,9 @@ void CommModbusRequestParser::parser(const QJsonDocument &document) {
     const QJsonObject jsonObj = document.object();
     const QJsonArray devices = jsonObj.value(QStringLiteral("devices")).toArray();
 
+    // TODO Move this process to workers threads
+    // Get a thread pool and feed them with each device, when everything is finished put into _request
+
     for (const auto &device : devices) {
         const QJsonObject deviceObj = device.toObject();
         const auto address = static_cast<quint8>(deviceObj.value(QStringLiteral("address")).toInt(0));
