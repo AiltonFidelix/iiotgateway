@@ -7,7 +7,7 @@ import multiprocessing
 from functools import wraps
 from pathlib import Path
 
-BUILDROOT_PATH = (Path("/opt") / "buildroot").resolve()
+BUILDROOT_PATH = (Path.home() / "buildroot").resolve()
 DISTRO_PATH = (Path(__file__).resolve().parent / "distro").resolve()
 DEF_CONFIG_FILE = "raspberrypi3_64_defconfig"
 

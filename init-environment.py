@@ -3,9 +3,11 @@
 import os
 import shutil
 import subprocess
+from pathlib import Path
 
 TMP_PATH = "/tmp"
 OPT_PATH = "/opt"
+HOME_PATH = Path.home()
 
 GTEST_REPOSITORY = "https://github.com/google/googletest"
 GTEST_BRANCH = "v1.16.0"
@@ -131,7 +133,7 @@ def install_emscripten():
 
 
 def install_buildroot():
-    BUILDROOT_PATH = f"{OPT_PATH}/buildroot"
+    BUILDROOT_PATH = f"{HOME_PATH}/buildroot"
 
     if os.path.exists(BUILDROOT_PATH):
         print("---> Buildroot is already installed")
@@ -142,7 +144,7 @@ def install_buildroot():
     try:
         run(
             ["git", "clone", "--branch", BUILDROOT_BRANCH, BUILDROOT_REPOSITORY],
-            OPT_PATH,
+            HOME_PATH,
         )
         print("---> Buildroot installed successfully")
     except Exception as e:
@@ -156,14 +158,41 @@ def verify_tool(tool: str):
         print(f"[{tool}] is installed at: {tool_path}")
     else:
         print(f"\033[31m[{tool}] is not installed or not in the system PATH.\033[0m")
+        print(
+            "\033[31mPlease install the required tool using your system package management.\033[0m"
+        )
+        print(f"\033[31m---> Debian: sudo apt install {tool}\033[0m")
+        print(f"\033[31m---> Fedora: sudo dnf install {tool}\033[0m")
         exit(1)
 
 
 def verify_tools():
     print("---> Verifying required tools")
 
-    verify_tool("cmake")
-    verify_tool("git")
+    required_tools = [
+        "git",
+        "gcc",
+        "g++",
+        "wget",
+        "sed",
+        "cmake",
+        "make",
+        "file",
+        "unzip",
+        "rsync",
+        "awk",
+        "tar",
+        "gzip",
+        "bzip2",
+        "perl",
+        "cpio",
+        "patch",
+        "go",
+        "bc",
+    ]
+
+    for tool in required_tools:
+        verify_tool(tool)
 
 
 def main():
