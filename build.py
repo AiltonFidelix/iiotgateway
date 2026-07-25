@@ -90,6 +90,12 @@ def main():
     )
 
     parser.add_argument(
+        "--only-make",
+        action="store_true",
+        help="Only runs the make command",
+    )
+
+    parser.add_argument(
         "--clean-gateway",
         action="store_true",
         help="Clean previous gateway build artifacts",
@@ -119,13 +125,15 @@ def main():
         print("---> Cleaning distro built artifacts in buildroot")
         run(["make", "clean"], cwd=BUILDROOT_PATH)
 
-    if not args.skip_gateway:
+    if not args.skip_gateway and not args.only_make:
         build_and_install_dashboard(args.jobs, args.clean_gateway)
         build_and_install_gateway(args.jobs, args.clean_gateway)
 
     print("---> Building IIoTGateway system...")
 
-    run(["make", f"BR2_EXTERNAL={DISTRO_PATH}", args.defc], cwd=BUILDROOT_PATH)
+    if not args.only_make:
+        run(["make", f"BR2_EXTERNAL={DISTRO_PATH}", args.defc], cwd=BUILDROOT_PATH)
+
     run(["make", f"-j{args.jobs}"], cwd=BUILDROOT_PATH)
 
 
