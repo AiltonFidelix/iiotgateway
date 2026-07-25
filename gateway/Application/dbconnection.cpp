@@ -5,23 +5,20 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
-DBConnection *DBConnection::m_instance = nullptr;
+DBConnection *DBConnection::_instance = nullptr;
 
-DBConnection*
-DBConnection::instance()
-{
-    if (m_instance == nullptr)
-    {
-        m_instance = new DBConnection();
+DBConnection *
+DBConnection::instance() {
+    if (_instance == nullptr) {
+        _instance = new DBConnection();
 
-        connect(qApp, &QCoreApplication::aboutToQuit, m_instance, &DBConnection::close);
+        connect(qApp, &QCoreApplication::aboutToQuit, _instance, &DBConnection::close);
     }
 
-    return m_instance;
+    return _instance;
 }
 
-bool DBConnection::open()
-{
+bool DBConnection::open() {
     const QByteArray dbType = qgetenv("DB_TYPE");
     const QByteArray dbName = qgetenv("DB_NAME");
     const QByteArray dbHost = qgetenv("DB_HOST");
@@ -31,60 +28,55 @@ bool DBConnection::open()
     bool ok = false;
     const int port = qEnvironmentVariableIntValue("DB_PORT", &ok);
 
-    m_database = QSqlDatabase::addDatabase(dbType);
-    m_database.setDatabaseName(dbName);
+    _database = QSqlDatabase::addDatabase(dbType);
+    _database.setDatabaseName(dbName);
 
-    if (dbType != "QSQLITE")
-    {
-        m_database.setHostName(dbHost);
-        m_database.setUserName(dbUser);
-        m_database.setPassword(dbPass);
-        m_database.setPort(ok ? port : -1);
+    if (dbType != "QSQLITE") {
+        _database.setHostName(dbHost);
+        _database.setUserName(dbUser);
+        _database.setPassword(dbPass);
+        _database.setPort(ok ? port : -1);
     }
 
     qInfo() << "Opening connection..";
 
-    return m_database.open();
+    return _database.open();
 }
 
-void DBConnection::close()
-{
+void DBConnection::close() {
     qInfo() << "Closing connection..";
-    m_database.close();
+    _database.close();
 }
 
-bool DBConnection::isOpen() const
-{
-    return m_database.isOpen();
+bool DBConnection::isOpen() const {
+    return _database.isOpen();
 }
 
-bool DBConnection::verifyScripts()
-{
-    auto insertHistory = [](const QString &script) -> bool
-    {
+bool DBConnection::verifyScripts() {
+    auto insertHistory = [](const QString &script) -> bool {
         QSqlQuery query;
         return (!query.exec(QString("INSERT INTO history(id, script) VALUES(NULL, '%1')").arg(script)));
     };
 
-    auto scriptExec = [this](const QString &fileName) -> bool
-    {
+    auto scriptExec = [this](const QString &fileName) -> bool {
         QFile file(fileName);
 
-        if (!file.open(QIODevice::ReadOnly))
+        if (!file.open(QIODevice::ReadOnly)) {
             return false;
+        }
 
         const QByteArray data = file.readAll();
         const auto scripts = data.trimmed().split(';');
 
         file.close();
 
-        bool ok = m_database.transaction();
+        bool ok = _database.transaction();
 
-        if (!ok)
-            return ok;
+        if (!ok) {
+            return false;
+        }
 
-        for (const QByteArray &script : scripts)
-        {
+        for (const QByteArray &script : scripts) {
             if (script.isEmpty())
                 continue;
 
@@ -92,44 +84,43 @@ bool DBConnection::verifyScripts()
 
             const bool ret = query.exec(script);
 
-            if (!ret)
-            {
+            if (!ret) {
                 qWarning() << "Query failed:" << query.lastError().text();
             }
 
             ok &= ret;
         }
 
-        ok ? m_database.commit() : m_database.rollback();
+        ok ? _database.commit() : _database.rollback();
 
         return ok;
     };
 
-    auto scriptExists = [](const QString &script) -> bool
-    {
+    auto scriptExists = [](const QString &script) -> bool {
         QSqlQuery query;
 
-        if (!query.exec(QString("SELECT count(script) FROM history WHERE script = '%1'").arg(script)))
-        {
+        if (!query.exec(QString("SELECT count(script) FROM history WHERE script = '%1'").arg(script))) {
             qWarning() << "Query failed:" << query.lastError().text();
             return false;
         }
 
-        if (!query.next())
+        if (!query.next()) {
             return false;
+        }
 
         return (query.value(0).toInt() == 1);
     };
 
-    auto tableExists = [](const QString &table) -> bool
-    {
+    auto tableExists = [](const QString &table) -> bool {
         QSqlQuery query;
 
-        if (!query.exec(QString("SELECT count(name) FROM sqlite_master WHERE type = 'table' AND name = '%1'").arg(table)))
+        if (!query.exec(QString("SELECT count(name) FROM sqlite_master WHERE type = 'table' AND name = '%1'").arg(table))) {
             return false;
+        }
 
-        if (!query.next())
+        if (!query.next()) {
             return false;
+        }
 
         return (query.value(0).toInt() == 1);
     };
@@ -138,22 +129,22 @@ bool DBConnection::verifyScripts()
 
     QDir dir(QStringLiteral(":/scripts"));
 
-    if (!dir.exists())
+    if (!dir.exists()) {
         return false;
+    }
 
     auto files = dir.entryList(QDir::Files);
 
-    if (!files.contains(historyScript))
+    if (!files.contains(historyScript)) {
         return false;
+    }
 
     files.removeOne(historyScript);
 
-    if (!tableExists(QStringLiteral("history")))
-    {
+    if (!tableExists(QStringLiteral("history"))) {
         qDebug() << "Executing script:" << historyScript;
 
-        if (!scriptExec(QString("%1/%2").arg(dir.absolutePath(), historyScript)))
-        {
+        if (!scriptExec(QString("%1/%2").arg(dir.absolutePath(), historyScript))) {
             qWarning() << "Failed to execute script:" << historyScript;
             return false;
         }
@@ -163,19 +154,14 @@ bool DBConnection::verifyScripts()
 
     bool ok = true;
 
-    for (const auto &fileName : std::as_const(files))
-    {
-        if (!scriptExists(fileName))
-        {
+    for (const auto &fileName : std::as_const(files)) {
+        if (!scriptExists(fileName)) {
             qDebug() << "Executing script:" << fileName;
 
-            if (!scriptExec(QString("%1/%2").arg(dir.absolutePath(), fileName)))
-            {
+            if (!scriptExec(QString("%1/%2").arg(dir.absolutePath(), fileName))) {
                 qWarning() << "Failed to execute script:" << fileName;
                 ok = false;
-            }
-            else
-            {
+            } else {
                 insertHistory(fileName);
             }
         }
@@ -184,7 +170,6 @@ bool DBConnection::verifyScripts()
     return ok;
 }
 
-QString DBConnection::lastError() const
-{
-    return m_database.lastError().text();
+QString DBConnection::lastError() const {
+    return _database.lastError().text();
 }

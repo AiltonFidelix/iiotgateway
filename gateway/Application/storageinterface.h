@@ -1,12 +1,11 @@
 #ifndef STORAGEINTERFACE_H
 #define STORAGEINTERFACE_H
 
+#include <QJsonObject>
 #include <QString>
 #include <QStringView>
-#include <QJsonObject>
 
-class StorageInterface
-{
+class StorageInterface {
 public:
     virtual ~StorageInterface() = default;
 
@@ -24,4 +23,4 @@ public:
     virtual QPair<QString, QString> userCredentials() const = 0;
 };
 
-#endif // STORAGEINTERFACE_H
+#endif  // STORAGEINTERFACE_H

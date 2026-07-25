@@ -4,18 +4,9 @@
 #include <QObject>
 #include <QSqlDatabase>
 
-class DBConnection : public QObject
-{
+class DBConnection : public QObject {
     Q_OBJECT
-
-    static DBConnection *m_instance;
-    QSqlDatabase m_database;
-
-    DBConnection() = default;
-    ~DBConnection() = default;
-
 public:
-
     // History table enum
     enum class History : uint8_t {
         Id = 0,
@@ -52,6 +43,13 @@ public:
 public slots:
     bool open();
     void close();
+
+private:
+    DBConnection() = default;
+    ~DBConnection() = default;
+
+    static DBConnection *_instance;
+    QSqlDatabase _database;
 };
 
-#endif // DBCONNECTION_H
+#endif  // DBCONNECTION_H

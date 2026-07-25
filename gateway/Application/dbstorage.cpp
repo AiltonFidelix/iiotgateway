@@ -1,54 +1,44 @@
 #include "dbstorage.h"
 
 #include <QDateTime>
+#include <QJsonDocument>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlRecord>
 
-#include <QJsonDocument>
-
 DBStorage::DBStorage()
-    : m_connection{DBConnection::instance()}
-{
+    : _connection{DBConnection::instance()} {
 }
 
-DBStorage::~DBStorage()
-{
-    m_connection->close();
+DBStorage::~DBStorage() {
+    _connection->close();
 }
 
-bool DBStorage::verify() const
-{
+bool DBStorage::verify() const {
     qInfo() << "Verifying database scripts...";
 
-    if (!m_connection->open())
-    {
-        qFatal() << "Database connection failed:" << m_connection->lastError();
+    if (!_connection->open()) {
+        qFatal() << "Database connection failed:" << _connection->lastError();
         return false;
     }
 
-    return m_connection->verifyScripts();
+    return _connection->verifyScripts();
 }
 
-bool DBStorage::setActive(bool active) const
-{
+bool DBStorage::setActive(bool active) const {
     return insertSettings(QStringLiteral("active"), active ? QStringLiteral("Y") : QStringLiteral("N"));
 }
 
-bool DBStorage::setCloudProtocol(const QString &protocol) const
-{
+bool DBStorage::setCloudProtocol(const QString &protocol) const {
     return insertSettings(QStringLiteral("cloud_protocol"), protocol);
 }
 
-bool DBStorage::setEdgeProtocol(const QString &protocol) const
-{
+bool DBStorage::setEdgeProtocol(const QString &protocol) const {
     return insertSettings(QStringLiteral("edge_protocol"), protocol);
 }
 
-bool DBStorage::setProtocolSettings(const QString &protocol, const QJsonObject &settings) const
-{
-    auto settingsExist = [](const QString &protocol) -> bool
-    {
+bool DBStorage::setProtocolSettings(const QString &protocol, const QJsonObject &settings) const {
+    auto settingsExist = [](const QString &protocol) -> bool {
         QSqlQuery sqlquery;
 
         bool ret = sqlquery.exec(QString("SELECT count(*) FROM protocols WHERE type = '%1'").arg(protocol));
@@ -65,13 +55,10 @@ bool DBStorage::setProtocolSettings(const QString &protocol, const QJsonObject &
 
     bool ret = false;
 
-    if (settingsExist(protocol))
-    {
+    if (settingsExist(protocol)) {
         ret = insert(QString("UPDATE protocols SET settings = '%1', updated = '%2' WHERE type = '%3'")
                          .arg(strSettings, currentDT, protocol));
-    }
-    else
-    {
+    } else {
         ret = insert(QString("INSERT INTO protocols (id, type, settings, created, updated) VALUES (NULL, '%1', '%2', '%3', '%4')")
                          .arg(protocol, strSettings, currentDT, currentDT));
     }
@@ -79,8 +66,7 @@ bool DBStorage::setProtocolSettings(const QString &protocol, const QJsonObject &
     return ret;
 }
 
-bool DBStorage::active() const
-{
+bool DBStorage::active() const {
     const QSqlRecord record = selectSettings();
 
     if (record.isEmpty())
@@ -91,8 +77,7 @@ bool DBStorage::active() const
     return record.value(index).toString() == "Y";
 }
 
-QString DBStorage::cloudProtocol() const
-{
+QString DBStorage::cloudProtocol() const {
     const QSqlRecord record = selectSettings();
 
     if (record.isEmpty())
@@ -103,8 +88,7 @@ QString DBStorage::cloudProtocol() const
     return record.value(index).toString();
 }
 
-QString DBStorage::edgeProtocol() const
-{
+QString DBStorage::edgeProtocol() const {
     const QSqlRecord record = selectSettings();
 
     if (record.isEmpty())
@@ -115,8 +99,7 @@ QString DBStorage::edgeProtocol() const
     return record.value(index).toString();
 }
 
-QJsonObject DBStorage::protocolSettings(const QString &protocol) const
-{
+QJsonObject DBStorage::protocolSettings(const QString &protocol) const {
     QSqlQuery sqlquery;
 
     bool ret = sqlquery.prepare(QString("SELECT settings FROM protocols WHERE type = '%1'").arg(protocol));
@@ -137,8 +120,7 @@ QJsonObject DBStorage::protocolSettings(const QString &protocol) const
     return doc.object();
 }
 
-QPair<QString, QString> DBStorage::userCredentials() const
-{
+QPair<QString, QString> DBStorage::userCredentials() const {
     QSqlQuery sqlquery;
 
     bool ret = sqlquery.prepare(QStringLiteral("SELECT username, password FROM users WHERE id = 1"));
@@ -158,15 +140,12 @@ QPair<QString, QString> DBStorage::userCredentials() const
     return credentials;
 }
 
-bool DBStorage::insert(const QString &query) const
-{
+bool DBStorage::insert(const QString &query) const {
     return QSqlQuery().exec(query);
 }
 
-bool DBStorage::insertSettings(const QString &field, const QString &value) const
-{
-    auto settingsExist = []() -> bool
-    {
+bool DBStorage::insertSettings(const QString &field, const QString &value) const {
+    auto settingsExist = []() -> bool {
         QSqlQuery sqlquery;
 
         bool ret = sqlquery.exec("SELECT count(*) FROM settings");
@@ -180,13 +159,10 @@ bool DBStorage::insertSettings(const QString &field, const QString &value) const
     const QString currentDT(currentDateTime());
     bool ret = false;
 
-    if (settingsExist())
-    {
+    if (settingsExist()) {
         ret = insert(QString("UPDATE settings SET %1 = '%2', updated = '%3' WHERE id = 1")
                          .arg(field, value, currentDT));
-    }
-    else
-    {
+    } else {
         ret = insert(QString("INSERT INTO settings (id, %1, created, updated) VALUES (NULL, '%2', '%3', '%4')")
                          .arg(field, value, currentDT, currentDT));
     }
@@ -194,19 +170,16 @@ bool DBStorage::insertSettings(const QString &field, const QString &value) const
     return ret;
 }
 
-QSqlRecord DBStorage::selectSettings() const
-{
+QSqlRecord DBStorage::selectSettings() const {
     QSqlQuery sqlquery;
 
-    if (!sqlquery.exec("SELECT * FROM settings") || !sqlquery.next())
-    {
+    if (!sqlquery.exec("SELECT * FROM settings") || !sqlquery.next()) {
         return QSqlRecord();
     }
 
     return sqlquery.record();
 }
 
-QString DBStorage::currentDateTime() const
-{
+QString DBStorage::currentDateTime() const {
     return QDateTime::currentDateTime().toString(QStringLiteral("yyyy-MM-dd hh:mm:ss"));
 }
