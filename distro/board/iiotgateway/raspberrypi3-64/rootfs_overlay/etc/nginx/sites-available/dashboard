@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name raspberrypi.local iiotgateway.local _;
+    server_name iiotgateway.local _;
 
     root /var/www/dashboard;
     index index.html;
