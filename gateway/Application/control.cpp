@@ -91,6 +91,10 @@ void Control::stop()
     {
         server->close();
     }
+
+    if (m_gateway != nullptr) {
+        m_gateway->stop();
+    }
 }
 
 void Control::setGateway(Gateway *gateway)
