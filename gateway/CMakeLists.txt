@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20...4.3.0)
+cmake_minimum_required(VERSION 3.20)
 
 project(gateway VERSION 1.0.0 LANGUAGES CXX)
 
@@ -13,7 +13,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 message(STATUS "Compiler detected: ${CMAKE_CXX_COMPILER_ID}")
