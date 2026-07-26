@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.1 Chrome/142.0.7444.265 Electron/39.8.0 Safari/537.36">
   <diagram name="Page-1" id="_IMDAuUJehEkOgth7poG">
-    <mxGraphModel dx="2571" dy="1524" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="725" dy="430" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -202,7 +202,7 @@
             <mxPoint x="1330" y="265" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="eXWphZMgn-3jSWCou-jE-41" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Dasboard&lt;div&gt;(Qt/QML/C++/Wasm)&lt;/div&gt;" vertex="1">
+        <mxCell id="eXWphZMgn-3jSWCou-jE-41" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Dashboard&lt;div&gt;(Qt/QML/C++/Wasm)&lt;/div&gt;" vertex="1">
           <mxGeometry height="60" width="120" x="1090" y="200" as="geometry" />
         </mxCell>
         <mxCell id="eXWphZMgn-3jSWCou-jE-42" edge="1" parent="1" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" value="">
