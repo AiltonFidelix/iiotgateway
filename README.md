@@ -22,13 +22,13 @@ These requirements apply only to the **development environment**, not to the tar
 
 ### Toolchain
 
-- GCC ≥ 11.4.0
+- GCC ≥ 14 (Needs support for C++23 standard)
 - CMake ≥ 3.20
 - Python ≥ 3.10.12
+- Go ≥ 1.26
 
 ### Dependencies
 
-- Emscripten 3.1.56
 - Qt 6.8.3
     - Desktop
     - WebAssembly (single-threaded)
@@ -37,12 +37,22 @@ These requirements apply only to the **development environment**, not to the tar
         - Qt Serial Bus
         - Qt Serial Port
 
-### Libraries
+**Note:** For development Qt needs to be installed manually.
 
-- googletest v1.16.0 (via CMake FetchContent)
-- paho.mqtt.cpp v1.5.1 (via CMake FetchContent)
+Others dependencies/libraries can be installed using the `init-environment` script.
 
-**#TODO** Provide `docker` images for cross-compilation and WebAssembly builds.
+```sh
+python3 init-environment.py
+```
+
+The script will install the following items:
+
+- googletest v1.16.0
+- paho.mqtt.cpp v1.5.1
+- emscripten 3.1.56
+- buildroot 2025.02.x
+
+**Note:** This script will check the required tools and ask you to install if not find.
 
 ---
 
@@ -52,23 +62,27 @@ These requirements apply only to the **development environment**, not to the tar
 .
 ├── dashboard   # Web-based UI for configuration and monitoring
 ├── distro      # Buildroot-based embedded Linux distribution
-└── gateway     # Core service (Modbus ↔ MQTT bridge
+├── gateway     # Core service (Modbus <-> MQTT bridge)
+└── manager     # Backend manager for settings and gateway control (In developement)
 ```
 
 - **dashboard:** Browser-based interface for system configuration and operation
+- **manager:** Backend for the dashboard and system control
 - **gateway:** Core application responsible for protocol translation and device communication
 - **distro:** Custom Linux image for Raspberry Pi, bundling the gateway and dashboard
 
 Architecture diagram:
 
-![diagram](/docs/diagram.png)
+![diagram](/docs/images/architecture_diagram.png)
+
+**Note:** `LedStatus` and `Manager` applications are still being migrating from the `Gateway` (This is the intended architecture). 
 
 ---
 
 ## Documentation
 
 - [Modbus Request Structure](./docs/MODBUS.md)
-- [Dashboard Default Settings](./docs/DASHBOARD.md)
+- [Dashboard Settings](./docs/DASHBOARD.md)
 
 ---
 
@@ -89,3 +103,9 @@ Additional command-line options are available to customize the build process (e.
 ```sh
 python3 build.py --help
 ```
+
+## Note
+
+This is an evolving project, some bugs and undefined behavior may be found yet, as well as some difference in performance depend on the number of registers you are reading/writing. If you want to use this project, be aware of these issues.
+
+Suggestions, new ideas, and contributions are welcome.
