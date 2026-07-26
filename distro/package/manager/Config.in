@@ -1,0 +1,9 @@
+config BR2_PACKAGE_MANAGER
+    bool "manager"
+    default y
+    depends on BR2_PACKAGE_HOST_GO_TARGET_ARCH_SUPPORTS
+    select BR2_PACKAGE_HOST_GO
+    help
+        Manager application of IIoTGateway.
+
+        https://github.com/AiltonFidelix/iiotgateway
