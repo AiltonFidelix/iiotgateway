@@ -4,17 +4,17 @@ COMM_BEGIN_NAMESPACE
 
 std::set<QByteArray> CommFactory::_commInterfaces{};
 
-CommInterface *CommFactory::getCommInterface(const QByteArray &commInterface, QJsonObject settings) {
+std::expected<CommInterface *, CommFactoryError> CommFactory::getCommInterface(const QByteArray &commInterface, QJsonObject settings) {
     const QMetaType type = QMetaType::fromName(commInterface.toUpper());
 
     if (!_commInterfaces.contains(commInterface) || !type.isRegistered()) {
-        throw std::runtime_error("Comm Interface not found");
+        return std::unexpected(CommFactoryError::INTERFACE_NOT_FOUND);
     }
 
     QObject *interfaceObject = type.metaObject()->newInstance(std::move(settings));
 
     if (interfaceObject == nullptr) {
-        throw std::runtime_error("Failed to invoke Comm Interface");
+        return std::unexpected(CommFactoryError::FAILED_TO_CREATE);
     }
 
     return qobject_cast<CommInterface *>(interfaceObject);

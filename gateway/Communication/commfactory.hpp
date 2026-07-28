@@ -2,6 +2,7 @@
 #define COMMFACTORY_H
 
 #include <QJsonObject>
+#include <expected>
 #include <set>
 
 #include "comm_global.hpp"
@@ -9,11 +10,17 @@
 
 COMM_BEGIN_NAMESPACE
 
+enum class CommFactoryError : uint8_t {
+    UNKNOWN = 0,
+    INTERFACE_NOT_FOUND,
+    FAILED_TO_CREATE,
+};
+
 class CommFactory {
 public:
     CommFactory() = delete;
 
-    static CommInterface *getCommInterface(const QByteArray &commInterface, QJsonObject settings = QJsonObject());
+    static std::expected<CommInterface *, CommFactoryError> getCommInterface(const QByteArray &commInterface, QJsonObject settings = QJsonObject());
 
     template <typename T>
     static int registerInterface(QByteArray commInterface) {
