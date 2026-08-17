@@ -20,11 +20,10 @@ static Control *control = nullptr;
         {SIGKILL, "SIGKILL"},
         {SIGQUIT, "SIGQUIT"},
         {SIGHUP, "SIGHUP"},
-        {SIGINT, "SIGINT"},
     };
 
     if (auto it = sigNames.find(sig); it != sigNames.end()) {
-        qCritical() << "Received:" << *it;
+        qCritical().noquote() << "Received:" << it->second;
     }
 
     qDebug() << "Closing all connections and exiting the process...";
@@ -34,11 +33,11 @@ static Control *control = nullptr;
         delete control;
     }
 
-    exit(EXIT_FAILURE);
+    std::exit(sig);
 }
 
 void setup_unix_signal_handlers() {
-    constexpr std::array<int, 7> sigs{SIGINT, SIGABRT, SIGTERM, SIGKILL, SIGQUIT, SIGHUP, SIGINT};
+    constexpr std::array<int, 7> sigs{SIGINT, SIGABRT, SIGTERM, SIGKILL, SIGQUIT, SIGHUP};
 
     for (const int &sig : sigs) {
         signal(sig, quit);
