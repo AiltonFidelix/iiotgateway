@@ -13,7 +13,7 @@ public:
 signals:
     void connected();
     void disconnected();
-    void connectionFailed();
+    void connectionFailed(int returnCode = 1);
     void outgoing(QByteArray data);
     void error(QByteArray error);
 
