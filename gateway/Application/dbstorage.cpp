@@ -145,6 +145,8 @@ bool DBStorage::insert(const QString &query) const {
 }
 
 bool DBStorage::insertSettings(const QString &field, const QString &value) const {
+    qDebug().noquote() << "[field]" << field << "[value]" << value;
+
     auto settingsExist = []() -> bool {
         QSqlQuery sqlquery;
 
