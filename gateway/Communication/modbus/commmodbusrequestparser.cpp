@@ -43,7 +43,7 @@ void CommModbusRequestParser::parser(const QJsonDocument &document) {
                 break;
 
             unit.setValue(i, current->toInt());
-            current++;
+            ++current;
         }
     };
 
@@ -57,11 +57,11 @@ void CommModbusRequestParser::parser(const QJsonDocument &document) {
         const QJsonObject deviceObj = device.toObject();
         const auto address = static_cast<quint8>(deviceObj.value(QStringLiteral("address")).toInt(0));
 
-        const auto registertype = getType(deviceObj.value(QStringLiteral("registerType")).toString());
+        const auto registerType = getType(deviceObj.value(QStringLiteral("registerType")).toString());
         const auto startRegister = static_cast<quint16>(deviceObj.value(QStringLiteral("startRegister")).toInt(0));
         const auto numberOfEntries = static_cast<quint16>(deviceObj.value(QStringLiteral("numberOfEntries")).toInt(0));
 
-        bool hasValues = deviceObj.contains(QStringLiteral("values"));
+        const bool hasValues = deviceObj.contains(QStringLiteral("values"));
 
         QJsonArray values{};
         QJsonArray::Iterator current{};
@@ -77,7 +77,7 @@ void CommModbusRequestParser::parser(const QJsonDocument &document) {
         for (int i = 0, r = startRegister; i < numberOfEntries; i += _maxEntries, r += _maxEntries) {
             const quint16 entries = std::min(_maxEntries, quint16(numberOfEntries - i));
 
-            QModbusDataUnit unit(registertype, r, entries);
+            QModbusDataUnit unit(registerType, r, entries);
 
             if (hasValues) {
                 setValues(current, values, unit);
