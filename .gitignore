@@ -15,6 +15,9 @@ main
 .qtcreator
 *.txt.user
 
+# CLion
+.idea
+
 # Python
 venv
 .venv
