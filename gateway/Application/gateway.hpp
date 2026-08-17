@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QThread>
 #include <memory>
+#include <mutex>
 
 #include "comminterface.hpp"
 #include "storageinterface.h"
@@ -28,16 +29,15 @@ public slots:
     void stop();
     bool restart();
 
-private slots:
-    void notifyError(const QByteArray &error);
-
 private:
+    bool startCommunicationThread(std::unique_ptr<QThread, CommThreadDeleter> &commThread, CommInterface *comm) const;
     CommInterface *createCommunication(const QByteArray &protocol, QJsonObject settings) const;
 
     bool _isRunning;
     StorageInterface *_storage;
     std::unique_ptr<QThread, CommThreadDeleter> _cloudThread;
     std::unique_ptr<QThread, CommThreadDeleter> _edgeThread;
+    std::mutex _mutex;
 };
 
 #endif  // GATEWAY_H
