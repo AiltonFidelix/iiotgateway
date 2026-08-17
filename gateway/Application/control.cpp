@@ -83,8 +83,7 @@ bool Control::start(int port)
     return true;
 }
 
-void Control::stop()
-{
+void Control::stop() {
     auto servers = m_httpServer.servers();
 
     for (auto server : std::as_const(servers))
@@ -93,6 +92,7 @@ void Control::stop()
     }
 
     if (m_gateway != nullptr) {
+        qDebug() << "Stopping gateway...";
         m_gateway->stop();
     }
 }
