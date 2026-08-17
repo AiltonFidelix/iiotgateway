@@ -40,10 +40,8 @@ void CommModbusRTU::connectComm() {
         connect(_modbusClient, &CommModbusClientInterface::stateChanged, this, &CommModbusRTU::stateChanged);
 
         if (!_modbusClient->connectDevice()) {
-            emit error(QString("Connection failed: %1").arg(_modbusClient->errorString()).toUtf8());
+            qDebug().noquote() << "Connection failed:" << _modbusClient->errorString();
             emit connectionFailed();
-        } else {
-            emit connected();
         }
     }
 }

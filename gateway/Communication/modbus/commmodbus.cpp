@@ -82,11 +82,9 @@ void CommModbus::stateChanged(QModbusDevice::State state) {
             break;
         case QModbusDevice::ConnectingState:
             qInfo() << "Modbus received connecting state";
-            emit connected();
             break;
         case QModbusDevice::ClosingState:
             qInfo() << "Modbus received closing state";
-            emit connected();
             break;
         default:
             break;
