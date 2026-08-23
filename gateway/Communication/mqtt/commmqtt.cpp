@@ -39,6 +39,8 @@ CommMQTT::~CommMQTT() {
     if (m_client) {
         delete m_client;
     }
+
+    qDebug() << "Destroying...";
 }
 
 bool CommMQTT::isconnected() const {
@@ -108,6 +110,8 @@ void CommMQTT::connectComm() {
 }
 
 void CommMQTT::disconnectComm() {
+    qDebug() << "Disconnecting communication...";
+
     if (isconnected()) {
         auto discTok = m_client->disconnect();
 
