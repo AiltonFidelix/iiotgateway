@@ -17,8 +17,6 @@ CommModbus::CommModbus(QJsonObject settings)
 
 CommModbus::~CommModbus() {
     if (_modbusClient) {
-        _modbusClient->disconnect();
-
         delete _modbusClient;
     }
 
@@ -28,10 +26,14 @@ CommModbus::~CommModbus() {
 
         delete _polling;
     }
+
+    qDebug() << "Destroying...";
 }
 
 void CommModbus::disconnectComm() {
-    if (!isconnected()) {
+    qDebug() << "Disconnecting communication...";
+
+    if (isconnected()) {
         _modbusClient->disconnectDevice();
     }
 
