@@ -65,7 +65,7 @@ void Backend::login(const QString &username, const QString &password) {
 }
 
 void Backend::setCommunicationSettings(const QByteArray &settings) {
-    QNetworkRequest request(QUrl(QString("%1/iiotgateway/communication").arg(_serverUrl)));
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/protocol").arg(_serverUrl)));
     request.setRawHeader("Content-Type", "application/json");
 
     auto reply = _manager.post(request, settings);
@@ -94,7 +94,7 @@ void Backend::requestCommunicationSettings(const QStringList &protocols) {
 
     query.removeLast();
 
-    QNetworkRequest request(QUrl(QString("%1/iiotgateway/communication%2").arg(_serverUrl, query)));
+    QNetworkRequest request(QUrl(QString("%1/iiotgateway/protocol%2").arg(_serverUrl, query)));
     request.setRawHeader("Content-Type", "application/json");
 
     auto reply = _manager.get(request);
