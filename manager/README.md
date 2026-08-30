@@ -41,3 +41,4 @@ go build -o manager cmd/manager/main.go
 - Implement system controller
 - Add db migration
 - Add unit tests
+- Add a unix socket server to provide information for the gateway
