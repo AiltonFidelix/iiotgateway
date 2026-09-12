@@ -9,6 +9,7 @@ import (
 	"manager/internal/config"
 	"manager/internal/handler"
 	"manager/internal/repository"
+	"manager/internal/service"
 
 	_ "modernc.org/sqlite"
 )
@@ -38,14 +39,17 @@ func main() {
 
 	defer db.Close()
 
-	userRepository := repository.NewUserRepository(db)
-	protocolRepository := repository.NewProtocolRepository(db)
+	mux := http.NewServeMux()
 
+	userRepository := repository.NewUserRepository(db)
+	loginService := service.NewLoginService(userRepository)
+	loginHandler := handler.NewLoginHandler(loginService)
+	loginHandler.RegisterRoutes(mux)
+
+	protocolRepository := repository.NewProtocolRepository(db)
 	managerHandler := handler.NewManagerHandler()
-	managerHandler.SetUserRepository(userRepository)
 	managerHandler.SetProtocolRepository(protocolRepository)
 
-	mux := http.NewServeMux()
 	managerHandler.RegisterRoutes(mux)
 
 	portStr := fmt.Sprintf(":%d", config.SERVER_PORT)

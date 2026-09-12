@@ -1,21 +1,28 @@
-package routes
+package handler
 
 import (
 	"context"
 	"encoding/json"
 	"log"
 	"manager/internal/domain"
+	"manager/internal/service"
 	"net/http"
 	"time"
 )
 
-func PostLogin(w http.ResponseWriter, req *http.Request, repository domain.UserRepository) {
+type LoginHandler struct {
+	loginService *service.LoginService
+}
 
-	if repository == nil {
-		log.Println("Login failed, repository not valid!")
-		http.Error(w, INTERNAL_ERROR_MESSAGE, http.StatusInternalServerError)
-		return
-	}
+func NewLoginHandler(loginService *service.LoginService) *LoginHandler {
+	return &LoginHandler{loginService: loginService}
+}
+
+func (h *LoginHandler) RegisterRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("POST /iiotgateway/login", h.postLogin)
+}
+
+func (h *LoginHandler) postLogin(w http.ResponseWriter, req *http.Request) {
 
 	var userRequest domain.UserModel
 
@@ -33,22 +40,16 @@ func PostLogin(w http.ResponseWriter, req *http.Request, repository domain.UserR
 
 	defer cancel()
 
-	userAdmin, err := repository.GetUser(ctx)
-
-	if err != nil {
-		log.Println(LOGIN_FAILED_MESSAGE, err)
-		http.Error(w, INTERNAL_ERROR_MESSAGE, http.StatusInternalServerError)
-		return
-	}
-
 	respData := domain.ResponseModel{
 		Status:  "ok",
 		Message: "Login success!",
 	}
 
-	if userAdmin.Name != userRequest.Name || userAdmin.Password != userRequest.Password {
+	err = h.loginService.CheckCredentials(ctx, &userRequest)
+
+	if err != nil {
 		respData.Status = "error"
-		respData.Message = "Wrong credentials!"
+		respData.Message = err.Error()
 		log.Printf("%v %v\n", LOGIN_FAILED_MESSAGE, respData.Message)
 	}
 
